@@ -22,6 +22,6 @@ before_install:
 script:
   - mkdir build
   - cd build
-  - gcc --version
+  - gcc-5 --version
   - source /opt/qt58/bin/qt58-env.sh
   - cmake ..
