@@ -29,6 +29,3 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 add_subdirectory(src/gui)
 add_subdirectory(src/components)
 
-enable_testing()
-add_subdirectory(3rdParty/fakeit)
-add_subdirectory(tests)
