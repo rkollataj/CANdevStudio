@@ -17,11 +17,11 @@ before_install:
   - sudo add-apt-repository --yes ppa:jonathonf/gcc-5.3
   - sudo apt-get update -q
 #  - sudo apt-get install -qq gcc-5
-#  - travis_wait 30 sudo apt-get install -qq qt58-meta-full
+  - travis_wait 30 sudo apt-get install -qq qt58-meta-full
 
 script:
   - mkdir build
   - cd build
-  - gcc-5 --version
   - source /opt/qt58/bin/qt58-env.sh
   - cmake ..
+  - make -j4
