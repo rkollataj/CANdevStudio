@@ -9,7 +9,7 @@ before_install:
   - sudo add-apt-repository --yes ppa:beineri/opt-qt58-trusty
   - sudo add-apt-repository --yes ppa:jonathonf/gcc-5.3
   - sudo apt-get update -q
-  - sudo apt-get install -qq gcc-5.3
+  - sudo apt-get install -qq gcc-5
 #  - travis_wait 30 sudo apt-get install -qq qt58-meta-full
 
 script:
