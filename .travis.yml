@@ -1,7 +1,6 @@
 sudo: required
 language: cpp
-#dist: trusty
-dist: xenial
+dist: trusty
 
 notifications:
       email: false
@@ -28,7 +27,7 @@ script:
   - cmake ..
   - make -j4
 # Clang x64
-  - cd build-c64
+  - cd ../build-c64
   - export CC=clang
   - export CXX=clang++
   - cmake ..
