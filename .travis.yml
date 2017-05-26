@@ -33,7 +33,7 @@ script:
   #- lcov --remove coverage.info '/usr/*' --output-file coverage.info # filter out system
   #- lcov --list coverage.info #debug info
   # Uploading report to CodeCov
-  - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+  - bash <(curl -s https://codecov.io/bash) -x gcov-6 || echo "Codecov did not collect coverage reports"
 # Clang x64
   #- cd ../build-c64
   #- export CC=clang
