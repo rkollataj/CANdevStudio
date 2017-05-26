@@ -20,14 +20,14 @@ if(NOT MSVC)
     add_definitions(-Wall -Wextra -std=c++1z)
 endif()
 
-if(WITH_COVERAGE)
-    set(CMAKE_CXX_FLAGS "-g -O0 -Wwrite-strings -fprofile-arcs -ftest-coverage")
-    set(CMAKE_C_FLAGS="-g -O0 -Wall -W -fprofile-arcs -ftest-coverage")
-    set(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
-endif()
-
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
 add_subdirectory(src/gui)
 add_subdirectory(src/components)
 
+if(WITH_COVERAGE)
+    set(CMAKE_CXX_FLAGS "-g -O0 -Wwrite-strings -fprofile-arcs -ftest-coverage")
+    set(CMAKE_C_FLAGS="-g -O0 -Wall -W -fprofile-arcs -ftest-coverage")
+    set(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
+    add_subdirectory(tests)
+endif()
