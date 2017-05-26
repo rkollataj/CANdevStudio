@@ -18,10 +18,18 @@ before_install:
   - travis_wait 30 sudo apt-get install -qq qt58-meta-full
 
 script:
-  - mkdir build
-  - cd build
+  - source /opt/qt58/bin/qt58-env.sh
+  - mkdir build-g64 build-c64
+# GCC x64
+  - cd build-g64
   - export CC=gcc-5
   - export CXX=g++-5
-  - source /opt/qt58/bin/qt58-env.sh
   - cmake ..
   - make -j4
+# Clang x64
+  - cd build-c64
+  - export CC=clang
+  - export CXX=clang++
+  - cmake ..
+  - make -j4
+  
