@@ -21,23 +21,37 @@ before_install:
 
 script:
   - source /opt/qt58/bin/qt58-env.sh
-  - mkdir build-g64 build-c64
-# GCC x64
+  - mkdir build-g64 build-g64d build-c64 build-c64d build-coverage
+# GCC x64 Release
   - cd build-g64
+  - export CC=gcc-5
+  - export CXX=g++-5
+  - cmake .. -DCMAKE_BUILD_TYPE=Release
+  - make -j4
+# Clang x64 Debug
+  - cd ../build-g64d
+  - export CC=gcc-5
+  - export CXX=g++-5
+  - cmake .. -DCMAKE_BUILD_TYPE=Debug
+  - make -j4
+# Clang x64 Release
+  - cd ../build-c64
+  - export CC=clang
+  - export CXX=clang++
+  - cmake .. -DCMAKE_BUILD_TYPE=Release
+  - make -j4
+# Clang x64 Debug
+  - cd ../build-c64d
+  - export CC=clang
+  - export CXX=clang++
+  - cmake .. -DCMAKE_BUILD_TYPE=Debug
+  - make -j4
+# GCC x64 codecoverage
+  - cd ../build-coverage
   - export CC=gcc-6
   - export CXX=g++-6
   - cmake .. -DWITH_COVERAGE=ON
   - make -j4
   - ctest -V
-  #- lcov --directory . --capture --output-file coverage.info # capture coverage info
-  #- lcov --remove coverage.info '/usr/*' --output-file coverage.info # filter out system
-  #- lcov --list coverage.info #debug info
-  # Uploading report to CodeCov
   - bash <(curl -s https://codecov.io/bash) -x gcov-6 || echo "Codecov did not collect coverage reports"
-# Clang x64
-  #- cd ../build-c64
-  #- export CC=clang
-  #- export CXX=clang++
-  #- cmake ..
-  #- make -j4
   
