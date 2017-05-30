@@ -100,7 +100,7 @@ end
 #commits.each { |commit| puts "commit: #{commit[:id]}" }
 
 # get blob contents
-appveyor_yml = get_git_blob_contents(end_commit_id, "appveyor.yml")
+appveyor_yml = get_git_blob_contents(end_commit_id, ".appveyor.yml")
 
 payload = {
 	:ref => ref,
