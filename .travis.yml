@@ -5,14 +5,14 @@ dist: trusty
 notifications:
       email: false
 
-#addons:
-  #apt:
-    #sources:
-      #- ubuntu-toolchain-r-test
-    #packages:
-      #- g++-5
-      #- g++-6
-      #- lcov
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-5
+      - g++-6
+      - lcov
 
 before_install:
   - echo "PR $TRAVIS_PULL_REQUEST"
