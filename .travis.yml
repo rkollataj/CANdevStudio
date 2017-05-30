@@ -5,17 +5,17 @@ dist: trusty
 notifications:
       email: false
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-5
-      - g++-6
-      - lcov
+#addons:
+  #apt:
+    #sources:
+      #- ubuntu-toolchain-r-test
+    #packages:
+      #- g++-5
+      #- g++-6
+      #- lcov
 
 before_install:
-  - echo HEAD~ HEAD refs/heads/`git rev-parse --abbrev-ref HEAD` | ./.trigger_appveyor.rb
+  - echo HEAD~ HEAD refs/heads/$TRAVIS_BRANCH | ./.trigger_appveyor.rb
   - sudo add-apt-repository --yes ppa:beineri/opt-qt58-trusty
   - sudo apt-get update -q
   - travis_wait 30 sudo apt-get install -qq qt58-meta-full
