@@ -15,7 +15,7 @@ notifications:
       #- lcov
 
 before_install:
-  - echo "PR: $TRAVIS_PULL_REQUEST"
+  - echo "PR $TRAVIS_PULL_REQUEST"
   - if [ $TRAVIS_PULL_REQUEST != "false" ]; then echo HEAD~ HEAD refs/heads/$TRAVIS_BRANCH | ./.trigger_appveyor.rb; fi
   - sudo add-apt-repository --yes ppa:beineri/opt-qt58-trusty
   - sudo apt-get update -q
