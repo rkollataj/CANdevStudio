@@ -24,6 +24,8 @@ if(WITH_COVERAGE)
     set(CMAKE_CXX_FLAGS "-g -O0 -Wwrite-strings -fprofile-arcs -ftest-coverage")
     set(CMAKE_C_FLAGS="-g -O0 -Wall -W -fprofile-arcs -ftest-coverage")
     set(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
+    
+    add_subdirectory(3rdParty/fakeit)
     add_subdirectory(tests)
 endif()
 
