@@ -20,15 +20,15 @@ endif()
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
 if(WITH_COVERAGE)
-    enable_testing()
     set(CMAKE_CXX_FLAGS "-g -O0 -Wwrite-strings -fprofile-arcs -ftest-coverage")
     set(CMAKE_C_FLAGS="-g -O0 -Wall -W -fprofile-arcs -ftest-coverage")
     set(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
     
-    add_subdirectory(3rdParty/fakeit)
-    add_subdirectory(tests)
 endif()
 
 add_subdirectory(src/gui)
 add_subdirectory(src/components)
 
+enable_testing()
+add_subdirectory(3rdParty/fakeit)
+add_subdirectory(tests)
