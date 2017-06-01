@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_RUNNER
 #include <fakeit.hpp>
-#include "candevice/candevice.h"
+#include <candevice.h>
 
 TEST_CASE("Simple test", "[example]") {
     CanDevice cd;
