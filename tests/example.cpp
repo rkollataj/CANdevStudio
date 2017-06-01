@@ -3,10 +3,8 @@
 #include <candevice.h>
 
 
-TEST_CASE("Simple test", "[example]") {
-    CanDevice cd;
-    cd.init("peakcan", "can0");
-    cd.start();
+TEST_CASE("Simple test", "[example]") 
+{
 }
 
 //int main(int argc, char *argv[])
