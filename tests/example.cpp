@@ -1,6 +1,7 @@
-#define CATCH_CONFIG_RUNNER
+#define CATCH_CONFIG_MAIN
 #include <fakeit.hpp>
 #include <candevice.h>
+
 
 TEST_CASE("Simple test", "[example]") {
     CanDevice cd;
@@ -8,7 +9,7 @@ TEST_CASE("Simple test", "[example]") {
     cd.start();
 }
 
-int main(int argc, char *argv[])
-{
-    return Catch::Session().run(argc, argv);
-}
+//int main(int argc, char *argv[])
+//{
+    //return Catch::Session().run(argc, argv);
+//}
