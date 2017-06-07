@@ -14,11 +14,11 @@ CanDevice::~CanDevice()
 bool CanDevice::init(const QString& backend, const QString& interface)
 {
     Q_D(CanDevice);
-    QString errorString;
 
     d->mBackend = backend;
     d->mInterface = interface;
-    d->mDevice.reset(QCanBus::instance()->createDevice(backend, interface, &errorString));
+    // use toUtf8() to make it compile with Qt5.7
+    d->mDevice.reset(QCanBus::instance()->createDevice(backend.toUtf8(), interface));
 
     if (!d->mDevice) {
         return false;
