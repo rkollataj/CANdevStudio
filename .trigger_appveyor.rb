@@ -17,7 +17,15 @@ def get_git_config(setting_name)
 end
 
 def get_git_blob_contents(ref, fileName)
-	contents = `git show #{ref}:#{fileName}`
+    pr_number = ENV["TRAVIS_PULL_REQUEST"]
+
+    if pr_number == "false"
+	    contents = `git show #{ref}:#{fileName}`
+    else
+        # sed is so so evil... but it works ;)
+		contents = `git show HEAD:#{fileName} | sed 's/#&& git fetch origin pull\\/XXX/\\&\\& git fetch origin pull\\/#{pr_number}/g'`
+    end
+
 	if $?.success?
 		contents
 	else
@@ -78,12 +86,17 @@ repo_name = Pathname.new(repo_path).basename
 # get git config
 webhook_url = ENV["APPVEYOR_WEBHOOK"] 
 #puts "Webhook URL: #{webhook_url}"
+pr_number = ENV["TRAVIS_PULL_REQUEST"]
 
 comments_end = SecureRandom.hex
 log_format = "--date=rfc --format=%H%n%an%n%ae%n%ad%n%B%n#{comments_end}"
 commits = []
 
-if start_commit_id == "0000000000000000000000000000000000000000"
+if pr_number != "false"
+	result = `git log #{ENV["TRAVIS_PULL_REQUEST_SHA"]} -1 #{log_format}`.split("\n")
+	commits += parse_commits(result, comments_end)
+    commits[0][:message] = "Pull Request ##{pr_number}: #{commits[0][:message]}"
+elsif start_commit_id == "0000000000000000000000000000000000000000"
 	# tag
 	result = `git log #{end_commit_id} -1 #{log_format}`.split("\n")
 	commits += parse_commits(result, comments_end)
@@ -101,6 +114,7 @@ end
 
 # get blob contents
 appveyor_yml = get_git_blob_contents(end_commit_id, ".appveyor.yml")
+puts appveyor_yml
 
 payload = {
 	:ref => ref,
@@ -122,8 +136,8 @@ req = Net::HTTP::Post.new(uri.request_uri, initheader = {'Content-Type' =>'appli
 req.body = payload.to_json
 
 response = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == "https") do |http|
-	http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-	http.request req
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    http.request req
 end
 
 if response.code != "200" and response.code != "204"
