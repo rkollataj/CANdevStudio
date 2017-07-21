@@ -27,7 +27,7 @@ void CanRawView::frameView(const QCanBusFrame& frame, const QString& direction)
     }
 
     QList<QStandardItem*> list;
-    list.append(new QStandardItem("0"));
+    list.append(new QStandardItem("zzzzz"));
     list.append(new QStandardItem("0x" + QString::number(frame.frameId(), 16)));
     list.append(new QStandardItem(direction));
     list.append(new QStandardItem(QString::number(frame.payload().size())));
