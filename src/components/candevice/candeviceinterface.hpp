@@ -16,6 +16,7 @@ struct CanDeviceInterface {
     virtual void setFramesReceivedCbk(const framesReceived_t& cb) = 0;
     virtual void setErrorOccurredCbk(const errorOccurred_t& cb) = 0;
 
+    virtual bool init(const QString& backend, const QString& iface) = 0;
     virtual bool writeFrame(const QCanBusFrame& frame) = 0;
     virtual bool connectDevice() = 0;
     virtual qint64 framesAvailable() = 0;

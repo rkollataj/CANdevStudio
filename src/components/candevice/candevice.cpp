@@ -2,15 +2,8 @@
 #include "candevice_p.h"
 #include <QtCore/QQueue>
 
-#include "canfactory.hpp"
-
-CanDevice::CanDevice()
-    : d_ptr(new CanDevicePrivate)
-{
-}
-
-CanDevice::CanDevice(CanFactoryInterface& factory)
-    : d_ptr(new CanDevicePrivate(factory))
+CanDevice::CanDevice(CanDeviceCtx* ctx)
+    : d_ptr(new CanDevicePrivate(ctx))
 {
 }
 
@@ -23,15 +16,11 @@ bool CanDevice::init(const QString& backend, const QString& interface)
 
     d->mBackend = backend;
     d->mInterface = interface;
-    d->canDevice.reset(d->mFactory.create(backend, interface));
 
-    if (!d->canDevice) {
-        return false;
-    }
-
-    d->canDevice->setFramesWrittenCbk(std::bind(&CanDevice::framesWritten, this, std::placeholders::_1));
-    d->canDevice->setFramesReceivedCbk(std::bind(&CanDevice::framesReceived, this));
-    d->canDevice->setErrorOccurredCbk(std::bind(&CanDevice::errorOccurred, this, std::placeholders::_1));
+    d->canDevice.init(backend, interface);
+    d->canDevice.setFramesWrittenCbk(std::bind(&CanDevice::framesWritten, this, std::placeholders::_1));
+    d->canDevice.setFramesReceivedCbk(std::bind(&CanDevice::framesReceived, this));
+    d->canDevice.setErrorOccurredCbk(std::bind(&CanDevice::errorOccurred, this, std::placeholders::_1));
 
     // connect
 
@@ -43,15 +32,11 @@ void CanDevice::sendFrame(const QCanBusFrame& frame)
     Q_D(CanDevice);
     bool status = false;
 
-    if (!d->canDevice) {
-        return;
-    }
-
     // Success will be reported in framesWritten signal.
     // Sending may be buffered. Keep correlation between sending results and frame/context
     d->mSendQueue.push_back(frame);
 
-    status = d->canDevice->writeFrame(frame);
+    status = d->canDevice.writeFrame(frame);
 
     if (!status) {
         emit frameSent(status, frame);
@@ -63,19 +48,15 @@ bool CanDevice::start()
 {
     Q_D(CanDevice);
 
-    if (!d->canDevice) {
-        return false;
-    }
-
-    return d->canDevice->connectDevice();
+    return d->canDevice.connectDevice();
 }
 
 void CanDevice::framesReceived()
 {
     Q_D(CanDevice);
 
-    while (static_cast<bool>(d->canDevice->framesAvailable())) {
-        const QCanBusFrame frame = d->canDevice->readFrame();
+    while (static_cast<bool>(d->canDevice.framesAvailable())) {
+        const QCanBusFrame frame = d->canDevice.readFrame();
         emit frameReceived(frame);
     }
 }
