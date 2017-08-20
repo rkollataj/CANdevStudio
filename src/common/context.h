@@ -8,8 +8,10 @@ class CanDeviceInterface;
 
 template <typename... Args> struct Context {
     Context(Args*... args)
-        : _implsPtr(args...)
-        , _implsRef(*args...) // only to satisfy compiler
+        // need explicitely mark unique_ptr type as GCC 5 fails to deduce type
+        : _implsPtr(std::unique_ptr<Args>(args)...)
+        // only to satisfy compiler. Will not be used.
+        , _implsRef(*args...)
         , _usePtr(true)
     {
     }
