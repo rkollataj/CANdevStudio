@@ -21,7 +21,7 @@ struct CanDeviceInterface {
     virtual bool connectDevice() = 0;
     virtual qint64 framesAvailable() = 0;
 
-    virtual QCanBusFrame readFrame() noexcept = 0;
+    virtual QCanBusFrame readFrame() = 0;
 };
 
 #endif /* end of include guard: CANDEVICEINTERFACE_HPP_DNXOI7PW */
