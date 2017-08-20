@@ -68,6 +68,8 @@ void CanDevice::framesWritten(qint64)
     if (!d->mSendQueue.isEmpty()) {
         auto sendItem = d->mSendQueue.takeFirst();
         emit frameSent(true, sendItem);
+    } else {
+        cds_warn("Send queue is empty");
     }
 }
 
@@ -78,5 +80,7 @@ void CanDevice::errorOccurred(int error)
     if (error == QCanBusDevice::WriteError && !d->mSendQueue.isEmpty()) {
         auto sendItem = d->mSendQueue.takeFirst();
         emit frameSent(false, sendItem);
+    } else {
+        cds_warn("Can device error emitted: {}", error);
     }
 }
