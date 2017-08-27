@@ -1,15 +1,19 @@
 
-#include "log.hpp"
 #include "mainwindow.h"
-#include "modelvisitor.h"  // apply_model_visitor
+#include "log.hpp"
+#include "modelvisitor.h" // apply_model_visitor
 #include "ui_mainwindow.h"
 
-#include <QCloseEvent>
 #include <QtCore/QFile>
+#include <QtCore/QMimeData>
+#include <QtGui/QDrag>
+#include <QtGui/QWindow>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QMdiArea>
 #include <QtWidgets/QMdiSubWindow>
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QToolButton>
+#include <QtWidgets/QVBoxLayout>
 
 #include <cassert> // assert
 #include <iostream>
@@ -62,25 +66,24 @@ void MainWindow::nodeCreatedCallback(QtNodes::Node& node)
 
     assert(nullptr != dataModel);
 
-    apply_model_visitor(*dataModel
-        , [this, dataModel](CanRawViewModel& m)
-          {
+    apply_model_visitor(*dataModel,
+        [this, dataModel](CanRawViewModel& m) {
             auto rawView = &m.canRawView;
             ui->mdiArea->addSubWindow(rawView);
             connect(ui->actionstart, &QAction::triggered, rawView, &CanRawView::startSimulation);
             connect(ui->actionstop, &QAction::triggered, rawView, &CanRawView::stopSimulation);
             connect(rawView, &CanRawView::dockUndock, this, [this, rawView] { handleDock(rawView, ui->mdiArea); });
-          }
-        , [this, dataModel](CanRawSenderModel& m)
-          {
+        },
+        [this, dataModel](CanRawSenderModel& m) {
             QWidget* crsWidget = m.canRawSender.getMainWidget();
             auto& rawSender = m.canRawSender;
             ui->mdiArea->addSubWindow(crsWidget);
-            connect(&rawSender, &CanRawSender::dockUndock, this, [this, crsWidget] { handleDock(crsWidget, ui->mdiArea); });
+            connect(
+                &rawSender, &CanRawSender::dockUndock, this, [this, crsWidget] { handleDock(crsWidget, ui->mdiArea); });
             connect(ui->actionstart, &QAction::triggered, &rawSender, &CanRawSender::startSimulation);
             connect(ui->actionstop, &QAction::triggered, &rawSender, &CanRawSender::stopSimulation);
-          }
-        , [this](CanDeviceModel&) {});
+        },
+        [this](CanDeviceModel&) {});
 }
 
 void handleWidgetDeletion(QWidget* widget)
@@ -98,17 +101,9 @@ void MainWindow::nodeDeletedCallback(QtNodes::Node& node)
 
     assert(nullptr != dataModel);
 
-    apply_model_visitor(*dataModel
-        , [this, dataModel](CanRawViewModel& m)
-          {
-            handleWidgetDeletion(&m.canRawView);
-          }
-        , [this, dataModel](CanRawSenderModel& m)
-          {
-            handleWidgetDeletion(m.canRawSender.getMainWidget());
-          }
-        , [this](CanDeviceModel&) {});
-
+    apply_model_visitor(*dataModel, [this, dataModel](CanRawViewModel& m) { handleWidgetDeletion(&m.canRawView); },
+        [this, dataModel](CanRawSenderModel& m) { handleWidgetDeletion(m.canRawSender.getMainWidget()); },
+        [this](CanDeviceModel&) {});
 }
 
 void handleWidgetShowing(QWidget* widget)
@@ -128,16 +123,9 @@ void MainWindow::nodeDoubleClickedCallback(QtNodes::Node& node)
 
     assert(nullptr != dataModel);
 
-    apply_model_visitor(*dataModel
-        , [this, dataModel](CanRawViewModel& m)
-          {
-            handleWidgetShowing(&m.canRawView);
-          }
-        , [this, dataModel](CanRawSenderModel& m)
-          {
-            handleWidgetShowing(m.canRawSender.getMainWidget());
-          }
-        , [this](CanDeviceModel&) {});
+    apply_model_visitor(*dataModel, [this, dataModel](CanRawViewModel& m) { handleWidgetShowing(&m.canRawView); },
+        [this, dataModel](CanRawSenderModel& m) { handleWidgetShowing(m.canRawSender.getMainWidget()); },
+        [this](CanDeviceModel&) {});
 }
 
 void MainWindow::handleDock(QWidget* component, QMdiArea* mdi)
@@ -227,9 +215,110 @@ void MainWindow::connectMenuSignals()
         [this] { ui->mdiArea->setViewMode(QMdiArea::SubWindowView); });
 }
 
+struct ModelToolButton : public QToolButton {
+    ModelToolButton(QWidget* parent = nullptr)
+        : QToolButton(parent)
+    {
+        setAcceptDrops(true);
+    }
+
+    static QString mimeDataKey() { return QStringLiteral("application/x-qtnodeeditor"); }
+
+    void mousePressEvent(QMouseEvent* event) override
+    {
+        cds_debug("mousePressEvent");
+        QPoint hotSpot = event->pos();
+
+        QMimeData* mimeData = new QMimeData;
+        mimeData->setData(ModelToolButton::mimeDataKey(), text().toUtf8());
+
+        qreal dpr = window()->windowHandle()->devicePixelRatio();
+        QPixmap pixmap(this->size() * dpr);
+        pixmap.setDevicePixelRatio(dpr);
+        this->render(&pixmap);
+
+        QDrag* drag = new QDrag(this);
+        drag->setMimeData(mimeData);
+        drag->setPixmap(pixmap);
+        drag->setHotSpot(hotSpot);
+        drag->exec(Qt::CopyAction);
+    }
+};
+
+struct FlowViewWrapper : public QtNodes::FlowView {
+    FlowViewWrapper(QtNodes::FlowScene* scene)
+        : QtNodes::FlowView(scene)
+        , _scene(scene)
+    {
+        setAcceptDrops(true);
+    }
+
+    void dropEvent(QDropEvent* event) override
+    {
+        cds_debug("DropEvent");
+
+        const QMimeData* mime = event->mimeData();
+        QByteArray data = mime->data(ModelToolButton::mimeDataKey());
+
+        if (data.size() > 0) {
+            QString modelName = data;
+
+            cds_debug("Drop data: {}", modelName.toStdString());
+
+            addNode(modelName, event->pos());
+        } else {
+            cds_warn("Accepted drop does not contain {} data", ModelToolButton::mimeDataKey().toStdString());
+        }
+    }
+
+    void dragMoveEvent(QDragMoveEvent* event) override
+    {
+        QtNodes::FlowView::dragMoveEvent(event);
+
+        const QMimeData* mime = event->mimeData();
+        QByteArray data = mime->data(ModelToolButton::mimeDataKey());
+
+        if (data.size() > 0) {
+            event->acceptProposedAction();
+        }
+    }
+
+    void addNode(const QString& modelName, const QPoint& pos)
+    {
+        auto type = _scene->registry().create(modelName);
+
+        if (type) {
+            auto& node = _scene->createNode(std::move(type));
+            node.nodeGraphicsObject().setPos(mapToScene(pos));
+        } else {
+            cds_warn("Failed to create {} node. Does it exist in the registry?", modelName.toStdString());
+        }
+    }
+
+private:
+    QtNodes::FlowScene* _scene;
+};
+
 void MainWindow::setupMdiArea()
 {
-    graphView = new QtNodes::FlowView(graphScene.get());
+    graphView = new QWidget();
+    graphView->setAcceptDrops(true);
+    auto flowView = new FlowViewWrapper(graphScene.get());
+    auto layout = new QHBoxLayout();
+    auto toolbar = new QToolBar();
+    toolbar->setOrientation(Qt::Vertical);
+
+    auto button = new ModelToolButton;
+    button->setText("CanDeviceModel");
+    toolbar->addWidget(button);
+
+    button = new ModelToolButton;
+    button->setText("CanRawViewModel");
+    toolbar->addWidget(button);
+
+    layout->addWidget(toolbar);
+    layout->addWidget(flowView);
+    graphView->setLayout(layout);
     graphView->setWindowTitle("Project Configuration");
     ui->mdiArea->addSubWindow(graphView);
     ui->mdiArea->setAttribute(Qt::WA_DeleteOnClose, false);

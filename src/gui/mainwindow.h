@@ -32,7 +32,7 @@ private:
     std::unique_ptr<Ui::MainWindow> ui;
     std::shared_ptr<CanRawSender> canRawSender;
     std::shared_ptr<QtNodes::FlowScene> graphScene;
-    QtNodes::FlowView* graphView;
+    QWidget* graphView;
 
     void handleDock(QWidget* component, QMdiArea* mdi);
     void connectToolbarSignals();
