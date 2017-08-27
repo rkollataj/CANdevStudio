@@ -243,9 +243,11 @@ struct ModelToolButton : public QToolButton {
         drag->setHotSpot(hotSpot);
         Qt::DropAction action = drag->exec(Qt::CopyAction);
 
-        if(Qt::IgnoreAction == action) {
-            cds_debug("Drag and drop ignored. Apply default handler");
-            QToolButton::mousePressEvent(event);
+        if (Qt::IgnoreAction == action) {
+            cds_debug("Drag and drop ignored. Act as if clicked");
+            emit pressed();
+        } else {
+            event->accept();
         }
     }
 };
@@ -267,10 +269,9 @@ struct FlowViewWrapper : public QtNodes::FlowView {
 
         if (data.size() > 0) {
             QString modelName = data;
-
             cds_debug("Drop data: {}", modelName.toStdString());
-
             addNode(modelName, event->pos());
+            event->acceptProposedAction();
         } else {
             cds_warn("Accepted drop does not contain {} data", ModelToolButton::mimeDataKey().toStdString());
         }
