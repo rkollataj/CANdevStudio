@@ -241,7 +241,12 @@ struct ModelToolButton : public QToolButton {
         drag->setMimeData(mimeData);
         drag->setPixmap(pixmap);
         drag->setHotSpot(hotSpot);
-        drag->exec(Qt::CopyAction);
+        Qt::DropAction action = drag->exec(Qt::CopyAction);
+
+        if(Qt::IgnoreAction == action) {
+            cds_debug("Drag and drop ignored. Apply default handler");
+            QToolButton::mousePressEvent(event);
+        }
     }
 };
 
@@ -285,6 +290,7 @@ struct FlowViewWrapper : public QtNodes::FlowView {
 
     void addNode(const QString& modelName, const QPoint& pos)
     {
+        cds_debug("Adding node: {}", modelName.toStdString());
         auto type = _scene->registry().create(modelName);
 
         if (type) {
@@ -310,10 +316,12 @@ void MainWindow::setupMdiArea()
 
     auto button = new ModelToolButton;
     button->setText("CanDeviceModel");
+    connect(button, &ModelToolButton::pressed, [=]() { flowView->addNode(button->text(), QPoint()); });
     toolbar->addWidget(button);
 
     button = new ModelToolButton;
     button->setText("CanRawViewModel");
+    connect(button, &ModelToolButton::pressed, [=]() { flowView->addNode(button->text(), QPoint()); });
     toolbar->addWidget(button);
 
     layout->addWidget(toolbar);
