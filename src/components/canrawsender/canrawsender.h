@@ -9,6 +9,7 @@ class QCanBusFrame;
 class CanRawSenderPrivate;
 class CRSFactoryInterface;
 class QWidget;
+class QMenu;
 
 class CanRawSender : public QObject {
     Q_OBJECT
@@ -21,6 +22,7 @@ public:
     void closeEvent(QCloseEvent* e);
 
     QWidget* getMainWidget();
+    QMenu& getMenu();
 
 signals:
     void sendFrame(const QCanBusFrame& frame);

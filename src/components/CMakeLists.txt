@@ -15,6 +15,7 @@ set(CANRAWSENDER_FILES
     canrawsender/canrawsendermodel.cpp
     canrawsender/canrawsender.ui
     canrawsender/newlinemanager.cpp
+    canrawsender/configwindow.ui
 )
 
 function(add_component_ui_dir componentName srcfiles)

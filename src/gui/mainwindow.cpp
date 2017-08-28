@@ -302,6 +302,21 @@ struct FlowViewWrapper : public QtNodes::FlowView {
         }
     }
 
+    void contextMenuEvent(QContextMenuEvent* event) override
+    {
+
+        if (_dataModel) {
+            apply_model_visitor(*_dataModel, [this](CanRawViewModel& m) {},
+                [this, event](CanRawSenderModel& m) {
+                    auto& menu = m.canRawSender.getMenu();
+                    menu.exec(event->globalPos());
+                },
+                [this](CanDeviceModel&) {});
+        }
+    }
+
+    NodeDataModel* _dataModel;
+
 private:
     QtNodes::FlowScene* _scene;
 };
@@ -315,6 +330,19 @@ void MainWindow::setupMdiArea()
     auto toolbar = new QToolBar();
     toolbar->setOrientation(Qt::Vertical);
 
+    connect(graphScene.get(), &QtNodes::FlowScene::nodeHovered, [=](QtNodes::Node& n, QPoint screenPos) {
+        auto dataModel = n.nodeDataModel();
+        assert(nullptr != dataModel);
+        cds_debug("Node hover enter: {}", dataModel->name().toStdString());
+        flowView->_dataModel = dataModel;
+    });
+    connect(graphScene.get(), &QtNodes::FlowScene::nodeHoverLeft, [=](QtNodes::Node& n) {
+        auto dataModel = n.nodeDataModel();
+        assert(nullptr != dataModel);
+        cds_debug("Node hover left: {}", dataModel->name().toStdString());
+        flowView->_dataModel = nullptr;
+    });
+
     auto button = new ModelToolButton;
     button->setText("CanDeviceModel");
     connect(button, &ModelToolButton::pressed, [=]() { flowView->addNode(button->text(), QPoint()); });
@@ -322,6 +350,11 @@ void MainWindow::setupMdiArea()
 
     button = new ModelToolButton;
     button->setText("CanRawViewModel");
+    connect(button, &ModelToolButton::pressed, [=]() { flowView->addNode(button->text(), QPoint()); });
+    toolbar->addWidget(button);
+
+    button = new ModelToolButton;
+    button->setText("CanRawSenderModel");
     connect(button, &ModelToolButton::pressed, [=]() { flowView->addNode(button->text(), QPoint()); });
     toolbar->addWidget(button);
 

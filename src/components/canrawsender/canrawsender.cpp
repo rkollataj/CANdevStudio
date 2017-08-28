@@ -34,3 +34,10 @@ QWidget* CanRawSender::getMainWidget()
 
     return d->mUi->getMainWidget();
 }
+
+QMenu& CanRawSender::getMenu()
+{
+    Q_D(CanRawSender);
+
+    return d->mUi->getMenu();
+}

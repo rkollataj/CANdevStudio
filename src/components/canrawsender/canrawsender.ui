@@ -72,6 +72,16 @@
     </widget>
    </item>
   </layout>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actionConfigure">
+   <property name="text">
+    <string>Configure</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

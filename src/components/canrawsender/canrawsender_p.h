@@ -5,6 +5,7 @@
 #include "crsgui.hpp"
 #include "newlinemanager.h"
 #include "ui_canrawsender.h"
+#include "ui_configwindow.h"
 #include <QtGui/QStandardItemModel>
 #include <memory>
 

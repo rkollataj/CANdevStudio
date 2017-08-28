@@ -3,11 +3,18 @@
 
 #include "crsguiinterface.hpp"
 #include "ui_canrawsender.h"
-#include <memory>
+#include "ui_configwindow.h"
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QMenu>
 #include <cdswidget.h>
+#include <memory>
 
 namespace Ui {
 class CanRawSenderPrivate;
+}
+
+namespace Ui {
+class ConfigWindow;
 }
 
 struct CRSGui : public CRSGuiInterface {
@@ -16,6 +23,24 @@ struct CRSGui : public CRSGuiInterface {
         , widget(new CDSWidget)
     {
         ui->setupUi(widget);
+
+        _menu.addAction(ui->actionOpen);
+        _menu.addAction(ui->actionConfigure);
+
+        QObject::connect(ui->actionOpen, &QAction::triggered, [this]() {
+            if (widget->parentWidget()) {
+                widget->parentWidget()->show();
+            } else {
+                widget->show();
+            }
+        });
+
+        QObject::connect(ui->actionConfigure, &QAction::triggered, [this]() {
+            QDialog dialog;
+            Ui::ConfigWindow configWindow;
+            configWindow.setupUi(&dialog);
+            dialog.exec();
+        });
     }
 
     void setAddCbk(const add_t& cb) override { QObject::connect(ui->pbAdd, &QPushButton::pressed, cb); }
@@ -40,8 +65,11 @@ struct CRSGui : public CRSGuiInterface {
 
     void setIndexWidget(const QModelIndex& index, QWidget* widget) override { ui->tv->setIndexWidget(index, widget); }
 
+    QMenu& getMenu() override { return _menu; }
+
 private:
     Ui::CanRawSenderPrivate* ui;
     CDSWidget* widget;
+    QMenu _menu;
 };
 #endif // CRSGUI_HPP
