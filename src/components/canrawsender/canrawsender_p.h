@@ -26,22 +26,7 @@ public:
     /// \brief Create new CanRawSenderPrivate class
     /// \param[in] q Pointer to CanRawSender class
     /// \param[in] ctx CanRawSender context
-    CanRawSenderPrivate(CanRawSender* q, CanRawSenderCtx&& ctx = CanRawSenderCtx(new CRSGui, new NLMFactory))
-        : _ctx(std::move(ctx))
-        , mUi(_ctx.get<CRSGuiInterface>())
-        , nlmFactory(_ctx.get<NLMFactoryInterface>())
-        , canRawSender(q)
-        , simulationState(false)
-        , columnsOrder({ "Id", "Data", "Loop", "Interval", "" })
-    {
-        tvModel.setHorizontalHeaderLabels(columnsOrder);
-
-        mUi.initTableView(tvModel);
-
-        mUi.setAddCbk(std::bind(&CanRawSenderPrivate::addNewItem, this));
-        mUi.setRemoveCbk(std::bind(&CanRawSenderPrivate::removeRowsSelectedByMouse, this));
-        mUi.setDockUndockCbk(std::bind(&CanRawSenderPrivate::dockUndock, this));
-    }
+    CanRawSenderPrivate(CanRawSender* q, CanRawSenderCtx&& ctx = CanRawSenderCtx(new CRSGui, new NLMFactory));
 
     /// \brief destructor
     virtual ~CanRawSenderPrivate() = default;
