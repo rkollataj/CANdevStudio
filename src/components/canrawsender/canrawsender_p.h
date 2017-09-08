@@ -29,7 +29,7 @@ public:
     CanRawSenderPrivate(CanRawSender* q, CanRawSenderCtx&& ctx = CanRawSenderCtx(new CRSGui, new NLMFactory));
 
     /// \brief destructor
-    virtual ~CanRawSenderPrivate() = default;
+    virtual ~CanRawSenderPrivate();
 
     /// \brief This method propagates the system simulator state
     /// \param[in] state Actual simulator state

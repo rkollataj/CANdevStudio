@@ -19,6 +19,10 @@ CanRawSenderPrivate::CanRawSenderPrivate(CanRawSender* q, CanRawSenderCtx&& ctx)
     mUi.setDockUndockCbk(std::bind(&CanRawSenderPrivate::dockUndock, this));
 }
 
+CanRawSenderPrivate::~CanRawSenderPrivate()
+{
+}
+
 void CanRawSenderPrivate::setSimulationState(bool state)
 {
     simulationState = state;
