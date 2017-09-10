@@ -17,6 +17,7 @@ using QtNodes::NodeDataType;
 */
 class CanRawSenderModel : public ComponentModel<CanRawSender, CanRawSenderModel>,
                           public VisitableWith<CanNodeDataModelVisitor> {
+    Q_OBJECT
 
 public:
     CanRawSenderModel();
