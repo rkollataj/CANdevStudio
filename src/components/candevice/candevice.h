@@ -31,6 +31,7 @@ public:
     */
     bool init(const QString& backend, const QString& iface);
     bool start();
+    void saveSettings(QJsonObject& json) const;
 
 signals:
     void frameReceived(const QCanBusFrame& frame);

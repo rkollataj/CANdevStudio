@@ -99,3 +99,8 @@ void CanDevice::errorOccurred(int error)
         emit frameSent(false, sendItem);
     }
 }
+
+void CanDevice::saveSettings(QJsonObject& ) const
+{
+}
+
