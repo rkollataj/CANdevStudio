@@ -2,11 +2,10 @@
 #define COMPONENTMODEL_H
 
 #include <QtCore/QObject>
-#include <nodes/NodeDataModel>
 #include <QtWidgets/QLabel>
+#include <nodes/NodeDataModel>
 
-template<typename C, typename Derived>
-class ComponentModel : public QtNodes::NodeDataModel {
+template <typename C, typename Derived> class ComponentModel : public QtNodes::NodeDataModel {
 
 public:
     ComponentModel() = default;
@@ -21,7 +20,7 @@ public:
         return _caption;
     }
 
-    virtual void setCaption(const QString &caption)
+    virtual void setCaption(const QString& caption)
     {
         _caption = caption;
     }
@@ -35,7 +34,7 @@ public:
         return _name;
     }
 
-    virtual void setName(const QString &name)
+    virtual void setName(const QString& name)
     {
         _name = name;
     }
@@ -73,7 +72,7 @@ public:
     virtual void setModelName(QString modelName)
     {
         _modelName = modelName;
-    } 
+    }
 
     /**
     *   @brief  Used to get widget embedded in Node
@@ -109,11 +108,11 @@ public:
 
 protected:
     C _component;
-    QLabel* _label { new QLabel };
+    QLabel* _label{ new QLabel };
     QString _caption;
     QString _name;
     QString _modelName;
-    bool _resizable { false };
+    bool _resizable{ false };
 };
 
 #endif // COMPONENTMODEL_H

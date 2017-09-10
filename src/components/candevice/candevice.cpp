@@ -100,7 +100,6 @@ void CanDevice::errorOccurred(int error)
     }
 }
 
-void CanDevice::saveSettings(QJsonObject& ) const
+void CanDevice::saveSettings(QJsonObject&) const
 {
 }
-

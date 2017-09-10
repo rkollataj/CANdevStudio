@@ -43,4 +43,3 @@ unsigned int CanRawSenderModel::nPorts(PortType portType) const
 {
     return (PortType::Out == portType) ? 1 : 0;
 }
-
