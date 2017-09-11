@@ -80,3 +80,8 @@ void CanRawView::setDockUndockClbk(const std::function<void()> &cb)
 
     d->_ui.setDockUndockCbk(cb);
 }
+
+bool CanRawView::docked() const
+{
+    return d_ptr->docked;
+}

@@ -89,7 +89,7 @@ public:
         auto iface = dynamic_cast<ComponentModelInterface*>(dataModel);
         auto& component = iface->getComponent();
 
-        handleWidgetShowing(component.getMainWidget());
+        handleWidgetShowing(component.getMainWidget(), component.docked());
     }
 
 private:
@@ -104,20 +104,12 @@ private:
         } // else path not needed
     }
 
-    void handleWidgetShowing(QWidget* widget)
+    void handleWidgetShowing(QWidget* widget, bool docked)
     {
+        Q_Q(ProjectConfig);
+
         if (!widget)
             return;
-
-        Q_Q(ProjectConfig);
-        bool docked = false;
-        // TODO: Temporary solution. To be changed once MainWindow is refactored
-        QPushButton* undockButton = widget->findChild<QPushButton*>("pbDockUndock");
-        if (undockButton) {
-            docked = !undockButton->isChecked();
-        } else {
-            cds_debug("Undock button for '{}' widget not found", widget->windowTitle().toStdString());
-        }
 
         // Add widget to MDI area when showing for the first time
         // Widget will be also added to MDI area after closing it in undocked state

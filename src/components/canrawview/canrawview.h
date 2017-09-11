@@ -25,6 +25,7 @@ public:
     void setConfig(QJsonObject& json) override;
     QJsonObject getConfig() const override;
     void setDockUndockClbk(const std::function<void()> &cb) override;
+    bool docked() const override;
 
 public slots:
     void frameReceived(const QCanBusFrame& frame);

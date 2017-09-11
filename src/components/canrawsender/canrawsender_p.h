@@ -41,6 +41,7 @@ public:
 
         _ui.setAddCbk(std::bind(&CanRawSenderPrivate::addNewItem, this));
         _ui.setRemoveCbk(std::bind(&CanRawSenderPrivate::removeRowsSelectedByMouse, this));
+        _ui.setDockUndockCbk( [this] { docked=!docked; });
     }
 
     /// \brief destructor
@@ -78,6 +79,7 @@ public:
     CanRawSenderCtx _ctx;
     CRSGuiInterface& _ui;
     NLMFactoryInterface& _nlmFactory;
+    bool docked { true };
 
 private:
     std::vector<std::unique_ptr<NewLineManager>> _lines;

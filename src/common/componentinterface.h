@@ -14,8 +14,10 @@ struct ComponentInterface {
     virtual void setConfig(QJsonObject& json) = 0;
     virtual QJsonObject getConfig() const = 0;
     virtual QWidget* getMainWidget() = 0;
+
     // Do nothing by default. Override in component to handle dock/undock action
     virtual void setDockUndockClbk(const std::function<void()>&) {}
+    virtual bool docked() const { return true; }
 };
 
 #endif /* !__COMPONENTINTERFACE_H */

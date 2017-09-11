@@ -113,10 +113,28 @@ QJsonObject CanDevice::getConfig() const
 
 void CanDevice::startSimulation()
 {
+    Q_D(CanDevice);
+
+    if (!d->_initialized) {
+        cds_info("CanDevice not initialized");
+        return;
+    }
+
+    if(!d->_canDevice.connectDevice()) {
+        cds_error("Failed to connect device");
+    }
 }
 
 void CanDevice::stopSimulation()
 {
+    Q_D(CanDevice);
+
+    if (!d->_initialized) {
+        cds_info("CanDevice not initialized");
+        return;
+    }
+
+    d->_canDevice.disconnectDevice();
 }
 
 QWidget* CanDevice::getMainWidget()

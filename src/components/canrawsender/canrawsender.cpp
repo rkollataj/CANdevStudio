@@ -60,3 +60,8 @@ void CanRawSender::setDockUndockClbk(const std::function<void()> &cb)
 
     d->_ui.setDockUndockCbk(cb);
 }
+
+bool CanRawSender::docked() const
+{
+    return d_ptr->docked;
+}
