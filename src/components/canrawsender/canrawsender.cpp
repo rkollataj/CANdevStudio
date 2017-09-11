@@ -47,7 +47,6 @@ void CanRawSender::setConfig(QJsonObject&)
 
 QJsonObject CanRawSender::getConfig() const
 {
-    //Q_D(CanRawSender);
     QJsonObject config;
 
     d_ptr->saveSettings(config);

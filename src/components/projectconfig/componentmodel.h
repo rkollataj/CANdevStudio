@@ -10,18 +10,7 @@ struct ComponentInterface;
 
 struct ComponentModelInterface {
     virtual ~ComponentModelInterface() = default;
-    virtual QString caption() const = 0;
-    virtual void setCaption(const QString& caption) = 0;
-    virtual QString name() const = 0;
-    virtual void setName(const QString& name) = 0;
-    virtual std::unique_ptr<QtNodes::NodeDataModel> clone() const = 0;
-    virtual QJsonObject save() const = 0;
-    virtual QString modelName() const = 0;
-    virtual void setModelName(QString modelName) = 0;
-    virtual QWidget* embeddedWidget() = 0;
-    virtual bool resizable() const = 0;
-    virtual void setResizable(bool resizable) = 0;
-    virtual ComponentInterface* getComponent() = 0;
+    virtual ComponentInterface& getComponent() = 0;
 };
 
 template <typename C, typename Derived>
@@ -40,11 +29,6 @@ public:
         return _caption;
     }
 
-    virtual void setCaption(const QString& caption)
-    {
-        _caption = caption;
-    }
-
     /**
     *   @brief  Used to identify model by data model name
     *   @return Node model name
@@ -52,11 +36,6 @@ public:
     virtual QString name() const override
     {
         return _name;
-    }
-
-    virtual void setName(const QString& name)
-    {
-        _name = name;
     }
 
     /**
@@ -74,8 +53,8 @@ public:
      */
     virtual QJsonObject save() const override
     {
-        QJsonObject json;
-        json["name"] = _component.getConfig();
+        QJsonObject json =_component.getConfig();
+        json["name"] = name();
         return json;
     }
 
@@ -86,11 +65,6 @@ public:
     virtual QString modelName() const
     {
         return _modelName;
-    }
-
-    virtual void setModelName(QString modelName)
-    {
-        _modelName = modelName;
     }
 
     /**
@@ -111,18 +85,13 @@ public:
         return _resizable;
     }
 
-    virtual void setResizable(bool resizable) override
-    {
-        _resizable = resizable;
-    }
-
     /**
     *   @brief Component getter
     *   @return Component managed by model
     */
-    virtual ComponentInterface* getComponent() override
+    virtual ComponentInterface& getComponent() override
     {
-        return &_component;
+        return _component;
     }
 
 protected:

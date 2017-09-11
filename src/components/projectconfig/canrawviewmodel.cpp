@@ -10,7 +10,7 @@ CanRawViewModel::CanRawViewModel()
 
     _caption = "CanRawView Node";
     _name = "CanRawViewModel";
-    _modelName = "Raw View";
+    _modelName = "Raw view";
 
     _component.getMainWidget()->setWindowTitle("CANrawView");
     connect(this, &CanRawViewModel::frameSent, &_component, &CanRawView::frameSent);

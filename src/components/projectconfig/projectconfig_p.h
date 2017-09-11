@@ -65,9 +65,7 @@ public:
         assert(nullptr != dataModel);
 
         auto iface = dynamic_cast<ComponentModelInterface*>(dataModel);
-
-        auto component = iface->getComponent();
-        assert(component != nullptr);
+        auto& component = iface->getComponent();
 
         handleWidgetCreation(component);
     }
@@ -78,11 +76,9 @@ public:
         assert(nullptr != dataModel);
 
         auto iface = dynamic_cast<ComponentModelInterface*>(dataModel);
+        auto& component = iface->getComponent();
 
-        auto component = iface->getComponent();
-        assert(component != nullptr);
-
-        handleWidgetDeletion(component->getMainWidget());
+        handleWidgetDeletion(component.getMainWidget());
     }
 
     void nodeDoubleClickedCallback(QtNodes::Node& node)
@@ -91,11 +87,9 @@ public:
         assert(nullptr != dataModel);
 
         auto iface = dynamic_cast<ComponentModelInterface*>(dataModel);
+        auto& component = iface->getComponent();
 
-        auto component = iface->getComponent();
-        assert(component != nullptr);
-
-        handleWidgetShowing(component->getMainWidget());
+        handleWidgetShowing(component.getMainWidget());
     }
 
 private:
@@ -143,14 +137,14 @@ private:
         }
     }
 
-    void handleWidgetCreation(ComponentInterface* view)
+    void handleWidgetCreation(ComponentInterface& view)
     {
         Q_Q(ProjectConfig);
 
-        QWidget* widget = view->getMainWidget();
-        connect(q, &ProjectConfig::startSimulation, std::bind(&ComponentInterface::startSimulation, view));
-        connect(q, &ProjectConfig::stopSimulation, std::bind(&ComponentInterface::stopSimulation, view));
-        view->setDockUndockClbk([this, widget, q] { emit q->handleDock(widget); });
+        QWidget* widget = view.getMainWidget();
+        connect(q, &ProjectConfig::startSimulation, std::bind(&ComponentInterface::startSimulation, &view));
+        connect(q, &ProjectConfig::stopSimulation, std::bind(&ComponentInterface::stopSimulation, &view));
+        view.setDockUndockClbk([widget, q] { emit q->handleDock(widget); });
     }
 
     QtNodes::FlowScene _graphScene;
