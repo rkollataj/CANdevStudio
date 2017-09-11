@@ -41,7 +41,6 @@ public:
 
         _ui.setAddCbk(std::bind(&CanRawSenderPrivate::addNewItem, this));
         _ui.setRemoveCbk(std::bind(&CanRawSenderPrivate::removeRowsSelectedByMouse, this));
-        _ui.setDockUndockCbk(std::bind(&CanRawSenderPrivate::dockUndock, this));
     }
 
     /// \brief destructor
@@ -74,9 +73,6 @@ private slots:
 
     /// \brief This method adds new line to table
     void addNewItem();
-
-    /// \brief This method dock/undock can raw sender window
-    void dockUndock();
 
 public:
     CanRawSenderCtx _ctx;

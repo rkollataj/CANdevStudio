@@ -24,9 +24,7 @@ public:
     QWidget* getMainWidget() override;
     void setConfig(QJsonObject& json) override;
     QJsonObject getConfig() const override;
-
-signals:
-    void dockUndock();
+    void setDockUndockClbk(const std::function<void()> &cb) override;
 
 public slots:
     void frameReceived(const QCanBusFrame& frame);

@@ -73,3 +73,10 @@ QJsonObject CanRawView::getConfig() const
 
     return config;
 }
+
+void CanRawView::setDockUndockClbk(const std::function<void()> &cb)
+{
+    Q_D(CanRawView);
+
+    d->_ui.setDockUndockCbk(cb);
+}

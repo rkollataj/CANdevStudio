@@ -71,7 +71,3 @@ void CanRawSenderPrivate::addNewItem()
     _lines.push_back(std::move(newLine));
 }
 
-void CanRawSenderPrivate::dockUndock()
-{
-    emit q_ptr->dockUndock();
-}

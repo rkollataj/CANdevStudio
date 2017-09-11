@@ -30,7 +30,6 @@ public:
         _ui.setModel(&_uniqueModel);
 
         _ui.setClearCbk(std::bind(&CanRawViewPrivate::clear, this));
-        _ui.setDockUndockCbk(std::bind(&CanRawViewPrivate::dockUndock, this));
         _ui.setSectionClikedCbk(std::bind(&CanRawViewPrivate::sort, this, std::placeholders::_1));
         _ui.setFilterCbk(std::bind(&CanRawViewPrivate::setFilter, this));
     }
@@ -145,12 +144,6 @@ private slots:
     {
         _tvModel.removeRows(0, _tvModel.rowCount());
         _uniqueModel.clearFilter();
-    }
-
-    void dockUndock()
-    {
-        Q_Q(CanRawView);
-        emit q->dockUndock();
     }
 
     void sort(const int clickedIndex)

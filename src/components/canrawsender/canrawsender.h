@@ -22,10 +22,10 @@ public:
     QWidget* getMainWidget() override;
     void setConfig(QJsonObject& json) override;
     QJsonObject getConfig() const override;
+    void setDockUndockClbk(const std::function<void()> &cb) override;
 
 signals:
     void sendFrame(const QCanBusFrame& frame);
-    void dockUndock();
 
 public slots:
     void stopSimulation(void);

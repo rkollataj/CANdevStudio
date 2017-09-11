@@ -101,7 +101,7 @@ public:
 private:
     void handleWidgetDeletion(QWidget* widget)
     {
-        if(!widget)
+        if (!widget)
             return;
 
         if (widget->parentWidget()) {
@@ -112,7 +112,7 @@ private:
 
     void handleWidgetShowing(QWidget* widget)
     {
-        if(!widget)
+        if (!widget)
             return;
 
         Q_Q(ProjectConfig);
@@ -150,7 +150,7 @@ private:
         QWidget* widget = view->getMainWidget();
         connect(q, &ProjectConfig::startSimulation, std::bind(&ComponentInterface::startSimulation, view));
         connect(q, &ProjectConfig::stopSimulation, std::bind(&ComponentInterface::stopSimulation, view));
-        //connect(&view, &T::dockUndock, this, [this, widget, q] { emit q->handleDock(widget); });
+        view->setDockUndockClbk([this, widget, q] { emit q->handleDock(widget); });
     }
 
     QtNodes::FlowScene _graphScene;

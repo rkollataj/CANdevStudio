@@ -4,12 +4,11 @@
 #include <QtCore/QObject>
 #include <QtWidgets/QLabel>
 #include <nodes/NodeDataModel>
+#include <functional>
 
 struct ComponentInterface;
 
 struct ComponentModelInterface {
-    //typedef std::function<void()> dockUndockClbk_t;
-
     virtual ~ComponentModelInterface() = default;
     virtual QString caption() const = 0;
     virtual void setCaption(const QString& caption) = 0;
@@ -23,7 +22,6 @@ struct ComponentModelInterface {
     virtual bool resizable() const = 0;
     virtual void setResizable(bool resizable) = 0;
     virtual ComponentInterface* getComponent() = 0;
-    //virtual void setDockUndockClbk(const dockUndockClbk_t& cb) = 0;
 };
 
 template <typename C, typename Derived>
@@ -126,11 +124,6 @@ public:
     {
         return &_component;
     }
-
-    //void setDockUndockClbk(void)
-    //{
-        //connect(&_component, &C::dockUndock, cb);
-    //}
 
 protected:
     C _component;
