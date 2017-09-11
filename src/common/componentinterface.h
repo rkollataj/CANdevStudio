@@ -15,5 +15,4 @@ struct ComponentInterface {
     virtual QWidget* getMainWidget() = 0;
 };
 
-
 #endif /* !__COMPONENTINTERFACE_H */

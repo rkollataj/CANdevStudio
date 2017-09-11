@@ -5,7 +5,29 @@
 #include <QtWidgets/QLabel>
 #include <nodes/NodeDataModel>
 
-template <typename C, typename Derived> class ComponentModel : public QtNodes::NodeDataModel {
+struct ComponentInterface;
+
+struct ComponentModelInterface {
+    //typedef std::function<void()> dockUndockClbk_t;
+
+    virtual ~ComponentModelInterface() = default;
+    virtual QString caption() const = 0;
+    virtual void setCaption(const QString& caption) = 0;
+    virtual QString name() const = 0;
+    virtual void setName(const QString& name) = 0;
+    virtual std::unique_ptr<QtNodes::NodeDataModel> clone() const = 0;
+    virtual QJsonObject save() const = 0;
+    virtual QString modelName() const = 0;
+    virtual void setModelName(QString modelName) = 0;
+    virtual QWidget* embeddedWidget() = 0;
+    virtual bool resizable() const = 0;
+    virtual void setResizable(bool resizable) = 0;
+    virtual ComponentInterface* getComponent() = 0;
+    //virtual void setDockUndockClbk(const dockUndockClbk_t& cb) = 0;
+};
+
+template <typename C, typename Derived>
+class ComponentModel : public QtNodes::NodeDataModel, public ComponentModelInterface {
 
 public:
     ComponentModel() = default;
@@ -43,7 +65,7 @@ public:
     *   @brief Creates new node of the same type
     *   @return cloned node
     */
-    virtual std::unique_ptr<NodeDataModel> clone() const override
+    virtual std::unique_ptr<QtNodes::NodeDataModel> clone() const override
     {
         return std::make_unique<Derived>();
     }
@@ -77,7 +99,7 @@ public:
     *   @brief  Used to get widget embedded in Node
     *   @return QLabel
     */
-    QWidget* embeddedWidget() override
+    virtual QWidget* embeddedWidget() override
     {
         return _label;
     }
@@ -86,12 +108,12 @@ public:
     *   @brief  Used to get information if node is resizable
     *   @return false
     */
-    bool resizable() const override
+    virtual bool resizable() const override
     {
         return _resizable;
     }
 
-    void setResizable(bool resizable)
+    virtual void setResizable(bool resizable) override
     {
         _resizable = resizable;
     }
@@ -100,10 +122,15 @@ public:
     *   @brief Component getter
     *   @return Component managed by model
     */
-    C& getComponent()
+    virtual ComponentInterface* getComponent() override
     {
-        return _component;
+        return &_component;
     }
+
+    //void setDockUndockClbk(void)
+    //{
+        //connect(&_component, &C::dockUndock, cb);
+    //}
 
 protected:
     C _component;
