@@ -4,12 +4,13 @@
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 #include <context.h>
+#include <componentinterface.h>
 
 class QCanBusFrame;
 class CanRawSenderPrivate;
 class QWidget;
 
-class CanRawSender : public QObject {
+class CanRawSender : public QObject, public ComponentInterface {
     Q_OBJECT
     Q_DECLARE_PRIVATE(CanRawSender)
 
@@ -18,9 +19,9 @@ public:
     explicit CanRawSender(CanRawSenderCtx&& ctx);
     ~CanRawSender();
     int getLineCount() const;
-    void saveSettings(QJsonObject& json) const;
-
-    QWidget* getMainWidget();
+    QWidget* getMainWidget() override;
+    void setConfig(QJsonObject& json) override;
+    QJsonObject getConfig() const override;
 
 signals:
     void sendFrame(const QCanBusFrame& frame);

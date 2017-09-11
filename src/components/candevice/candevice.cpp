@@ -100,6 +100,26 @@ void CanDevice::errorOccurred(int error)
     }
 }
 
-void CanDevice::saveSettings(QJsonObject&) const
+void CanDevice::setConfig(QJsonObject&)
 {
+    // TODO
+}
+
+QJsonObject CanDevice::getConfig() const
+{
+    // TODO
+    return {};
+}
+
+void CanDevice::startSimulation()
+{
+}
+
+void CanDevice::stopSimulation()
+{
+}
+
+QWidget* CanDevice::getMainWidget()
+{
+    return nullptr;
 }

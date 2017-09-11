@@ -55,8 +55,7 @@ public:
     virtual QJsonObject save() const override
     {
         QJsonObject json;
-        json["name"] = name();
-        _component.saveSettings(json);
+        json["name"] = _component.getConfig();
         return json;
     }
 

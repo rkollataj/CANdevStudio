@@ -3,6 +3,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
+#include <componentinterface.h>
 #include <context.h>
 #include <memory>
 
@@ -10,7 +11,7 @@ class QCanBusFrame;
 class CanRawViewPrivate;
 class QWidget;
 
-class CanRawView : public QObject {
+class CanRawView : public QObject, public ComponentInterface {
     Q_OBJECT
     Q_DECLARE_PRIVATE(CanRawView)
 
@@ -20,7 +21,9 @@ public:
     ~CanRawView();
 
     void saveSettings(QJsonObject& json) const;
-    QWidget* getMainWidget();
+    QWidget* getMainWidget() override;
+    void setConfig(QJsonObject& json) override;
+    QJsonObject getConfig() const override;
 
 signals:
     void dockUndock();
