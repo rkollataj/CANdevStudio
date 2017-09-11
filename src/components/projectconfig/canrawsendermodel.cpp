@@ -34,11 +34,6 @@ void CanRawSenderModel::sendFrame(const QCanBusFrame& frame)
     emit dataUpdated(0); // Data ready on port 0
 }
 
-void CanRawSenderModel::visit(CanNodeDataModelVisitor& v)
-{
-    v(*this);
-}
-
 unsigned int CanRawSenderModel::nPorts(PortType portType) const
 {
     return (PortType::Out == portType) ? 1 : 0;

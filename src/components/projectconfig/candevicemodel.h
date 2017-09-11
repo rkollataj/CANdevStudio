@@ -5,8 +5,6 @@
 #include <QtCore/QObject>
 #include <QtSerialBus/QCanBusFrame>
 #include <candevice.h>
-#include <modelvisitor.h>
-#include <visitablewith.h>
 
 using QtNodes::PortType;
 using QtNodes::PortIndex;
@@ -18,14 +16,11 @@ enum class Direction;
 /**
 *   @brief The class provides node graphical representation of CanDevice
 */
-class CanDeviceModel : public ComponentModel<CanDevice, CanDeviceModel>, public VisitableWith<CanNodeDataModelVisitor> {
+class CanDeviceModel : public ComponentModel<CanDevice, CanDeviceModel> {
     Q_OBJECT
 
 public:
     CanDeviceModel();
-
-    /** @see VisitableWith */
-    virtual void visit(CanNodeDataModelVisitor& v) override;
 
     /**
     *   @brief  Used to get number of ports of each type used by model

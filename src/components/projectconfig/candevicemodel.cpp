@@ -68,7 +68,3 @@ void CanDeviceModel::setInData(std::shared_ptr<NodeData> nodeData, PortIndex)
     }
 }
 
-void CanDeviceModel::visit(CanNodeDataModelVisitor& v)
-{
-    v(*this);
-}

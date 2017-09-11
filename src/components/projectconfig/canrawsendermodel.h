@@ -4,8 +4,6 @@
 #include "componentmodel.h"
 #include <QtSerialBus/QCanBusFrame>
 #include <canrawsender.h>
-#include <modelvisitor.h>
-#include <visitablewith.h>
 
 using QtNodes::PortType;
 using QtNodes::PortIndex;
@@ -15,16 +13,12 @@ using QtNodes::NodeDataType;
 /**
 *   @brief The class provides node graphical representation of CanRawSender
 */
-class CanRawSenderModel : public ComponentModel<CanRawSender, CanRawSenderModel>,
-                          public VisitableWith<CanNodeDataModelVisitor> {
+class CanRawSenderModel : public ComponentModel<CanRawSender, CanRawSenderModel> {
     Q_OBJECT
 
 public:
     CanRawSenderModel();
     virtual ~CanRawSenderModel() = default;
-
-    /** @see VisitableWith */
-    virtual void visit(CanNodeDataModelVisitor& v) override;
 
     /**
     *   @brief  Used to get number of ports of each type used by model

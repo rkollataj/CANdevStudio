@@ -48,8 +48,3 @@ void CanRawViewModel::setInData(std::shared_ptr<NodeData> nodeData, PortIndex)
         cds_warn("Incorrect nodeData");
     }
 }
-
-void CanRawViewModel::visit(CanNodeDataModelVisitor& v)
-{
-    v(*this);
-}
