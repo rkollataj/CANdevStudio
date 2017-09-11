@@ -3,8 +3,8 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
-#include <context.h>
 #include <componentinterface.h>
+#include <context.h>
 
 class QCanBusFrame;
 class CanRawSenderPrivate;
@@ -19,11 +19,31 @@ public:
     explicit CanRawSender(CanRawSenderCtx&& ctx);
     ~CanRawSender();
     int getLineCount() const;
+
+    /**
+    *   @see ComponentInterface
+    */
     QWidget* getMainWidget() override;
+
+    /**
+    *   @see ComponentInterface
+    */
     void setConfig(QJsonObject& json) override;
+
+    /**
+    *   @see ComponentInterface
+    */
     QJsonObject getConfig() const override;
-    void setDockUndockClbk(const std::function<void()> &cb) override;
-    bool docked() const override;
+
+    /**
+    *   @see ComponentInterface
+    */
+    void setDockUndockClbk(const std::function<void()>& cb) override;
+
+    /**
+    *   @see ComponentInterface
+    */
+    bool mainWidgetDocked() const override;
 
 signals:
     void sendFrame(const QCanBusFrame& frame);

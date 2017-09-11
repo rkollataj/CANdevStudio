@@ -67,4 +67,3 @@ void CanDeviceModel::setInData(std::shared_ptr<NodeData> nodeData, PortIndex)
         cds_warn("Incorrect nodeData");
     }
 }
-

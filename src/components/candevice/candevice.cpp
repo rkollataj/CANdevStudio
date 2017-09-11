@@ -109,7 +109,7 @@ void CanDevice::startSimulation()
         return;
     }
 
-    if(!d->_canDevice.connectDevice()) {
+    if (!d->_canDevice.connectDevice()) {
         cds_error("Failed to connect device");
     }
 }

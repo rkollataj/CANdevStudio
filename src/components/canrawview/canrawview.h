@@ -20,12 +20,30 @@ public:
     explicit CanRawView(CanRawViewCtx&& ctx);
     ~CanRawView();
 
-    void saveSettings(QJsonObject& json) const;
+    /**
+    *   @see ComponentInterface
+    */
     QWidget* getMainWidget() override;
+
+    /**
+    *   @see ComponentInterface
+    */
     void setConfig(QJsonObject& json) override;
+
+    /**
+    *   @see ComponentInterface
+    */
     QJsonObject getConfig() const override;
-    void setDockUndockClbk(const std::function<void()> &cb) override;
-    bool docked() const override;
+
+    /**
+    *   @see ComponentInterface
+    */
+    void setDockUndockClbk(const std::function<void()>& cb) override;
+
+    /**
+    *   @see ComponentInterface
+    */
+    bool mainWidgetDocked() const override;
 
 public slots:
     void frameReceived(const QCanBusFrame& frame);

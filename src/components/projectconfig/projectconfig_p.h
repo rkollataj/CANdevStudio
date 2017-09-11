@@ -89,7 +89,7 @@ public:
         auto iface = dynamic_cast<ComponentModelInterface*>(dataModel);
         auto& component = iface->getComponent();
 
-        handleWidgetShowing(component.getMainWidget(), component.docked());
+        handleWidgetShowing(component.getMainWidget(), component.mainWidgetDocked());
     }
 
 private:

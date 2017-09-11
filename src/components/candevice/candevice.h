@@ -3,8 +3,8 @@
 
 #include <QScopedPointer>
 #include <QtCore/QObject>
-#include <context.h>
 #include <componentinterface.h>
+#include <context.h>
 
 class CanDevicePrivate;
 class QCanBusFrame;
@@ -31,7 +31,15 @@ public:
     *   @return true on success, false of failure
     */
     bool init(const QString& backend, const QString& iface);
+
+    /**
+    *   @see ComponentInterface
+    */
     void setConfig(QJsonObject& json) override;
+
+    /**
+    *   @see ComponentInterface
+    */
     QJsonObject getConfig() const override;
 
 signals:

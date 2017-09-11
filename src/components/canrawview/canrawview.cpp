@@ -67,7 +67,7 @@ void CanRawView::setConfig(QJsonObject&)
 
 QJsonObject CanRawView::getConfig() const
 {
-    //Q_D(CanRawView);
+    // Q_D(CanRawView);
     QJsonObject config;
 
     d_ptr->saveSettings(config);
@@ -75,14 +75,14 @@ QJsonObject CanRawView::getConfig() const
     return config;
 }
 
-void CanRawView::setDockUndockClbk(const std::function<void()> &cb)
+void CanRawView::setDockUndockClbk(const std::function<void()>& cb)
 {
     Q_D(CanRawView);
 
     d->_ui.setDockUndockCbk(cb);
 }
 
-bool CanRawView::docked() const
+bool CanRawView::mainWidgetDocked() const
 {
     return d_ptr->docked;
 }

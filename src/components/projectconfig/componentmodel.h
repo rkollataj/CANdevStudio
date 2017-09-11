@@ -3,8 +3,8 @@
 
 #include <QtCore/QObject>
 #include <QtWidgets/QLabel>
-#include <nodes/NodeDataModel>
 #include <functional>
+#include <nodes/NodeDataModel>
 
 struct ComponentInterface;
 
@@ -53,7 +53,7 @@ public:
      */
     virtual QJsonObject save() const override
     {
-        QJsonObject json =_component.getConfig();
+        QJsonObject json = _component.getConfig();
         json["name"] = name();
         return json;
     }

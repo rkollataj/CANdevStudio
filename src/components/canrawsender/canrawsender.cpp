@@ -54,14 +54,14 @@ QJsonObject CanRawSender::getConfig() const
     return config;
 }
 
-void CanRawSender::setDockUndockClbk(const std::function<void()> &cb)
+void CanRawSender::setDockUndockClbk(const std::function<void()>& cb)
 {
     Q_D(CanRawSender);
 
     d->_ui.setDockUndockCbk(cb);
 }
 
-bool CanRawSender::docked() const
+bool CanRawSender::mainWidgetDocked() const
 {
     return d_ptr->docked;
 }
