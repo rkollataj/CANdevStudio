@@ -18,7 +18,6 @@ CanDeviceModel::CanDeviceModel()
     _modelName = "CAN device";
 
     _component.init("socketcan", "can0"); // TODO
-    _component.start();
 }
 
 unsigned int CanDeviceModel::nPorts(PortType portType) const

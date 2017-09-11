@@ -31,8 +31,6 @@ public:
     *   @return true on success, false of failure
     */
     bool init(const QString& backend, const QString& iface);
-    bool start();
-    QWidget* getMainWidget() override;
     void setConfig(QJsonObject& json) override;
     QJsonObject getConfig() const override;
 

@@ -27,6 +27,7 @@ void CanRawView::startSimulation()
 
     d->_timer.restart();
     d->_simStarted = true;
+    d->clear();
 }
 
 void CanRawView::stopSimulation()

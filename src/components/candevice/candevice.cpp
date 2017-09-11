@@ -55,17 +55,6 @@ void CanDevice::sendFrame(const QCanBusFrame& frame)
     }
 }
 
-bool CanDevice::start()
-{
-    Q_D(CanDevice);
-
-    if (!d->_initialized) {
-        return false;
-    }
-
-    return d->_canDevice.connectDevice();
-}
-
 void CanDevice::framesReceived()
 {
     Q_D(CanDevice);
@@ -135,9 +124,4 @@ void CanDevice::stopSimulation()
     }
 
     d->_canDevice.disconnectDevice();
-}
-
-QWidget* CanDevice::getMainWidget()
-{
-    return nullptr;
 }
