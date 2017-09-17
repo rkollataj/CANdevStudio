@@ -48,13 +48,13 @@ signals:
 
 public slots:
     void sendFrame(const QCanBusFrame& frame);
+    void startSimulation() override;
+    void stopSimulation() override;
 
 private slots:
     void errorOccurred(int error);
     void framesWritten(qint64 framesCnt);
     void framesReceived();
-    void startSimulation();
-    void stopSimulation();
 
 private:
     QScopedPointer<CanDevicePrivate> d_ptr;

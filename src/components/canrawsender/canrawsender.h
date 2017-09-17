@@ -49,8 +49,8 @@ signals:
     void sendFrame(const QCanBusFrame& frame);
 
 public slots:
-    void stopSimulation(void);
-    void startSimulation(void);
+    void stopSimulation(void) override;
+    void startSimulation(void) override;
 
 private:
     QScopedPointer<CanRawSenderPrivate> d_ptr;

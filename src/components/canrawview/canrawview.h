@@ -48,8 +48,8 @@ public:
 public slots:
     void frameReceived(const QCanBusFrame& frame);
     void frameSent(bool status, const QCanBusFrame& frame);
-    void stopSimulation(void);
-    void startSimulation(void);
+    void stopSimulation(void) override;
+    void startSimulation(void) override;
 
 private:
     QScopedPointer<CanRawViewPrivate> d_ptr;

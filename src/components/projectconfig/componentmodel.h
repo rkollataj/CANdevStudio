@@ -5,12 +5,14 @@
 #include <QtWidgets/QLabel>
 #include <functional>
 #include <nodes/NodeDataModel>
+#include "projectconfig.h"
 
 struct ComponentInterface;
 
 struct ComponentModelInterface {
     virtual ~ComponentModelInterface() = default;
     virtual ComponentInterface& getComponent() = 0;
+    virtual void handleModelCreation(ProjectConfig *config) = 0;
 };
 
 template <typename C, typename Derived>
@@ -92,6 +94,14 @@ public:
     virtual ComponentInterface& getComponent() override
     {
         return _component;
+    }
+
+    virtual void handleModelCreation(ProjectConfig *config) override
+    {
+        QWidget* widget = _component.getMainWidget();
+        connect(config, &ProjectConfig::startSimulation, &_component, &C::startSimulation);
+        connect(config, &ProjectConfig::stopSimulation, &_component, &C::stopSimulation);
+        _component.setDockUndockClbk([widget, config] { emit config->handleDock(widget); });
     }
 
 protected:

@@ -61,13 +61,13 @@ public:
 
     void nodeCreatedCallback(QtNodes::Node& node)
     {
+        Q_Q(ProjectConfig);
+
         auto dataModel = node.nodeDataModel();
         assert(nullptr != dataModel);
 
         auto iface = dynamic_cast<ComponentModelInterface*>(dataModel);
-        auto& component = iface->getComponent();
-
-        handleWidgetCreation(component);
+        iface->handleModelCreation(q);
     }
 
     void nodeDeletedCallback(QtNodes::Node& node)
@@ -127,16 +127,6 @@ private:
             widget->show();
             widget->activateWindow();
         }
-    }
-
-    void handleWidgetCreation(ComponentInterface& view)
-    {
-        Q_Q(ProjectConfig);
-
-        QWidget* widget = view.getMainWidget();
-        connect(q, &ProjectConfig::startSimulation, std::bind(&ComponentInterface::startSimulation, &view));
-        connect(q, &ProjectConfig::stopSimulation, std::bind(&ComponentInterface::stopSimulation, &view));
-        view.setDockUndockClbk([widget, q] { emit q->handleDock(widget); });
     }
 
     QtNodes::FlowScene _graphScene;
