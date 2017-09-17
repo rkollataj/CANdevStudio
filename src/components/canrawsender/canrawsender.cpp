@@ -10,9 +10,6 @@ CanRawSender::CanRawSender()
 CanRawSender::CanRawSender(CanRawSenderCtx&& ctx)
     : d_ptr(new CanRawSenderPrivate(this, std::move(ctx)))
 {
-    Q_D(CanRawSender);
-
-    d->_ui.setDockUndockCbk([this] { emit mainWidgetDockToggled(getMainWidget()); });
 }
 
 CanRawSender::~CanRawSender()

@@ -15,9 +15,6 @@ CanRawView::CanRawView()
 CanRawView::CanRawView(CanRawViewCtx&& ctx)
     : d_ptr(new CanRawViewPrivate(this, std::move(ctx)))
 {
-    Q_D(CanRawView);
-
-    d->_ui.setDockUndockCbk([this] { emit mainWidgetDockToggled(getMainWidget()); });
 }
 
 CanRawView::~CanRawView()
