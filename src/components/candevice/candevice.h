@@ -35,12 +35,22 @@ public:
     /**
     *   @see ComponentInterface
     */
+    QWidget* mainWidget() override;
+
+    /**
+    *   @see ComponentInterface
+    */
     void setConfig(QJsonObject& json) override;
 
     /**
     *   @see ComponentInterface
     */
     QJsonObject getConfig() const override;
+
+    /**
+    *   @see ComponentInterface
+    */
+    bool mainWidgetDocked() const override;
 
 signals:
     void frameReceived(const QCanBusFrame& frame);

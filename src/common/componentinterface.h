@@ -46,19 +46,13 @@ struct ComponentInterface {
     *   @brief  Gets components's main widget
     *   @return Main widget or nullptr if component doesn't have it
     */
-    virtual QWidget* mainWidget()
-    {
-        return nullptr;
-    }
+    virtual QWidget* mainWidget() = 0;
 
     /**
     *   @brief  Main widget docking status
     *   @return returns true if widget is docked (part of MDI) or undocked (separate window)
     */
-    virtual bool mainWidgetDocked() const
-    {
-        return true;
-    }
+    virtual bool mainWidgetDocked() const = 0;
 };
 
 #endif /* !__COMPONENTINTERFACE_H */
