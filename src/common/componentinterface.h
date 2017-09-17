@@ -14,6 +14,8 @@ struct ComponentInterface {
     {
     }
 
+    virtual void mainWidgetDockToggled(QWidget* widget) = 0;
+
     /**
     *   @brief  Action to be taken on simulation stop
     */
@@ -43,13 +45,6 @@ struct ComponentInterface {
     virtual QWidget* getMainWidget()
     {
         return nullptr;
-    }
-
-    /**
-    *   @brief  Callback, called when component requests dock/undock action
-    */
-    virtual void setDockUndockClbk(const std::function<void()>&)
-    {
     }
 
     /**

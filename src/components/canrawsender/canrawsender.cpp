@@ -10,6 +10,9 @@ CanRawSender::CanRawSender()
 CanRawSender::CanRawSender(CanRawSenderCtx&& ctx)
     : d_ptr(new CanRawSenderPrivate(this, std::move(ctx)))
 {
+    Q_D(CanRawSender);
+
+    d->_ui.setDockUndockCbk([this] { emit mainWidgetDockToggled(getMainWidget()); });
 }
 
 CanRawSender::~CanRawSender()
@@ -52,13 +55,6 @@ QJsonObject CanRawSender::getConfig() const
     d_ptr->saveSettings(config);
 
     return config;
-}
-
-void CanRawSender::setDockUndockClbk(const std::function<void()>& cb)
-{
-    Q_D(CanRawSender);
-
-    d->_ui.setDockUndockCbk(cb);
 }
 
 bool CanRawSender::mainWidgetDocked() const

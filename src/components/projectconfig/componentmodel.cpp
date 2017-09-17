@@ -1,4 +1,1 @@
 #include "componentmodel.h"
-
-
-

@@ -15,6 +15,9 @@ CanRawView::CanRawView()
 CanRawView::CanRawView(CanRawViewCtx&& ctx)
     : d_ptr(new CanRawViewPrivate(this, std::move(ctx)))
 {
+    Q_D(CanRawView);
+
+    d->_ui.setDockUndockCbk([this] { emit mainWidgetDockToggled(getMainWidget()); });
 }
 
 CanRawView::~CanRawView()
@@ -73,13 +76,6 @@ QJsonObject CanRawView::getConfig() const
     d_ptr->saveSettings(config);
 
     return config;
-}
-
-void CanRawView::setDockUndockClbk(const std::function<void()>& cb)
-{
-    Q_D(CanRawView);
-
-    d->_ui.setDockUndockCbk(cb);
 }
 
 bool CanRawView::mainWidgetDocked() const

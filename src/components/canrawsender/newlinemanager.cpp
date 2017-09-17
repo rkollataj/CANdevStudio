@@ -1,8 +1,8 @@
 
 #include <cassert> // assert
 
-#include "newlinemanager.h"
 #include "canrawsender.h"
+#include "newlinemanager.h"
 #include <QRegExpValidator>
 
 NewLineManager::NewLineManager(CanRawSender* q, bool _simulationState, NLMFactoryInterface& factory)
@@ -110,8 +110,7 @@ void NewLineManager::TimerExpired()
 
 QWidget* NewLineManager::GetColsWidget(ColNameIterator name)
 {
-    if (name.end() != name)
-    {
+    if (name.end() != name) {
         switch (*name) {
         case ColName::IdLine:
             return mId->getMainWidget();

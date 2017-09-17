@@ -46,9 +46,22 @@ signals:
     void frameReceived(const QCanBusFrame& frame);
     void frameSent(bool status, const QCanBusFrame& frame);
 
+    /**
+    *   @see ComponentInterface
+    */
+    void mainWidgetDockToggled(QWidget* widget) override;
+
 public slots:
     void sendFrame(const QCanBusFrame& frame);
+
+    /**
+    *   @see ComponentInterface
+    */
     void startSimulation() override;
+
+    /**
+    *   @see ComponentInterface
+    */
     void stopSimulation() override;
 
 private slots:
