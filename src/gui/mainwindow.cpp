@@ -158,9 +158,10 @@ void MainWindow::handleWidgetDeletion(QWidget* widget)
         return;
 
     if (widget->parentWidget()) {
-
         widget->parentWidget()->close();
-    } // else path not needed
+    } else {
+        widget->close();
+    }
 }
 
 void MainWindow::handleWidgetShowing(QWidget* widget, bool docked)
