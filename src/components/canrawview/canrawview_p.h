@@ -34,7 +34,7 @@ public:
         _ui.setFilterCbk(std::bind(&CanRawViewPrivate::setFilter, this));
         _ui.setDockUndockCbk([this] {
             docked = !docked;
-            emit q_ptr->mainWidgetDockToggled(_ui.getMainWidget());
+            emit q_ptr->mainWidgetDockToggled(_ui.mainWidget());
         });
     }
 

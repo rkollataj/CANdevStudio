@@ -14,15 +14,19 @@ struct ComponentInterface {
     {
     }
 
+    /**
+    *   @brief  Signal to be implemented by Component. Indicates when dock/undock action was invoked. 
+    *   @param  widget Widget subjected to dock/undock action
+    */
     virtual void mainWidgetDockToggled(QWidget* widget) = 0;
 
     /**
-    *   @brief  Action to be taken on simulation stop
+    *   @brief  Slot to be implemented by Component to execute simulation stop action
     */
     virtual void stopSimulation() = 0;
 
     /**
-    *   @brief  Action to be taken on simulation start
+    *   @brief  Slot to be implemented by Component to execute simulation start action
     */
     virtual void startSimulation() = 0;
 
@@ -42,7 +46,7 @@ struct ComponentInterface {
     *   @brief  Gets components's main widget
     *   @return Main widget or nullptr if component doesn't have it
     */
-    virtual QWidget* getMainWidget()
+    virtual QWidget* mainWidget()
     {
         return nullptr;
     }

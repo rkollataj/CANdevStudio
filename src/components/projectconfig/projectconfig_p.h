@@ -78,7 +78,7 @@ public:
         auto iface = dynamic_cast<ComponentModelInterface*>(dataModel);
         auto& component = iface->getComponent();
 
-        handleWidgetDeletion(component.getMainWidget());
+        handleWidgetDeletion(component.mainWidget());
     }
 
     void nodeDoubleClickedCallback(QtNodes::Node& node)
@@ -89,7 +89,7 @@ public:
         auto iface = dynamic_cast<ComponentModelInterface*>(dataModel);
         auto& component = iface->getComponent();
 
-        handleWidgetShowing(component.getMainWidget(), component.mainWidgetDocked());
+        handleWidgetShowing(component.mainWidget(), component.mainWidgetDocked());
     }
 
 private:

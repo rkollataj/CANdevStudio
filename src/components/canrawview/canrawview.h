@@ -23,7 +23,7 @@ public:
     /**
     *   @see ComponentInterface
     */
-    QWidget* getMainWidget() override;
+    QWidget* mainWidget() override;
 
     /**
     *   @see ComponentInterface

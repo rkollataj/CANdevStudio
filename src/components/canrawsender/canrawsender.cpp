@@ -28,11 +28,11 @@ void CanRawSender::stopSimulation()
     d_ptr->setSimulationState(false);
 }
 
-QWidget* CanRawSender::getMainWidget()
+QWidget* CanRawSender::mainWidget()
 {
     Q_D(CanRawSender);
 
-    return d->_ui.getMainWidget();
+    return d->_ui.mainWidget();
 }
 int CanRawSender::getLineCount() const
 {

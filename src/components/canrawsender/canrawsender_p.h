@@ -43,7 +43,7 @@ public:
 
         _ui.setDockUndockCbk([this] {
             docked = !docked;
-            emit q_ptr->mainWidgetDockToggled(_ui.getMainWidget());
+            emit q_ptr->mainWidgetDockToggled(_ui.mainWidget());
         });
     }
 
