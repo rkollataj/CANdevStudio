@@ -9,6 +9,17 @@ set(CMAKE_CXX_STANDARD 14)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
+# Set RPAHT to be able to run application from "bundle" dir
+set(CMAKE_INSTALL_RPATH ".")
+
+if(NOT DEFINED CMAKE_INSTALL_BINDIR)
+    set(CMAKE_INSTALL_BINDIR "bin")
+endif(NOT DEFINED CMAKE_INSTALL_BINDIR)
+
+if(NOT DEFINED CMAKE_INSTALL_LIBDIR)
+    set(CMAKE_INSTALL_LIBDIR "lib")
+endif(NOT DEFINED CMAKE_INSTALL_LIBDIR)
+
 option(WITH_COVERAGE "Build with coverage" OFF)
 
 if(NOT MSVC)
@@ -43,16 +54,16 @@ if(WITH_COVERAGE)
     setup_target_for_coverage(NAME coverage EXECUTABLE ctest DEPENDENCIES candevice_test)
 endif()
 
-set(SPDLOG_BUILD_TESTING CACHE FORCE OFF)
 set(BUILD_EXAMPLES CACHE FORCE OFF)
-add_subdirectory(3rdParty/spdlog)
 add_subdirectory(3rdParty/nodeeditor)
 add_subdirectory(src/common)
-add_subdirectory(src/gui)
 add_subdirectory(src/components)
+# Keep it always as a last directory to make bundle creation possible
+add_subdirectory(src/gui)
 
 if(WITH_TESTS OR WITH_COVERAGE)
     enable_testing()
     add_subdirectory(3rdParty/fakeit)
     add_subdirectory(tests)
 endif()
+
