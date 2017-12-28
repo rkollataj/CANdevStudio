@@ -26,6 +26,19 @@ TEST_CASE("PropertyEditorDialog", "[projectconfig]")
     CHECK(props->property("unsupported").isValid() == false);
 }
 
+TEST_CASE("PropertyEditorDialog no exposed props", "[projectconfig]")
+{
+    QObject obj;
+    PropertyEditorDialog dialog("title", obj);
+
+    auto props = dialog.properties();
+
+    CHECK(props->property("name").isValid() == false);
+    CHECK(props->property("backend").isValid() == false);
+    CHECK(props->property("interface").isValid() == false);
+    CHECK(props->property("unsupported").isValid() == false);
+}
+
 int main(int argc, char* argv[])
 {
     bool haveDebug = std::getenv("CDS_DEBUG") != nullptr;
