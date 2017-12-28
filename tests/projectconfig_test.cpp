@@ -1,5 +1,6 @@
 #define CATCH_CONFIG_RUNNER
 #include <projectconfig.h>
+#include <projectconfigvalidator.h>
 #include <fakeit.hpp>
 #include <log.h>
 #include <QWindow>
@@ -28,7 +29,13 @@ TEST_CASE("Loading and saving", "[projectconfig]")
 
 TEST_CASE("Color mode", "[projectconfig]")
 {
+    QDir dir("configfiles");
+    QFile file(dir.absoluteFilePath("projectconfig.cds"));
     ProjectConfig pc(new QWidget);
+
+    CHECK(file.open(QIODevice::ReadOnly) == true);
+    auto inConfig = file.readAll();
+    REQUIRE_NOTHROW(pc.load(inConfig));
 
     REQUIRE_NOTHROW(pc.setColorMode(true));
     REQUIRE_NOTHROW(pc.setColorMode(false));
@@ -45,8 +52,41 @@ TEST_CASE("Close event", "[projectconfig]")
     CHECK(closeSpy.count() == 1);
 }
 
+TEST_CASE("Validator - load", "[projectconfig]")
+{
+    ProjectConfigValidator pcv;
+
+    Q_INIT_RESOURCE(CANdevResources);
+
+    CHECK(pcv.loadConfigSchema());
+}
+
+TEST_CASE("Validator validate not initialized", "[projectconfig]")
+{
+    QDir dir("configfiles");
+    QFile file(dir.absoluteFilePath("projectconfig.cds"));
+    CHECK(file.open(QIODevice::ReadOnly) == true);
+    auto inConfig = file.readAll();
+
+    ProjectConfigValidator pcv;
+    CHECK(pcv.validateConfiguration(inConfig));
+}
+
+TEST_CASE("Validator validate", "[projectconfig]")
+{
+    QDir dir("configfiles");
+    QFile file(dir.absoluteFilePath("projectconfig.cds"));
+    CHECK(file.open(QIODevice::ReadOnly) == true);
+    auto inConfig = file.readAll();
+
+    ProjectConfigValidator pcv;
+    CHECK(pcv.loadConfigSchema());
+    CHECK(pcv.validateConfiguration(inConfig));
+}
+
 int main(int argc, char* argv[])
 {
+    Q_INIT_RESOURCE(CANdevResources);
     bool haveDebug = std::getenv("CDS_DEBUG") != nullptr;
     kDefaultLogger = spdlog::stdout_color_mt("cds");
     if (haveDebug) {

@@ -1,4 +1,5 @@
 include_directories(${CMAKE_SOURCE_DIR}/3rdParty/fakeit/single_header/catch)
+include_directories(${CMAKE_SOURCE_DIR}/3rdParty/rapidjson/include)
 include_directories(${CMAKE_SOURCE_DIR}/3rdParty/fakeit/config/catch)
 include_directories(${CMAKE_SOURCE_DIR}/src/components)
 
