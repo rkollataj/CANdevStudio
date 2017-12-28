@@ -43,6 +43,11 @@ target_link_libraries(projectconfig_test candevice Qt5::Core Qt5::SerialBus Qt5:
 target_compile_options(projectconfig_test PRIVATE $<$<CXX_COMPILER_ID:GNU>:-fno-devirtualize>)
 add_test( NAME ProjectConfigTest COMMAND projectconfig_test)
 
+add_executable(projectconfig_test_noqrc projectconfig_test_noqrc.cpp)
+target_link_libraries(projectconfig_test_noqrc candevice Qt5::Core Qt5::SerialBus Qt5::Test nodes cds-common projectconfig)
+target_compile_options(projectconfig_test_noqrc PRIVATE $<$<CXX_COMPILER_ID:GNU>:-fno-devirtualize>)
+add_test( NAME ProjectConfigTest_NoQrc COMMAND projectconfig_test_noqrc)
+
 set(CONFIG_SOURCE ${PROJECT_SOURCE_DIR}/tests/configfiles)
 set(CONFIG_DESTINATION ${PROJECT_BINARY_DIR}/tests/configfiles)
 add_custom_command(TARGET canrawsender_test canrawviewmodel_test POST_BUILD
