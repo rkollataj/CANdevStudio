@@ -123,6 +123,13 @@ bool compareJson(const QJsonObject& patern, const QJsonObject& check)
     return true;
 }
 
+TEST_CASE("setCaption", "[canrawview]")
+{
+    CanRawViewModel canRawViewModel;
+    
+    REQUIRE_NOTHROW(canRawViewModel.setCaption("foobar"));
+}
+
 TEST_CASE("Test restore - no name", "[canrawview]")
 {
     QJsonObject jsonObject;
@@ -227,6 +234,15 @@ TEST_CASE("Test restore configuration - width incorrect", "[canrawview]")
 
     CHECK(compareJson(jsonObject, json) == false);
 }
+
+TEST_CASE("Getters", "[canrawview]")
+{
+    CanRawViewModel crvModel;
+
+    CHECK(crvModel.painterDelegate() != nullptr);
+    CHECK(crvModel.outData(0));
+}
+
 
 int main(int argc, char* argv[])
 {
