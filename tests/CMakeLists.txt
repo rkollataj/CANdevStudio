@@ -37,6 +37,10 @@ target_link_libraries(common_test candevice Qt5::Core Qt5::SerialBus Qt5::Test n
 target_compile_options(common_test PRIVATE $<$<CXX_COMPILER_ID:GNU>:-fno-devirtualize>)
 add_test( NAME CommonTest COMMAND common_test)
 
+add_executable(projectconfig_test projectconfig_test.cpp)
+target_link_libraries(projectconfig_test candevice Qt5::Core Qt5::SerialBus Qt5::Test nodes cds-common projectconfig)
+target_compile_options(projectconfig_test PRIVATE $<$<CXX_COMPILER_ID:GNU>:-fno-devirtualize>)
+add_test( NAME ProjectConfigTest COMMAND projectconfig_test)
 
 set(CONFIG_SOURCE ${PROJECT_SOURCE_DIR}/tests/configfiles)
 set(CONFIG_DESTINATION ${PROJECT_BINARY_DIR}/tests/configfiles)
