@@ -123,6 +123,26 @@ bool compareJson(const QJsonObject& patern, const QJsonObject& check)
     return true;
 }
 
+TEST_CASE("Test restore - no name", "[canrawview]")
+{
+    QJsonObject jsonObject;
+    jsonObject["name"] = "aaa";
+
+    CanRawViewModel canRawViewModel;
+    
+    REQUIRE_NOTHROW(canRawViewModel.restore(jsonObject));
+}
+
+TEST_CASE("Test restore - no caption", "[canrawview]")
+{
+    QJsonObject jsonObject;
+    jsonObject["caption"] = "aaa";
+
+    CanRawViewModel canRawViewModel;
+    
+    REQUIRE_NOTHROW(canRawViewModel.restore(jsonObject));
+}
+
 TEST_CASE("Test restore configuration", "[canrawview]")
 {
     QDir dir("configfiles");
