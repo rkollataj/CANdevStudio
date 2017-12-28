@@ -52,24 +52,35 @@ TEST_CASE("Close event", "[projectconfig]")
     CHECK(closeSpy.count() == 1);
 }
 
-TEST_CASE("Validator - load", "[projectconfig]")
+
+TEST_CASE("Validation JSON format error", "[projectconfig]")
 {
-    ProjectConfigValidator pcv;
+    QDir dir("configfiles");
+    QFile file(dir.absoluteFilePath("projectconfig_wrong.cds"));
+    CHECK(file.open(QIODevice::ReadOnly) == true);
+    auto inConfig = file.read(40);
 
-    Q_INIT_RESOURCE(CANdevResources);
-
-    CHECK(pcv.loadConfigSchema());
+    CHECK(ProjectConfigValidator::validateConfiguration(inConfig) == false);
 }
 
-TEST_CASE("Validator validate not initialized", "[projectconfig]")
+TEST_CASE("Validation schema validation failed", "[projectconfig]")
+{
+    QDir dir("configfiles");
+    QFile file(dir.absoluteFilePath("projectconfig_wrong.cds"));
+    CHECK(file.open(QIODevice::ReadOnly) == true);
+    auto inConfig = file.readAll();
+
+    CHECK(ProjectConfigValidator::validateConfiguration(inConfig) == false);
+}
+
+TEST_CASE("Validation succeeded", "[projectconfig]")
 {
     QDir dir("configfiles");
     QFile file(dir.absoluteFilePath("projectconfig.cds"));
     CHECK(file.open(QIODevice::ReadOnly) == true);
     auto inConfig = file.readAll();
 
-    ProjectConfigValidator pcv;
-    CHECK(pcv.validateConfiguration(inConfig));
+    CHECK(ProjectConfigValidator::validateConfiguration(inConfig));
 }
 
 TEST_CASE("Validator validate", "[projectconfig]")
