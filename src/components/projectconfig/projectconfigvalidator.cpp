@@ -46,11 +46,11 @@ bool ProjectConfigValidator::validateConfiguration(const QByteArray& wholeFile)
     return true;
 }
 
-bool ProjectConfigValidator::loadConfigSchema()
+bool ProjectConfigValidator::loadConfigSchema(const char* filename)
 {
     using namespace rapidjson;
 
-    QFile file(":/files/json/projectConfigSchema.json");
+    QFile file(filename);
     if (!file.open(QIODevice::ReadOnly))
     {
         cds_error("Could not open configuration schema file");

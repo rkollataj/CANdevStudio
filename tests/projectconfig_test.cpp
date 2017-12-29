@@ -53,6 +53,15 @@ TEST_CASE("Close event", "[projectconfig]")
 }
 
 
+TEST_CASE("Validation schema parse error", "[projectconfig]")
+{
+    QFile file("Makefile");
+    CHECK(file.open(QIODevice::ReadOnly) == true);
+    auto inConfig = file.read(40);
+
+    CHECK(ProjectConfigValidator::loadConfigSchema(inConfig) == false);
+}
+
 TEST_CASE("Validation JSON format error", "[projectconfig]")
 {
     QDir dir("configfiles");
