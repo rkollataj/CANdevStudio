@@ -148,7 +148,7 @@ TEST_CASE("Sort test", "[canrawview]")
     // TODO spy sectionClicked signal...
 }
 
-TEST_CASE("setConfig using JSON read with QObject", "[candevice]")
+TEST_CASE("setConfig using QObject", "[canrawview]")
 {
     CanRawView crv;
     QObject config;

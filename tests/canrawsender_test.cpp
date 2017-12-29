@@ -311,3 +311,36 @@ TEST_CASE("Can raw sender restore configuration test - Interval incorrect", "[ca
     // If configuration is corrected create new line - check it
     CHECK(canRawSender.getLineCount() == 0);
 }
+
+TEST_CASE("Misc", "[canrawsender]")
+{
+    CanRawSender canRawSender;
+
+    CHECK(canRawSender.mainWidgetDocked() == true);
+    CHECK(canRawSender.mainWidget() != nullptr);
+}
+
+TEST_CASE("setConfig using QObject", "[canrawsender]")
+{
+    CanRawSender crs;
+    QObject config;
+
+    config.setProperty("name", "CAN1");
+    config.setProperty("fake", "unsupported");
+
+    crs.setConfig(config);
+
+    auto qConfig = crs.getQConfig();
+
+    CHECK(qConfig->property("name").toString() == "CAN1");
+    CHECK(qConfig->property("fake").isValid() == false);
+}
+
+TEST_CASE("start/stop simulation", "[canrawsender]")
+{
+    CanRawSender crs;
+
+    REQUIRE_NOTHROW(crs.startSimulation());
+    REQUIRE_NOTHROW(crs.stopSimulation());
+}
+
