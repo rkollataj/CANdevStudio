@@ -134,6 +134,8 @@ TEST_CASE("Sort test", "[canrawview]")
     addNewFrame(rowID, 10.00, 101, 1000, _tvModel, _uniqueModel);
     addNewFrame(rowID, 11.00, 11, 11, _tvModel, _uniqueModel);
 
+    _uniqueModel.toggleFilter();
+
     for(int i = 0; i < 4; ++i) {
         _uniqueModel.sort(i, Qt::AscendingOrder);
         _uniqueModel.sort(i, Qt::DescendingOrder);
@@ -177,6 +179,7 @@ TEST_CASE("Restore config paths", "[canrawview]")
     // Array item is not an obj
     columnItem["dummy"] = 123;
     columnArray.append(columnItem);
+    json["viewColumns"] = columnArray;
     canRawView.setConfig(json);
 
     // name does not exist
@@ -184,6 +187,7 @@ TEST_CASE("Restore config paths", "[canrawview]")
     columnItem["dummy"] = 123;
     columnItem["dummy2"] = 234;
     columnArray.append(columnItem);
+    json["viewColumns"] = columnArray;
     canRawView.setConfig(json);
    
     // name is not a string
@@ -191,6 +195,7 @@ TEST_CASE("Restore config paths", "[canrawview]")
     columnItem["name"] = 123;
     columnItem["dummy2"] = 234;
     columnArray.append(columnItem);
+    json["viewColumns"] = columnArray;
     canRawView.setConfig(json);
     
     // vIdx does not exist
@@ -198,6 +203,7 @@ TEST_CASE("Restore config paths", "[canrawview]")
     columnItem["name"] = "rowID";
     columnItem["dummy2"] = 234;
     columnArray.append(columnItem);
+    json["viewColumns"] = columnArray;
     canRawView.setConfig(json);
     
     // vIdx is not number
@@ -205,6 +211,7 @@ TEST_CASE("Restore config paths", "[canrawview]")
     columnItem["name"] = "rowID";
     columnItem["vIdx"] = "dsds";
     columnArray.append(columnItem);
+    json["viewColumns"] = columnArray;
     canRawView.setConfig(json);
     
     // Column not found
@@ -212,6 +219,30 @@ TEST_CASE("Restore config paths", "[canrawview]")
     columnItem["name"] = "Blah";
     columnItem["vIdx"] = 1;
     columnArray.append(columnItem);
+    json["viewColumns"] = columnArray;
+    canRawView.setConfig(json);
+
+    // No scrolling item
+    columnArray.removeFirst();
+    columnItem["name"] = "rowID";
+    columnItem["vIdx"] = 1;
+    columnArray.append(columnItem);
+    columnItem["name"] = "time";
+    columnItem["vIdx"] = 2;
+    columnArray.append(columnItem);
+    columnItem["name"] = "id";
+    columnItem["vIdx"] = 3;
+    columnArray.append(columnItem);
+    columnItem["name"] = "dir";
+    columnItem["vIdx"] = 4;
+    columnArray.append(columnItem);
+    columnItem["name"] = "dlc";
+    columnItem["vIdx"] = 5;
+    columnArray.append(columnItem);
+    columnItem["name"] = "data";
+    columnItem["vIdx"] = 6;
+    columnArray.append(columnItem);
+    json["viewColumns"] = columnArray;
     canRawView.setConfig(json);
 }
 
