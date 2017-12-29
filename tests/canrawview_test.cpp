@@ -5,6 +5,7 @@
 #include <QTableView>
 
 #include <QtWidgets/QApplication>
+#include <QJsonArray>
 #include <context.h>
 #include <fakeit.hpp>
 
@@ -157,6 +158,61 @@ TEST_CASE("setConfig using JSON read with QObject", "[candevice]")
 
     CHECK(qConfig->property("name").toString() == "CAN1");
     CHECK(qConfig->property("fake").isValid() == false);
+}
+
+TEST_CASE("Restore config paths", "[canrawview]")
+{
+    CanRawView canRawView;
+    QJsonObject json;
+    QJsonArray columnArray;
+    QJsonObject columnItem;
+
+    // No viewColumns
+    canRawView.setConfig(json);
+
+    // ViewColumn is not an array
+    json["viewColumns"] = "";
+    canRawView.setConfig(json);
+
+    // Array item is not an obj
+    columnItem["dummy"] = 123;
+    columnArray.append(columnItem);
+    canRawView.setConfig(json);
+
+    // name does not exist
+    columnArray.removeFirst();
+    columnItem["dummy"] = 123;
+    columnItem["dummy2"] = 234;
+    columnArray.append(columnItem);
+    canRawView.setConfig(json);
+   
+    // name is not a string
+    columnArray.removeFirst();
+    columnItem["name"] = 123;
+    columnItem["dummy2"] = 234;
+    columnArray.append(columnItem);
+    canRawView.setConfig(json);
+    
+    // vIdx does not exist
+    columnArray.removeFirst();
+    columnItem["name"] = "rowID";
+    columnItem["dummy2"] = 234;
+    columnArray.append(columnItem);
+    canRawView.setConfig(json);
+    
+    // vIdx is not number
+    columnArray.removeFirst();
+    columnItem["name"] = "rowID";
+    columnItem["vIdx"] = "dsds";
+    columnArray.append(columnItem);
+    canRawView.setConfig(json);
+    
+    // Column not found
+    columnArray.removeFirst();
+    columnItem["name"] = "Blah";
+    columnItem["vIdx"] = 1;
+    columnArray.append(columnItem);
+    canRawView.setConfig(json);
 }
 
 TEST_CASE("Misc", "[canrawview]")
