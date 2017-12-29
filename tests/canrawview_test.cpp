@@ -45,8 +45,6 @@ void addNewFrame(
 
 TEST_CASE("Initialize table", "[canrawview]")
 {
-
-    //  Q_D(CanRawView);
     Mock<CRVGuiInterface> crvMock;
     Fake(Dtor(crvMock));
 
@@ -58,8 +56,9 @@ TEST_CASE("Initialize table", "[canrawview]")
     Fake(Method(crvMock, setSorting));
 
     Fake(Method(crvMock, initTableView));
+    Fake(Method(crvMock, scrollToBottom));
     When(Method(crvMock, mainWidget)).Return(NULL);
-    When(Method(crvMock, isViewFrozen)).Return(false);
+    When(Method(crvMock, isViewFrozen)).Return(false).Return(true).Return(true);
     When(Method(crvMock, getSortOrder)).Return(Qt::AscendingOrder);
     When(Method(crvMock, getClickedColumn)).Return("rowID", "time", "id", "dir", "dlc", "data");
     When(Method(crvMock, isColumnHidden)).Return(true, false, false, false, false, false);
@@ -71,30 +70,18 @@ TEST_CASE("Initialize table", "[canrawview]")
     // Verify(Method(crvMock, getClickedColumn).Using(0));
     // Verify(Method(crvMock, getClickedColumn).Using(0));
 
+    QCanBusFrame frame;
     REQUIRE_NOTHROW(canRawView.startSimulation());
-
-    CanRawViewPrivate* d_ptr = canRawView.d_func();
-    CHECK(d_ptr != nullptr);
-
-    CHECK(canRawView.mainWidgetDocked() == true);
-    CHECK(canRawView.mainWidget() == nullptr);
+    REQUIRE_NOTHROW(canRawView.frameReceived(frame));
+    REQUIRE_NOTHROW(canRawView.frameSent(true, frame));
+    REQUIRE_NOTHROW(canRawView.frameSent(false, frame));
 
     REQUIRE_NOTHROW(canRawView.stopSimulation());
+    REQUIRE_NOTHROW(canRawView.frameReceived(frame));
 }
 
 TEST_CASE("Unique filter test", "[canrawview]")
 {
-    Mock<CRVGuiInterface> crvMock;
-    Fake(Dtor(crvMock));
-
-    Fake(Method(crvMock, setClearCbk));
-    Fake(Method(crvMock, setDockUndockCbk));
-    Fake(Method(crvMock, setSectionClikedCbk));
-    Fake(Method(crvMock, setFilterCbk));
-    Fake(Method(crvMock, setModel));
-    Fake(Method(crvMock, setSorting));
-    Fake(Method(crvMock, initTableView));
-
     QStandardItemModel _tvModel;
     UniqueFilterModel _uniqueModel;
     QTableView _tableView;
@@ -106,7 +93,7 @@ TEST_CASE("Unique filter test", "[canrawview]")
     QCanBusFrame testFrame;
     testFrame.setFrameId(123);
 
-    // rowID, time, frameID, data//
+    // rowID, time, frameID, data
     addNewFrame(rowID, 0.20, 1, 0, _tvModel, _uniqueModel);
     addNewFrame(rowID, 0.40, 2, 0, _tvModel, _uniqueModel);
     addNewFrame(rowID, 0.60, 3, 0, _tvModel, _uniqueModel);
@@ -132,17 +119,6 @@ TEST_CASE("Unique filter test", "[canrawview]")
 
 TEST_CASE("Sort test", "[canrawview]")
 {
-    Mock<CRVGuiInterface> crvMock;
-    Fake(Dtor(crvMock));
-
-    Fake(Method(crvMock, setClearCbk));
-    Fake(Method(crvMock, setDockUndockCbk));
-    Fake(Method(crvMock, setSectionClikedCbk));
-    Fake(Method(crvMock, setFilterCbk));
-    Fake(Method(crvMock, setModel));
-    Fake(Method(crvMock, setSorting));
-    Fake(Method(crvMock, initTableView));
-
     QStandardItemModel _tvModel;
     UniqueFilterModel _uniqueModel;
     QTableView _tableView;
@@ -157,9 +133,38 @@ TEST_CASE("Sort test", "[canrawview]")
     addNewFrame(rowID, 10.00, 101, 1000, _tvModel, _uniqueModel);
     addNewFrame(rowID, 11.00, 11, 11, _tvModel, _uniqueModel);
 
+    for(int i = 0; i < 4; ++i) {
+        _uniqueModel.sort(i, Qt::AscendingOrder);
+        _uniqueModel.sort(i, Qt::DescendingOrder);
+    }
+
     CHECK(_tvModel.rowCount() == 4);
     CHECK(_uniqueModel.isFilterActive() == false);
     // TODO spy sectionClicked signal...
+}
+
+TEST_CASE("setConfig using JSON read with QObject", "[candevice]")
+{
+    CanRawView crv;
+    QObject config;
+
+    config.setProperty("name", "CAN1");
+    config.setProperty("fake", "unsupported");
+
+    crv.setConfig(config);
+
+    auto qConfig = crv.getQConfig();
+
+    CHECK(qConfig->property("name").toString() == "CAN1");
+    CHECK(qConfig->property("fake").isValid() == false);
+}
+
+TEST_CASE("Misc", "[canrawview]")
+{
+    CanRawView canRawView;
+
+    CHECK(canRawView.mainWidgetDocked() == true);
+    CHECK(canRawView.mainWidget() != nullptr);
 }
 
 int main(int argc, char* argv[])
