@@ -51,29 +51,36 @@ TEST_CASE("Add and remove frame test", "[canrawsender]")
 
     Fake(Dtor(nlmLineEditMock));
     Fake(Method(nlmLineEditMock, textChangedCbk));
-    Fake(Method(nlmLineEditMock, init));
-    Fake(Method(nlmLineEditMock, setPlaceholderText));
-    Fake(Method(nlmLineEditMock, setDisabled));
     When(Method(nlmLineEditMock, mainWidget)).AlwaysDo([&]() {
         return reinterpret_cast<QWidget*>(&nlmLineEditMock.get());
     });
+    Fake(Method(nlmLineEditMock, init));
+    Fake(Method(nlmLineEditMock, setPlaceholderText));
+    Fake(Method(nlmLineEditMock, setDisabled));
+    Fake(Method(nlmLineEditMock, getTextLength));
+    Fake(Method(nlmLineEditMock, getText));
+    Fake(Method(nlmLineEditMock, setText));
     When(Method(nlmFactoryMock, createLineEdit)).AlwaysDo([&]() { return &nlmLineEditMock.get(); });
 
     Fake(Dtor(nlmCheckBoxMock));
     Fake(Method(nlmCheckBoxMock, toggledCbk));
+    When(Method(nlmCheckBoxMock, mainWidget)).AlwaysReturn(reinterpret_cast<QWidget*>(&nlmCheckBoxMock.get()));
+    Fake(Method(nlmCheckBoxMock, getState));
+    Fake(Method(nlmCheckBoxMock, setState));
     Fake(Method(nlmCheckBoxMock, setDisabled));
-    When(Method(nlmCheckBoxMock, mainWidget)).Return(reinterpret_cast<QWidget*>(&nlmCheckBoxMock.get()));
-    When(Method(nlmFactoryMock, createCheckBox)).Return(&nlmCheckBoxMock.get());
+    When(Method(nlmFactoryMock, createCheckBox)).AlwaysReturn(&nlmCheckBoxMock.get());
 
     Fake(Dtor(nlmPushButtonMock));
     Fake(Method(nlmPushButtonMock, init));
     Fake(Method(nlmPushButtonMock, pressedCbk));
+    Fake(Method(nlmPushButtonMock, setDisabled));
+    Fake(Method(nlmPushButtonMock, isEnabled));
     Fake(Method(nlmPushButtonMock, setCheckable));
     Fake(Method(nlmPushButtonMock, checkable));
-    Fake(Method(nlmPushButtonMock, checked));
+    When(Method(nlmPushButtonMock, checked)).Return(true).Return(false);
     Fake(Method(nlmPushButtonMock, setChecked));
-    When(Method(nlmPushButtonMock, mainWidget)).Return(reinterpret_cast<QWidget*>(&nlmPushButtonMock.get()));
-    When(Method(nlmFactoryMock, createPushButton)).Return(&nlmPushButtonMock.get());
+    When(Method(nlmPushButtonMock, mainWidget)).AlwaysReturn(reinterpret_cast<QWidget*>(&nlmPushButtonMock.get()));
+    When(Method(nlmFactoryMock, createPushButton)).AlwaysReturn(&nlmPushButtonMock.get());
 
     Fake(Dtor(crsMock));
     When(Method(crsMock, setAddCbk)).Do([&](auto&& fn) { addLineCbk = fn; });
@@ -87,10 +94,16 @@ TEST_CASE("Add and remove frame test", "[canrawsender]")
     CanRawSender canRawSender{ CanRawSenderCtx(&crsMock.get(), &nlmFactoryMock.get()) };
 
     CHECK(canRawSender.getLineCount() == 0);
+
     addLineCbk();
-    CHECK(canRawSender.getLineCount() == 1);
+    addLineCbk();
+    CHECK(canRawSender.getLineCount() == 2);
+
+    canRawSender.stopSimulation();
+    canRawSender.startSimulation();
+
     removeLineCbk();
-    CHECK(canRawSender.getLineCount() == 0);
+    CHECK(canRawSender.getLineCount() == 1);
 }
 
 TEST_CASE("Can raw sender save configuration test", "[canrawsender]")
