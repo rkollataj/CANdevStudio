@@ -10,6 +10,7 @@
 #include <gui/crsguiinterface.h>
 #include <memory>
 #include <newlinemanager.h>
+#include <QSignalSpy>
 
 using namespace fakeit;
 
@@ -38,6 +39,7 @@ TEST_CASE("Add and remove frame test", "[canrawsender]")
 
     CRSGuiInterface::add_t addLineCbk;
     CRSGuiInterface::remove_t removeLineCbk;
+    PushButtonInterface::pressed_t sendPressed;
 
     Mock<CRSGuiInterface> crsMock;
 
@@ -72,12 +74,12 @@ TEST_CASE("Add and remove frame test", "[canrawsender]")
 
     Fake(Dtor(nlmPushButtonMock));
     Fake(Method(nlmPushButtonMock, init));
-    Fake(Method(nlmPushButtonMock, pressedCbk));
+    When(Method(nlmPushButtonMock, pressedCbk)).AlwaysDo([&](auto&& fn) { sendPressed = fn; });
     Fake(Method(nlmPushButtonMock, setDisabled));
     Fake(Method(nlmPushButtonMock, isEnabled));
     Fake(Method(nlmPushButtonMock, setCheckable));
     Fake(Method(nlmPushButtonMock, checkable));
-    When(Method(nlmPushButtonMock, checked)).Return(true).Return(false);
+    When(Method(nlmPushButtonMock, checked)).Return(true).Return(false).Return(true);
     Fake(Method(nlmPushButtonMock, setChecked));
     When(Method(nlmPushButtonMock, mainWidget)).AlwaysReturn(reinterpret_cast<QWidget*>(&nlmPushButtonMock.get()));
     When(Method(nlmFactoryMock, createPushButton)).AlwaysReturn(&nlmPushButtonMock.get());
@@ -104,6 +106,8 @@ TEST_CASE("Add and remove frame test", "[canrawsender]")
 
     removeLineCbk();
     CHECK(canRawSender.getLineCount() == 1);
+
+    sendPressed();
 }
 
 TEST_CASE("Can raw sender save configuration test", "[canrawsender]")
@@ -349,14 +353,6 @@ TEST_CASE("setConfig using QObject", "[canrawsender]")
     CHECK(qConfig->property("fake").isValid() == false);
 }
 
-TEST_CASE("start/stop simulation", "[canrawsender]")
-{
-    CanRawSender crs;
-
-    REQUIRE_NOTHROW(crs.startSimulation());
-    REQUIRE_NOTHROW(crs.stopSimulation());
-}
-
 TEST_CASE("Restore config paths - columnAdopt", "[canrawsender]")
 {
     CanRawSender canRawSender;
@@ -526,4 +522,37 @@ TEST_CASE("Restore config paths - sortingAdopt", "[canrawsender]")
     // All good!
     json["sorting"] = QJsonObject({ { "currentIndex", 12 } });
     canRawSender.setConfig(json);
+}
+
+TEST_CASE("Dock/Undock", "[canrawsender]")
+{
+    CRSGuiInterface::dockUndock_t dockUndock;
+
+    Mock<CRSGuiInterface> crsMock;
+    Fake(Dtor(crsMock));
+    Fake(Method(crsMock, setAddCbk));
+    Fake(Method(crsMock, setRemoveCbk));
+    When(Method(crsMock, setDockUndockCbk)).Do([&](auto&& fn) { dockUndock = fn; });
+    Fake(Method(crsMock, mainWidget));
+    Fake(Method(crsMock, initTableView));
+    Fake(Method(crsMock, getSelectedRows));
+    Fake(Method(crsMock, setIndexWidget));
+
+    Mock<NLMFactoryInterface> nlmFactoryMock;
+    Fake(Dtor(nlmFactoryMock));
+
+    CanRawSender canRawSender{ CanRawSenderCtx(&crsMock.get(), &nlmFactoryMock.get()) };
+    QSignalSpy dockSpy(&canRawSender, &CanRawSender::mainWidgetDockToggled);
+
+    CHECK(canRawSender.mainWidgetDocked() == true);
+
+    dockUndock();
+
+    CHECK(dockSpy.count() == 1);
+    CHECK(canRawSender.mainWidgetDocked() == false);
+
+    dockUndock();
+
+    CHECK(dockSpy.count() == 2);
+    CHECK(canRawSender.mainWidgetDocked() == true);
 }
