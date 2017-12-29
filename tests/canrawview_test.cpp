@@ -72,6 +72,8 @@ TEST_CASE("Initialize table", "[canrawview]")
     // Verify(Method(crvMock, getClickedColumn).Using(0));
 
     QCanBusFrame frame;
+    frame.setPayload({"123"});
+
     REQUIRE_NOTHROW(canRawView.startSimulation());
     REQUIRE_NOTHROW(canRawView.frameReceived(frame));
     REQUIRE_NOTHROW(canRawView.frameSent(true, frame));
@@ -142,7 +144,7 @@ TEST_CASE("Sort test", "[canrawview]")
     }
 
     CHECK(_tvModel.rowCount() == 4);
-    CHECK(_uniqueModel.isFilterActive() == false);
+    CHECK(_uniqueModel.isFilterActive() == true);
     // TODO spy sectionClicked signal...
 }
 
