@@ -184,51 +184,87 @@ TEST_CASE("Restore config paths", "[canrawview]")
     json["viewColumns"] = columnArray;
     canRawView.setConfig(json);
 
-    // name does not exist
-    columnArray.removeFirst();
+    // Array size != 5 
+    columnArray = QJsonArray();
+    columnItem = QJsonObject();
     columnItem["dummy"] = 123;
     columnItem["dummy2"] = 234;
+    columnArray.append(columnItem);
+    columnArray.append(columnItem);
+    columnArray.append(columnItem);
+    columnArray.append(columnItem);
+    columnArray.append(columnItem);
+    json["viewColumns"] = columnArray;
+    canRawView.setConfig(json);
+    
+    // name does not exist
+    columnArray = QJsonArray();
+    columnItem = QJsonObject();
+    columnItem["dummy"] = 123;
+    columnItem["dummy2"] = 234;
+    columnArray.append(columnItem);
+    columnArray.append(columnItem);
+    columnArray.append(columnItem);
+    columnArray.append(columnItem);
     columnArray.append(columnItem);
     json["viewColumns"] = columnArray;
     canRawView.setConfig(json);
    
     // name is not a string
-    columnArray.removeFirst();
+    columnArray = QJsonArray();
+    columnItem = QJsonObject();
     columnItem["name"] = 123;
     columnItem["dummy2"] = 234;
+    columnArray.append(columnItem);
+    columnArray.append(columnItem);
+    columnArray.append(columnItem);
+    columnArray.append(columnItem);
     columnArray.append(columnItem);
     json["viewColumns"] = columnArray;
     canRawView.setConfig(json);
     
     // vIdx does not exist
-    columnArray.removeFirst();
+    columnArray = QJsonArray();
+    columnItem = QJsonObject();
     columnItem["name"] = "rowID";
     columnItem["dummy2"] = 234;
+    columnArray.append(columnItem);
+    columnArray.append(columnItem);
+    columnArray.append(columnItem);
+    columnArray.append(columnItem);
     columnArray.append(columnItem);
     json["viewColumns"] = columnArray;
     canRawView.setConfig(json);
     
     // vIdx is not number
-    columnArray.removeFirst();
+    columnArray = QJsonArray();
+    columnItem = QJsonObject();
     columnItem["name"] = "rowID";
     columnItem["vIdx"] = "dsds";
+    columnArray.append(columnItem);
+    columnArray.append(columnItem);
+    columnArray.append(columnItem);
+    columnArray.append(columnItem);
     columnArray.append(columnItem);
     json["viewColumns"] = columnArray;
     canRawView.setConfig(json);
     
     // Column not found
-    columnArray.removeFirst();
+    columnArray = QJsonArray();
+    columnItem = QJsonObject();
     columnItem["name"] = "Blah";
     columnItem["vIdx"] = 1;
+    columnArray.append(columnItem);
+    columnArray.append(columnItem);
+    columnArray.append(columnItem);
+    columnArray.append(columnItem);
     columnArray.append(columnItem);
     json["viewColumns"] = columnArray;
     canRawView.setConfig(json);
 
     // No scrolling item
-    columnArray.removeFirst();
-    columnItem["name"] = "rowID";
-    columnItem["vIdx"] = 1;
-    columnArray.append(columnItem);
+    columnArray = QJsonArray();
+    columnItem = QJsonObject();
     columnItem["name"] = "time";
     columnItem["vIdx"] = 2;
     columnArray.append(columnItem);
