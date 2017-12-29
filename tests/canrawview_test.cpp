@@ -178,25 +178,23 @@ TEST_CASE("Restore config paths", "[canrawview]")
     json["viewColumns"] = "";
     canRawView.setConfig(json);
 
-    // Array item is not an obj
-    columnItem["dummy"] = 123;
-    columnArray.append(columnItem);
-    json["viewColumns"] = columnArray;
-    canRawView.setConfig(json);
-
     // Array size != 5 
-    columnArray = QJsonArray();
-    columnItem = QJsonObject();
     columnItem["dummy"] = 123;
-    columnItem["dummy2"] = 234;
-    columnArray.append(columnItem);
-    columnArray.append(columnItem);
-    columnArray.append(columnItem);
-    columnArray.append(columnItem);
     columnArray.append(columnItem);
     json["viewColumns"] = columnArray;
     canRawView.setConfig(json);
     
+    // Array item is not an obj
+    columnArray = QJsonArray();
+    QJsonValue val;
+    columnArray.append(val);
+    columnArray.append(val);
+    columnArray.append(val);
+    columnArray.append(val);
+    columnArray.append(val);
+    json["viewColumns"] = columnArray;
+    canRawView.setConfig(json);
+
     // name does not exist
     columnArray = QJsonArray();
     columnItem = QJsonObject();
@@ -226,7 +224,7 @@ TEST_CASE("Restore config paths", "[canrawview]")
     // vIdx does not exist
     columnArray = QJsonArray();
     columnItem = QJsonObject();
-    columnItem["name"] = "rowID";
+    columnItem["name"] = "time";
     columnItem["dummy2"] = 234;
     columnArray.append(columnItem);
     columnArray.append(columnItem);
@@ -239,7 +237,7 @@ TEST_CASE("Restore config paths", "[canrawview]")
     // vIdx is not number
     columnArray = QJsonArray();
     columnItem = QJsonObject();
-    columnItem["name"] = "rowID";
+    columnItem["name"] = "time";
     columnItem["vIdx"] = "dsds";
     columnArray.append(columnItem);
     columnArray.append(columnItem);
