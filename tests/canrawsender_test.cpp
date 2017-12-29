@@ -344,3 +344,173 @@ TEST_CASE("start/stop simulation", "[canrawsender]")
     REQUIRE_NOTHROW(crs.stopSimulation());
 }
 
+TEST_CASE("Restore config paths - columnAdopt", "[canrawsender]")
+{
+    CanRawSender canRawSender;
+    QJsonObject json;
+    QJsonArray columnArray;
+    QJsonObject columnItem;
+
+    // No senderColumns
+    canRawSender.setConfig(json);
+
+    // senderColumns is not an array
+    json["senderColumns"] = "";
+    canRawSender.setConfig(json);
+
+    // Array size != 5
+    columnItem["dummy"] = 123;
+    columnArray.append(columnItem);
+    json["senderColumns"] = columnArray;
+    canRawSender.setConfig(json);
+
+    // No Id column
+    columnArray = QJsonArray();
+    columnArray.append({ "Idd" });
+    columnArray.append({ "Idd" });
+    columnArray.append({ "Idd" });
+    columnArray.append({ "Idd" });
+    columnArray.append({ "Idd" });
+    json["senderColumns"] = columnArray;
+    canRawSender.setConfig(json);
+
+    // No Data column
+    columnArray = QJsonArray();
+    columnArray.append({ "Id" });
+    columnArray.append({ "Idd" });
+    columnArray.append({ "Idd" });
+    columnArray.append({ "Idd" });
+    columnArray.append({ "Idd" });
+    json["senderColumns"] = columnArray;
+    canRawSender.setConfig(json);
+
+    // No Loop column
+    columnArray = QJsonArray();
+    columnArray.append({ "Id" });
+    columnArray.append({ "Data" });
+    columnArray.append({ "Idd" });
+    columnArray.append({ "Idd" });
+    columnArray.append({ "Idd" });
+    json["senderColumns"] = columnArray;
+    canRawSender.setConfig(json);
+
+    // No Interval column
+    columnArray = QJsonArray();
+    columnArray.append({ "Id" });
+    columnArray.append({ "Data" });
+    columnArray.append({ "Loop" });
+    columnArray.append({ "Idd" });
+    columnArray.append({ "Idd" });
+    json["senderColumns"] = columnArray;
+    canRawSender.setConfig(json);
+
+    // Validation complete
+    columnArray = QJsonArray();
+    columnArray.append({ "Id" });
+    columnArray.append({ "Data" });
+    columnArray.append({ "Loop" });
+    columnArray.append({ "Interval" });
+    columnArray.append({ "Idd" });
+    json["senderColumns"] = columnArray;
+    canRawSender.setConfig(json);
+}
+
+TEST_CASE("Restore config paths - contentAdopt", "[canrawsender]")
+{
+    CanRawSender canRawSender;
+    QJsonObject json;
+    QJsonArray columnArray;
+    QJsonObject columnItem;
+    QJsonArray contentArray;
+
+    // contentAdopt Validation complete
+    columnArray = QJsonArray();
+    columnArray.append({ "Id" });
+    columnArray.append({ "Data" });
+    columnArray.append({ "Loop" });
+    columnArray.append({ "Interval" });
+    columnArray.append({ "Idd" });
+    json["senderColumns"] = columnArray;
+
+    // content is not array
+    json["content"] = "";
+    canRawSender.setConfig(json);
+
+    // no Data Id Interval Loop and Send fields
+    contentArray = QJsonArray();
+    contentArray.append({ "dummy" });
+    json["content"] = contentArray;
+    canRawSender.setConfig(json);
+
+    // Data has wrong type
+    contentArray = QJsonArray();
+    contentArray.append(QJsonObject({ { "data", true } }));
+    json["content"] = contentArray;
+    canRawSender.setConfig(json);
+
+    // Id has wrong type
+    contentArray = QJsonArray();
+    contentArray.append(QJsonObject({ { "id", true } }));
+    json["content"] = contentArray;
+    canRawSender.setConfig(json);
+
+    // interval has wrong type
+    contentArray = QJsonArray();
+    contentArray.append(QJsonObject({ { "interval", true } }));
+    json["content"] = contentArray;
+    canRawSender.setConfig(json);
+
+    // loop has wrong type
+    contentArray = QJsonArray();
+    contentArray.append(QJsonObject({ { "loop", "aa" } }));
+    json["content"] = contentArray;
+    canRawSender.setConfig(json);
+
+    // loop has wrong type
+    contentArray = QJsonArray();
+    contentArray.append(QJsonObject({ { "send", "aa" } }));
+    json["content"] = contentArray;
+    canRawSender.setConfig(json);
+}
+
+TEST_CASE("Restore config paths - sortingAdopt", "[canrawsender]")
+{
+    CanRawSender canRawSender;
+    QJsonObject json;
+    QJsonArray columnArray;
+    QJsonObject columnItem;
+    QJsonArray contentArray;
+
+    // contentAdopt Validation complete
+    columnArray = QJsonArray();
+    columnArray.append({ "Id" });
+    columnArray.append({ "Data" });
+    columnArray.append({ "Loop" });
+    columnArray.append({ "Interval" });
+    columnArray.append({ "Idd" });
+    json["senderColumns"] = columnArray;
+    contentArray = QJsonArray();
+    contentArray.append({ "dummy" });
+    json["content"] = contentArray;
+    canRawSender.setConfig(json);
+
+    // sorting is not an Object
+    json["sorting"] = "";
+    canRawSender.setConfig(json);
+
+    // sorting is Object size != 1
+    json["sorting"] = QJsonObject({ { "a", "b" }, { "c", "d" } });
+    canRawSender.setConfig(json);
+
+    // no currentIndex
+    json["sorting"] = QJsonObject({ { "a", "b" } });
+    canRawSender.setConfig(json);
+
+    // currentIndex is not a number
+    json["sorting"] = QJsonObject({ { "currentIndex", "b" } });
+    canRawSender.setConfig(json);
+
+    // All good!
+    json["sorting"] = QJsonObject({ { "currentIndex", 12 } });
+    canRawSender.setConfig(json);
+}
