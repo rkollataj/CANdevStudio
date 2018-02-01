@@ -89,14 +89,6 @@ struct CRVGui : public CRVGuiInterface {
     {
         ui->tv->sortByColumn(sortNdx, order);
         ui->tv->horizontalHeader()->setSortIndicator(sortNdx, order);
-
-        if(sortNdx == 0) {
-            cds_info("Sorting disabled");
-            ui->tv->setSortingEnabled(false);
-        } else {
-            cds_info("Sorting enabled");
-            ui->tv->setSortingEnabled(true);
-        }
     }
 
     virtual QString getWindowTitle() override
