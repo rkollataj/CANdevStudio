@@ -23,6 +23,7 @@ class CanRawViewPrivate : public QObject {
 public:
     CanRawViewPrivate(CanRawView* q, CanRawViewCtx&& ctx = CanRawViewCtx(new CRVGui))
         : _ctx(std::move(ctx))
+        , _tvModel(rowCountMax)
         , _simStarted(false)
         , _ui(_ctx.get<CRVGuiInterface>())
         , _columnsOrder({ "rowID", "time", "id", "dir", "dlc", "data" })
@@ -90,67 +91,67 @@ public:
             _tvModel.removeRow(0);
         }
 
-        QList<QStandardItem*> list;
+        //QList<QStandardItem*> list;
 
         QString frameID = QString("0x" + QString::number(frame.frameId(), 16));
         QString time = QString::number((_timer.elapsed() / 1000.0), 'f', 2);
         QString size = QString::number(frame.payload().size());
         QString data = QString::fromUtf8(payHex.data(), payHex.size());
 
-        list.append(new QStandardItem(QString::number(_rowID)));
-        list.append(new QStandardItem(time));
-        list.append(new QStandardItem(frameID));
-        list.append(new QStandardItem(direction));
-        list.append(new QStandardItem(size));
-        list.append(new QStandardItem(data));
+        //list.append(new QStandardItem(QString::number(_rowID)));
+        //list.append(new QStandardItem(time));
+        //list.append(new QStandardItem(frameID));
+        //list.append(new QStandardItem(direction));
+        //list.append(new QStandardItem(size));
+        //list.append(new QStandardItem(data));
 
-        _tvModel.appendRow(list);
+        _tvModel.appendRow(QString::number(_rowID), time, frameID, direction, size, data);
 
-        if (direction == "RX") {
-            if (_uniqueRxMap.count(frame.frameId())) {
-                auto& row = _uniqueRxMap[frame.frameId()];
+        //if (direction == "RX") {
+            //if (_uniqueRxMap.count(frame.frameId())) {
+                //auto& row = _uniqueRxMap[frame.frameId()];
 
-                std::get<0>(row)->setText(QString::number(_rowID));
-                std::get<1>(row)->setText(time);
-                std::get<2>(row)->setText(frameID);
-                std::get<3>(row)->setText(direction);
-                std::get<4>(row)->setText(size);
-                std::get<5>(row)->setText(data);
-            } else {
-                auto rowEl = new QStandardItem(QString::number(_rowID));
-                auto timeEl = new QStandardItem(time);
-                auto frameEl = new QStandardItem(frameID);
-                auto dirEl = new QStandardItem(direction);
-                auto sizeEl = new QStandardItem(size);
-                auto dataEl = new QStandardItem(data);
+                //std::get<0>(row)->setText(QString::number(_rowID));
+                //std::get<1>(row)->setText(time);
+                //std::get<2>(row)->setText(frameID);
+                //std::get<3>(row)->setText(direction);
+                //std::get<4>(row)->setText(size);
+                //std::get<5>(row)->setText(data);
+            //} else {
+                //auto rowEl = new QStandardItem(QString::number(_rowID));
+                //auto timeEl = new QStandardItem(time);
+                //auto frameEl = new QStandardItem(frameID);
+                //auto dirEl = new QStandardItem(direction);
+                //auto sizeEl = new QStandardItem(size);
+                //auto dataEl = new QStandardItem(data);
 
-                _tvModelUnique.appendRow({ rowEl, timeEl, frameEl, dirEl, sizeEl, dataEl });
-                _uniqueRxMap[frame.frameId()] = { rowEl, timeEl, frameEl, dirEl, sizeEl, dataEl };
-            }
-        } else if (direction == "TX") {
-            if (_uniqueTxMap.count(frame.frameId())) {
-                auto& row = _uniqueTxMap[frame.frameId()];
+                //_tvModelUnique.appendRow({ rowEl, timeEl, frameEl, dirEl, sizeEl, dataEl });
+                //_uniqueRxMap[frame.frameId()] = { rowEl, timeEl, frameEl, dirEl, sizeEl, dataEl };
+            //}
+        //} else if (direction == "TX") {
+            //if (_uniqueTxMap.count(frame.frameId())) {
+                //auto& row = _uniqueTxMap[frame.frameId()];
 
-                std::get<0>(row)->setText(QString::number(_rowID));
-                std::get<1>(row)->setText(time);
-                std::get<2>(row)->setText(frameID);
-                std::get<3>(row)->setText(direction);
-                std::get<4>(row)->setText(size);
-                std::get<5>(row)->setText(data);
-            } else {
-                auto rowEl = new QStandardItem(QString::number(_rowID));
-                auto timeEl = new QStandardItem(time);
-                auto frameEl = new QStandardItem(frameID);
-                auto dirEl = new QStandardItem(direction);
-                auto sizeEl = new QStandardItem(size);
-                auto dataEl = new QStandardItem(data);
+                //std::get<0>(row)->setText(QString::number(_rowID));
+                //std::get<1>(row)->setText(time);
+                //std::get<2>(row)->setText(frameID);
+                //std::get<3>(row)->setText(direction);
+                //std::get<4>(row)->setText(size);
+                //std::get<5>(row)->setText(data);
+            //} else {
+                //auto rowEl = new QStandardItem(QString::number(_rowID));
+                //auto timeEl = new QStandardItem(time);
+                //auto frameEl = new QStandardItem(frameID);
+                //auto dirEl = new QStandardItem(direction);
+                //auto sizeEl = new QStandardItem(size);
+                //auto dataEl = new QStandardItem(data);
 
-                _tvModelUnique.appendRow({ rowEl, timeEl, frameEl, dirEl, sizeEl, dataEl });
-                _uniqueTxMap[frame.frameId()] = { rowEl, timeEl, frameEl, dirEl, sizeEl, dataEl };
-            }
-        } else {
-            cds_warn("Invalid direction string: {}", direction.toStdString());
-        }
+                //_tvModelUnique.appendRow({ rowEl, timeEl, frameEl, dirEl, sizeEl, dataEl });
+                //_uniqueTxMap[frame.frameId()] = { rowEl, timeEl, frameEl, dirEl, sizeEl, dataEl };
+            //}
+        //} else {
+            //cds_warn("Invalid direction string: {}", direction.toStdString());
+        //}
 
         if (!_ui.isViewFrozen()) {
             _ui.scrollToBottom();
