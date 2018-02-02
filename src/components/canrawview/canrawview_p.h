@@ -3,6 +3,7 @@
 
 #include "gui/crvgui.h"
 #include "uniquefiltermodel.h"
+#include "crvitemmodel.h"
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
@@ -385,7 +386,8 @@ private slots:
 public:
     CanRawViewCtx _ctx;
     QElapsedTimer _timer;
-    QStandardItemModel _tvModel;
+    CRVItemModel _tvModel;
+    //QStandardItemModel _tvModel;
     QStandardItemModel _tvModelUnique;
     bool _simStarted;
     CRVGuiInterface& _ui;

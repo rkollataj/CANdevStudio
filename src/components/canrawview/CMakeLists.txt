@@ -4,7 +4,8 @@ set(SRC
     gui/canrawview.ui
     gui/crvgui.h
     canrawview.cpp
-    uniquefiltermodel.cpp    
+    uniquefiltermodel.cpp
+    crvitemmodel.h
 )
 
 add_library(${COMPONENT_NAME} ${SRC})
