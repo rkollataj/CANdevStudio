@@ -13,7 +13,7 @@
 #include <memory>
 
 namespace {
-const int32_t rowCountMax = 10000;
+const int32_t rowCountMax = 2000;
 }
 
 class CanRawViewPrivate : public QObject {
@@ -37,6 +37,8 @@ public:
         _tvModelSort.setSourceModel(&_tvModel);
         _tvModelUniqueSort.setSourceModel(&_tvModelUnique);
         _ui.setModel(&_tvModelSort);
+
+        _tvModelUniqueSort.setFilterActive(true);
 
         _ui.setClearCbk(std::bind(&CanRawViewPrivate::clear, this));
         _ui.setSectionClikedCbk(std::bind(&CanRawViewPrivate::sort, this, std::placeholders::_1));
@@ -373,14 +375,13 @@ private slots:
      */
     void setFilter(bool enabled)
     {
-        _tvModelSort.setFilterActive(enabled);
-        _tvModelUniqueSort.setFilterActive(enabled);
-
         if (enabled) {
             _ui.setModel(&_tvModelUniqueSort);
         } else {
             _ui.setModel(&_tvModelSort);
         }
+
+        _ui.setSorting(_sortIndex, _currentSortOrder);
     }
 
 public:
