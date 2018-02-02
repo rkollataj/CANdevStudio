@@ -15,15 +15,15 @@ public:
     CRVItemModel(uint32_t maxSize)
         : _maxSize(maxSize)
     {
-        _rowsUser.reserve(maxSize);
-        _rowsStr.reserve(maxSize);
+        _rowsUser.reserve(_maxSize);
+        _rowsStr.reserve(_maxSize);
     }
 
     ~CRVItemModel() {}
 
     virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override
     {
-        //cds_debug("");
+        // cds_debug("");
         (void)parent;
 
         return createIndex(row, column);
@@ -31,7 +31,7 @@ public:
 
     virtual QModelIndex parent(const QModelIndex& child) const override
     {
-        //cds_debug("");
+        // cds_debug("");
         (void)child;
 
         return {};
@@ -47,7 +47,7 @@ public:
 
     int columnCount(const QModelIndex& parent = QModelIndex()) const override
     {
-        //cds_debug("");
+        // cds_debug("");
         (void)parent;
 
         return _columnHeaderItems.size();
@@ -59,10 +59,10 @@ public:
 
         switch (role) {
         case Qt::DisplayRole:
-            return getRowStr(index.row(), index.column());
+            return getRowStr((index.row() + _rowShift) % _maxSize, index.column());
 
         case Qt::UserRole:
-            return getRowUser(index.row(), index.column());
+            return getRowUser((index.row() + _rowShift) % _maxSize, index.column());
         }
 
         return {};
@@ -70,7 +70,7 @@ public:
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const
     {
-        //cds_debug("");
+        // cds_debug("");
         if ((orientation == Qt::Horizontal) && (_columnHeaderItems.size() > (uint32_t)section)) {
             return _columnHeaderItems[section]->data(role);
         } else {
@@ -82,7 +82,7 @@ public:
 
     void setHorizontalHeaderLabels(const QStringList& labels)
     {
-        //cds_debug("");
+        // cds_debug("");
         if (columnCount() < labels.count()) {
             for (int i = columnCount(); i < labels.count(); ++i) {
                 _columnHeaderItems.push_back(new QStandardItem());
@@ -98,30 +98,65 @@ public:
 
     template <typename... Args> void appendRow(Args... args)
     {
-        //cds_debug("");
+        // cds_debug("");
         std::tuple<Args...> items(args...);
 
-        beginInsertRows({}, 0, 0);
+        if (_rowsStr.size() >= _maxSize) {
 
-        // clang-format off
-        _rowsStr.push_back({
-                strToArray<0>(std::get<0>(items)),
-                strToArray<1>(std::get<1>(items)),
-                strToArray<2>(std::get<2>(items)),
-                strToArray<3>(std::get<3>(items)),
-                strToArray<4>(std::get<4>(items)),
-                strToArray<5>(std::get<5>(items)) });
+            //cds_info("Removing row");
 
-        _rowsUser.push_back({
-                strToUser<0>(std::get<0>(items)),
-                strToUser<1>(std::get<1>(items)),
-                strToUser<2>(std::get<2>(items)),
-                strToUser<3>(std::get<3>(items)),
-                strToUser<4>(std::get<4>(items)),
-                strToUser<5>(std::get<5>(items)) });
-        // clang-format on
+            if(_rowShift == _maxSize) {
+                _rowShift = 0;
+            }
 
-        endInsertRows();
+            // clang-format off
+            _rowsStr[_rowShift] = {
+                    strToArray<0>(std::get<0>(items)),
+                    strToArray<1>(std::get<1>(items)),
+                    strToArray<2>(std::get<2>(items)),
+                    strToArray<3>(std::get<3>(items)),
+                    strToArray<4>(std::get<4>(items)),
+                    strToArray<5>(std::get<5>(items)) };
+
+            _rowsUser[_rowShift] = {
+                    strToUser<0>(std::get<0>(items)),
+                    strToUser<1>(std::get<1>(items)),
+                    strToUser<2>(std::get<2>(items)),
+                    strToUser<3>(std::get<3>(items)),
+                    strToUser<4>(std::get<4>(items)),
+                    strToUser<5>(std::get<5>(items)) };
+            // clang-format on
+
+            ++_rowShift;
+
+            beginRemoveRows({}, 0, 0);
+            endRemoveRows();
+
+            beginInsertRows({}, 0, 0);
+            endInsertRows();
+        } else {
+            beginInsertRows({}, _rowsStr.size(), _rowsStr.size());
+
+            // clang-format off
+            _rowsStr.push_back({
+                    strToArray<0>(std::get<0>(items)),
+                    strToArray<1>(std::get<1>(items)),
+                    strToArray<2>(std::get<2>(items)),
+                    strToArray<3>(std::get<3>(items)),
+                    strToArray<4>(std::get<4>(items)),
+                    strToArray<5>(std::get<5>(items)) });
+
+            _rowsUser.push_back({
+                    strToUser<0>(std::get<0>(items)),
+                    strToUser<1>(std::get<1>(items)),
+                    strToUser<2>(std::get<2>(items)),
+                    strToUser<3>(std::get<3>(items)),
+                    strToUser<4>(std::get<4>(items)),
+                    strToUser<5>(std::get<5>(items)) });
+            // clang-format on
+
+            endInsertRows();
+        }
     }
 
 private:
@@ -226,13 +261,13 @@ private:
         return {};
     }
 
-
 private:
     const uint32_t _maxSize;
     std::vector<QStandardItem*> _columnHeaderItems;
     // row, time, id, dir (TX or RX + \0), dlc, data (8*2 + 7 + \0)
     std::vector<RowsUserTuple_t> _rowsUser;
     std::vector<RowsStrTuple_t> _rowsStr;
+    uint32_t _rowShift{ 0 };
 };
 
 #endif /* !__CRVITEMMODEL_H */
