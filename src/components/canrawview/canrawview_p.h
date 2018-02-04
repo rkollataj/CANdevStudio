@@ -43,25 +43,25 @@ public:
 
         _ui.setClearCbk(std::bind(&CanRawViewPrivate::clear, this));
         _ui.setSectionClikedCbk(std::bind(&CanRawViewPrivate::sort, this, std::placeholders::_1));
-        _ui.setFilterCbk(std::bind(&CanRawViewPrivate::setFilter, this, std::placeholders::_1));
+        _ui.setFilterCbk(std::bind(&CanRawViewPrivate::setFilter, this));
         _ui.setDockUndockCbk([this] {
             docked = !docked;
             emit q_ptr->mainWidgetDockToggled(_ui.mainWidget());
         });
 
-        _tvModel.setHeaderData(0, Qt::Horizontal, QVariant::fromValue(CRV_ColType::uint_type), Qt::UserRole); // rowID
-        _tvModel.setHeaderData(1, Qt::Horizontal, QVariant::fromValue(CRV_ColType::double_type), Qt::UserRole); // time
-        _tvModel.setHeaderData(2, Qt::Horizontal, QVariant::fromValue(CRV_ColType::hex_type), Qt::UserRole); // frame ID
-        _tvModel.setHeaderData(3, Qt::Horizontal, QVariant::fromValue(CRV_ColType::str_type), Qt::UserRole); // direction
-        _tvModel.setHeaderData(4, Qt::Horizontal, QVariant::fromValue(CRV_ColType::uint_type), Qt::UserRole); // length
-        _tvModel.setHeaderData(5, Qt::Horizontal, QVariant::fromValue(CRV_ColType::str_type), Qt::UserRole); // data
+        //_tvModel.setHeaderData(0, Qt::Horizontal, QVariant::fromValue(CRV_ColType::uint_type), Qt::UserRole); // rowID
+        //_tvModel.setHeaderData(1, Qt::Horizontal, QVariant::fromValue(CRV_ColType::double_type), Qt::UserRole); // time
+        //_tvModel.setHeaderData(2, Qt::Horizontal, QVariant::fromValue(CRV_ColType::hex_type), Qt::UserRole); // frame ID
+        //_tvModel.setHeaderData(3, Qt::Horizontal, QVariant::fromValue(CRV_ColType::str_type), Qt::UserRole); // direction
+        //_tvModel.setHeaderData(4, Qt::Horizontal, QVariant::fromValue(CRV_ColType::uint_type), Qt::UserRole); // length
+        //_tvModel.setHeaderData(5, Qt::Horizontal, QVariant::fromValue(CRV_ColType::str_type), Qt::UserRole); // data
 
-        _tvModelUnique.setHeaderData(0, Qt::Horizontal, QVariant::fromValue(CRV_ColType::uint_type), Qt::UserRole); // rowID
-        _tvModelUnique.setHeaderData(1, Qt::Horizontal, QVariant::fromValue(CRV_ColType::double_type), Qt::UserRole); // time
-        _tvModelUnique.setHeaderData(2, Qt::Horizontal, QVariant::fromValue(CRV_ColType::hex_type), Qt::UserRole); // frame ID
-        _tvModelUnique.setHeaderData(3, Qt::Horizontal, QVariant::fromValue(CRV_ColType::str_type), Qt::UserRole); // direction
-        _tvModelUnique.setHeaderData(4, Qt::Horizontal, QVariant::fromValue(CRV_ColType::uint_type), Qt::UserRole); // length
-        _tvModelUnique.setHeaderData(5, Qt::Horizontal, QVariant::fromValue(CRV_ColType::str_type), Qt::UserRole); // data
+        //_tvModelUnique.setHeaderData(0, Qt::Horizontal, QVariant::fromValue(CRV_ColType::uint_type), Qt::UserRole); // rowID
+        //_tvModelUnique.setHeaderData(1, Qt::Horizontal, QVariant::fromValue(CRV_ColType::double_type), Qt::UserRole); // time
+        //_tvModelUnique.setHeaderData(2, Qt::Horizontal, QVariant::fromValue(CRV_ColType::hex_type), Qt::UserRole); // frame ID
+        //_tvModelUnique.setHeaderData(3, Qt::Horizontal, QVariant::fromValue(CRV_ColType::str_type), Qt::UserRole); // direction
+        //_tvModelUnique.setHeaderData(4, Qt::Horizontal, QVariant::fromValue(CRV_ColType::uint_type), Qt::UserRole); // length
+        //_tvModelUnique.setHeaderData(5, Qt::Horizontal, QVariant::fromValue(CRV_ColType::str_type), Qt::UserRole); // data
     }
 
     ~CanRawViewPrivate() {}
@@ -341,10 +341,10 @@ private slots:
      */
     void clear()
     {
-        _tvModel.removeRows(0, _tvModel.rowCount());
-        _tvModelUnique.removeRows(0, _tvModelUnique.rowCount());
-        _uniqueRxMap.clear();
-        _uniqueTxMap.clear();
+        _tvModel.clear();
+        //_tvModelUnique.removeRows(0, _tvModelUnique.rowCount());
+        //_uniqueRxMap.clear();
+        //_uniqueTxMap.clear();
         _rowID = 0;
     }
 
@@ -374,13 +374,9 @@ private slots:
     /**
      *   @brief  Function call turns unique filter model on and off
      */
-    void setFilter(bool enabled)
+    void setFilter()
     {
-        if (enabled) {
-            _ui.setModel(&_tvModelUniqueSort);
-        } else {
-            _ui.setModel(&_tvModelSort);
-        }
+        _tvModel.toggleFilter();
 
         _ui.setSorting(_sortIndex, _currentSortOrder);
     }

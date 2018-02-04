@@ -13,7 +13,7 @@ class CRVItemModel : public QAbstractItemModel {
 
 public:
     CRVItemModel(uint32_t maxSize)
-        : _maxSize(maxSize)
+        : _maxSize(5)
     {
         _rowsUser.reserve(_maxSize);
         _rowsStr.reserve(_maxSize);
@@ -39,10 +39,14 @@ public:
 
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override
     {
-        //cds_debug("Rows count {}", _rowsUser.size());
+        // cds_debug("Rows count {}", _rowsUser.size());
         (void)parent;
 
-        return _rowsUser.size();
+        if (_isUnique) {
+            return _uniqueRows.size();
+        } else {
+            return _rowsUser.size();
+        }
     }
 
     int columnCount(const QModelIndex& parent = QModelIndex()) const override
@@ -55,14 +59,22 @@ public:
 
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override
     {
-        //cds_debug("row {}, col {}, role {}", index.row(), index.column(), role);
+        // cds_debug("row {}, col {}, role {}", index.row(), index.column(), role);
+
+        uint32_t rowId;
+
+        if (_isUnique) {
+            rowId = _uniqueRows[index.row()];
+        } else {
+            rowId = (index.row() + _rowShift) % _maxSize;
+        }
 
         switch (role) {
         case Qt::DisplayRole:
-            return getRowStr((index.row() + _rowShift) % _maxSize, index.column());
+            return getRowStr(rowId, index.column());
 
         case Qt::UserRole:
-            return getRowUser((index.row() + _rowShift) % _maxSize, index.column());
+            return getRowUser(rowId, index.column());
         }
 
         return {};
@@ -96,6 +108,27 @@ public:
         }
     }
 
+    void clear()
+    {
+        beginResetModel();
+
+        _rowsStr.clear();
+        _rowsUser.clear();
+        _uniqueMap.clear();
+        _uniqueRows.clear();
+        _rowShift = 0;
+
+        endResetModel();
+    }
+
+    void toggleFilter()
+    {
+        _isUnique = !_isUnique;
+
+        beginResetModel();
+        endResetModel();
+    }
+
     template <typename... Args> void appendRow(Args... args)
     {
         // cds_debug("");
@@ -103,10 +136,36 @@ public:
 
         if (_rowsStr.size() >= _maxSize) {
 
-            //cds_info("Removing row");
+            // cds_info("Removing row");
 
-            if(_rowShift == _maxSize) {
+            beginRemoveRows({}, 0, 0);
+
+            if (_rowShift == _maxSize) {
                 _rowShift = 0;
+            }
+
+            uint32_t id = strToUser<2>(std::get<2>(items));
+            uint32_t idOld = std::get<2>(_rowsUser[_rowShift]);
+            // we are about to overwrite a row that contains unique frame.
+            // Remove reference completely to avoid displaying wrong data.
+            // We don't have to remove element if newId == idOld
+
+            cds_info("id {:x}, idOld {:x}, size {}, rowShift {}, map {}, rows{}", id, idOld, _uniqueRows.size(), _rowShift, _uniqueMap[idOld], _uniqueRows[_uniqueMap[idOld]]);
+
+            if ((id != idOld) && (_uniqueRows[_uniqueMap[idOld]] == _rowShift)) {
+                for(uint32_t i = _uniqueMap[idOld]; i < _uniqueRows.size() - 1; ++i) {
+                    // update indexes for indexes that follows removed reference
+                    _uniqueRows[i] = _uniqueRows[i+1] - 1;
+                }
+                _uniqueRows.resize(_uniqueRows.size() - 1);
+                _uniqueMap.erase(idOld);
+            }
+
+            if (!_uniqueMap.count(id)) {
+                _uniqueMap[id] = _uniqueRows.size();
+                _uniqueRows.push_back(_rowShift);
+            } else {
+                _uniqueRows[_uniqueMap[id]] = _rowShift;
             }
 
             // clang-format off
@@ -121,7 +180,7 @@ public:
             _rowsUser[_rowShift] = {
                     strToUser<0>(std::get<0>(items)),
                     strToUser<1>(std::get<1>(items)),
-                    strToUser<2>(std::get<2>(items)),
+                    id,
                     strToUser<3>(std::get<3>(items)),
                     strToUser<4>(std::get<4>(items)),
                     strToUser<5>(std::get<5>(items)) };
@@ -129,13 +188,21 @@ public:
 
             ++_rowShift;
 
-            beginRemoveRows({}, 0, 0);
             endRemoveRows();
 
             beginInsertRows({}, 0, 0);
             endInsertRows();
         } else {
             beginInsertRows({}, _rowsStr.size(), _rowsStr.size());
+
+            uint32_t id = strToUser<2>(std::get<2>(items));
+
+            if (!_uniqueMap.count(id)) {
+                _uniqueMap[id] = _uniqueRows.size();
+                _uniqueRows.push_back(_rowsStr.size());
+            } else {
+                _uniqueRows[_uniqueMap[id]] = _rowsStr.size();
+            }
 
             // clang-format off
             _rowsStr.push_back({
@@ -149,7 +216,7 @@ public:
             _rowsUser.push_back({
                     strToUser<0>(std::get<0>(items)),
                     strToUser<1>(std::get<1>(items)),
-                    strToUser<2>(std::get<2>(items)),
+                    id,
                     strToUser<3>(std::get<3>(items)),
                     strToUser<4>(std::get<4>(items)),
                     strToUser<5>(std::get<5>(items)) });
@@ -182,12 +249,16 @@ private:
 
     template <int N> type_list<RowsUserTuple_t>::type<N> strToUser(const QString& str)
     {
-        if (std::is_same<type_list<RowsUserTuple_t>::type<N>, uint32_t>::value) {
+        switch (N) {
+        case 0:
+        case 4:
             return str.toUInt();
-        } else if (std::is_same<type_list<RowsUserTuple_t>::type<N>, uint8_t>::value) {
-            return str.toUInt();
-        } else if (std::is_same<type_list<RowsUserTuple_t>::type<N>, float>::value) {
+
+        case 1:
             return str.toFloat();
+
+        case 2:
+            return str.toUInt(nullptr, 16);
         }
 
         return {};
@@ -262,11 +333,14 @@ private:
     }
 
 private:
+    bool _isUnique{ false };
     const uint32_t _maxSize;
     std::vector<QStandardItem*> _columnHeaderItems;
     // row, time, id, dir (TX or RX + \0), dlc, data (8*2 + 7 + \0)
     std::vector<RowsUserTuple_t> _rowsUser;
     std::vector<RowsStrTuple_t> _rowsStr;
+    std::map<uint32_t, uint32_t> _uniqueMap;
+    std::vector<uint32_t> _uniqueRows;
     uint32_t _rowShift{ 0 };
 };
 
