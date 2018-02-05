@@ -13,10 +13,13 @@ class CRVItemModel : public QAbstractItemModel {
 
 public:
     CRVItemModel(uint32_t maxSize)
-        : _maxSize(5)
+        : _maxSize(maxSize)
     {
         _rowsUser.reserve(_maxSize);
         _rowsStr.reserve(_maxSize);
+        _uniqueRows.reserve(_maxSize);
+        _uniqueRowsTlb.resize(_maxSize, -1);
+        _uniqueTlbNdx = 0;
     }
 
     ~CRVItemModel() {}
@@ -64,7 +67,7 @@ public:
         uint32_t rowId;
 
         if (_isUnique) {
-            rowId = _uniqueRows[index.row()];
+            rowId = _uniqueRowsTlb[_uniqueRows[index.row()]];
         } else {
             rowId = (index.row() + _rowShift) % _maxSize;
         }
@@ -116,7 +119,10 @@ public:
         _rowsUser.clear();
         _uniqueMap.clear();
         _uniqueRows.clear();
+        _uniqueRowsTlb.clear();
+        _uniqueRowsTlb.resize(_maxSize, -1);
         _rowShift = 0;
+        _uniqueTlbNdx = 0;
 
         endResetModel();
     }
@@ -127,6 +133,52 @@ public:
 
         beginResetModel();
         endResetModel();
+    }
+
+    uint32_t findTlbNdx()
+    {
+        for (uint32_t ndx = 0; ndx < _uniqueRowsTlb.size(); ++ndx) {
+            // -1 means that TLB slot is unused
+            if (_uniqueRowsTlb[ndx] == -1) {
+                _uniqueTlbNdx = ndx;
+                return _uniqueTlbNdx;
+            }
+        }
+
+        cds_error("Failed to find free TLB. Clearing view");
+        clear();
+
+        return 0;
+    }
+
+    void updateTlbVal(uint32_t id, uint32_t val)
+    {
+        uint32_t tlbNdx = 0;
+        if (!_uniqueMap.count(id)) {
+            tlbNdx = findTlbNdx();
+            _uniqueMap[id] = tlbNdx;
+            _uniqueRows.push_back(tlbNdx);
+        } else {
+            tlbNdx = _uniqueMap[id];
+        }
+
+        _uniqueRowsTlb[tlbNdx] = val;
+    }
+
+    void removeUniqueRow(uint32_t val)
+    {
+        for (uint32_t i = 0; i < _uniqueRows.size(); ++i) {
+            if (_uniqueRows[i] == val) {
+                _uniqueRows.erase(_uniqueRows.begin() + i);
+                // Mark TLB entry empty
+                _uniqueRowsTlb[val] = -1;
+                cds_warn("Clear TLB {}", val);
+                return;
+            }
+        }
+
+        cds_error("Unique element not found. Clearing view");
+        clear();
     }
 
     template <typename... Args> void appendRow(Args... args)
@@ -146,27 +198,16 @@ public:
 
             uint32_t id = strToUser<2>(std::get<2>(items));
             uint32_t idOld = std::get<2>(_rowsUser[_rowShift]);
+
             // we are about to overwrite a row that contains unique frame.
             // Remove reference completely to avoid displaying wrong data.
             // We don't have to remove element if newId == idOld
-
-            cds_info("id {:x}, idOld {:x}, size {}, rowShift {}, map {}, rows{}", id, idOld, _uniqueRows.size(), _rowShift, _uniqueMap[idOld], _uniqueRows[_uniqueMap[idOld]]);
-
-            if ((id != idOld) && (_uniqueRows[_uniqueMap[idOld]] == _rowShift)) {
-                for(uint32_t i = _uniqueMap[idOld]; i < _uniqueRows.size() - 1; ++i) {
-                    // update indexes for indexes that follows removed reference
-                    _uniqueRows[i] = _uniqueRows[i+1] - 1;
-                }
-                _uniqueRows.resize(_uniqueRows.size() - 1);
+            if ((id != idOld) && (_uniqueRowsTlb[_uniqueMap[idOld]] == _rowShift)) {
+                removeUniqueRow(_uniqueMap[idOld]);
                 _uniqueMap.erase(idOld);
             }
 
-            if (!_uniqueMap.count(id)) {
-                _uniqueMap[id] = _uniqueRows.size();
-                _uniqueRows.push_back(_rowShift);
-            } else {
-                _uniqueRows[_uniqueMap[id]] = _rowShift;
-            }
+            updateTlbVal(id, _rowShift);
 
             // clang-format off
             _rowsStr[_rowShift] = {
@@ -197,12 +238,7 @@ public:
 
             uint32_t id = strToUser<2>(std::get<2>(items));
 
-            if (!_uniqueMap.count(id)) {
-                _uniqueMap[id] = _uniqueRows.size();
-                _uniqueRows.push_back(_rowsStr.size());
-            } else {
-                _uniqueRows[_uniqueMap[id]] = _rowsStr.size();
-            }
+            updateTlbVal(id, _rowsStr.size());
 
             // clang-format off
             _rowsStr.push_back({
@@ -341,7 +377,9 @@ private:
     std::vector<RowsStrTuple_t> _rowsStr;
     std::map<uint32_t, uint32_t> _uniqueMap;
     std::vector<uint32_t> _uniqueRows;
+    std::vector<int32_t> _uniqueRowsTlb;
     uint32_t _rowShift{ 0 };
+    uint32_t _uniqueTlbNdx{ 0 };
 };
 
 #endif /* !__CRVITEMMODEL_H */
