@@ -56,11 +56,11 @@ build_script:
 
     if DEFINED PACKAGE cpack -G ZIP && cmake . -DSTANDALONE=ON && cpack -G ZIP && mkdir ..\master && move *.zip ..\master && cmake . -DDEV_BUILD=OFF && cpack -G ZIP && cmake . -DSTANDALONE=OFF && cpack -G ZIP && mkdir ..\rc && move *.zip ..\rc
 
-    if DEFINED PACKAGE cd ..\master && for /f %f in ('dir /b') do curl -T %f -urkollataj:%BINTRAY_API_KEY% https://api.bintray.com/content/rkollataj/CANdevStudio/cds/master/%f;override=1
+    if DEFINED PACKAGE cd ..\master && for /f %%f in ('dir /b') do curl -T %%f -urkollataj:%BINTRAY_API_KEY% https://api.bintray.com/content/rkollataj/CANdevStudio/cds/master/%%f;override=1
 
     if DEFINED PACKAGE curl -urkollataj:%BINTRAY_API_KEY% -X POST https://api.bintray.com/content/rkollataj/CANdevStudio/cds/master/publish
 
-    if DEFINED PACKAGE cd ..\rc && for /f %f in ('dir /b') do curl -T %f -urkollataj:%BINTRAY_API_KEY% https://api.bintray.com/content/rkollataj/CANdevStudio/cds/rc/%f;override=1
+    if DEFINED PACKAGE cd ..\rc && for /f %%f in ('dir /b') do curl -T %%f -urkollataj:%BINTRAY_API_KEY% https://api.bintray.com/content/rkollataj/CANdevStudio/cds/rc/%%f;override=1
 
     if DEFINED PACKAGE curl -urkollataj:%BINTRAY_API_KEY% -X POST https://api.bintray.com/content/rkollataj/CANdevStudio/cds/rc/publish
 test: off
