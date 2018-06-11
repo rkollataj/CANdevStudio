@@ -202,7 +202,14 @@ if(STANDALONE)
         endif()
     endif()
 
-    install(DIRECTORY ${QT_PLUGINS_DIR}/
+    install(DIRECTORY
+                ${QT_PLUGINS_DIR}/platforms
+                ${QT_PLUGINS_DIR}/platforminputcontexts
+                ${QT_PLUGINS_DIR}/imageformats
+                ${QT_PLUGINS_DIR}/canbus
+                ${QT_PLUGINS_DIR}/generic
+                ${QT_PLUGINS_DIR}/platformthemes
+                ${QT_PLUGINS_DIR}/iconengines
             DESTINATION ${INSTALL_DEST_LIB}
             USE_SOURCE_PERMISSIONS
     )
