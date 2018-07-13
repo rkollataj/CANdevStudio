@@ -15,6 +15,7 @@ set(SRC
     projectconfigvalidator.cpp
     propertyeditordialog.cpp
     propertyeditordialog.ui
+    componentmodel.h
 	../../../CANdevResources.qrc
 )
 

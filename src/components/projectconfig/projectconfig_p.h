@@ -1,12 +1,12 @@
 #ifndef PROJECTCONFIG_P_H
 #define PROJECTCONFIG_P_H
 
+#include "canloadmodel.h"
+#include "canrawfiltermodel.h"
+#include "canrawloggermodel.h"
+#include "canrawplayermodel.h"
 #include "canrawsendermodel.h"
 #include "canrawviewmodel.h"
-#include "canrawplayermodel.h"
-#include "canrawloggermodel.h"
-#include "canrawfiltermodel.h"
-#include "canloadmodel.h"
 #include "flowviewwrapper.h"
 #include "iconlabel.h"
 #include "modeltoolbutton.h"
@@ -128,15 +128,11 @@ public:
         // For some reason QWidget title is being set to name instead of caption.
         // TODO: investigate why
         iface.setCaption(node.nodeDataModel()->caption());
-
-        if (iface.hasSeparateThread()) {
-            // Thread will be deleted during node deletion
-            iface.handleModelCreation(q, node, new QThread());
-        } else {
-            iface.handleModelCreation(q, node);
-        }
-
+        iface.setRedrawCbk([&node] { node.nodeGraphicsObject().update(); });
         iface.setColorMode(_darkMode);
+        connect(q, &ProjectConfig::startSimulation, &iface, &ComponentModelInterface::startSimulation);
+        connect(q, &ProjectConfig::stopSimulation, &iface, &ComponentModelInterface::stopSimulation);
+        connect(&iface, &ComponentModelInterface::handleDock, q, &ProjectConfig::handleDock);
 
         node.nodeGraphicsObject().setOpacity(node.nodeDataModel()->nodeStyle().Opacity);
         addShadow(node);
