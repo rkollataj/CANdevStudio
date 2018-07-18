@@ -20,7 +20,11 @@ def get_git_blob_contents(ref, fileName)
 	pr_number = ENV["TRAVIS_PULL_REQUEST"]
 
 	if pr_number == "false"
-		contents = `git show #{ref}:#{fileName}`
+        if ref == "master"
+            contents = `git show #{ref}:#{fileName} | sed 's/secure: thisisakey/secure: 5VhWtDtya2N1yL9pbFGQbFdH2+zbg7FZ0O3rONMv0GJ8uQIEyJHBPYuJjdWhcaLO/g'`
+        else
+            contents = `git show #{ref}:#{fileName}`
+        end
 	else
 	# sed is so so evil... but it works ;)
 		contents = `git show HEAD:#{fileName} | sed 's/rem git fetch origin pull\\/XXX/git fetch origin pull\\/#{pr_number}/g' | sed 's/rem git checkout FETCH_HEAD/git checkout FETCH_HEAD/g' | sed '/PACKAGE: 1/d'`

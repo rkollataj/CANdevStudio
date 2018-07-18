@@ -17,7 +17,7 @@ clone_script:
     git --no-pager log --pretty=oneline -1
 environment:
   BINTRAY_API_KEY:
-    secure: 5VhWtDtya2N1yL9pbFGQbFdH2+zbg7FZ0O3rONMv0GJ8uQIEyJHBPYuJjdWhcaLO
+    secure: thisisakey
   matrix:
   - GENERATOR: '"Visual Studio 14 2015"'
     BUILD_TYPE: Release
