@@ -55,7 +55,7 @@ std::string genComponentHdr(const std::string& name)
 #include <QWidget>
 #include <QtCore/QScopedPointer>
 #include <componentinterface.h>
-#include <context.h>
+#include <componentcontext.h>
 #include <memory>
 
 class {name}Private;
@@ -322,7 +322,7 @@ std::string genGuiComponentHdr(const std::string& name)
 #include <QWidget>
 #include <QtCore/QScopedPointer>
 #include <componentinterface.h>
-#include <context.h>
+#include <componentcontext.h>
 #include <memory>
 
 class {name}Private;

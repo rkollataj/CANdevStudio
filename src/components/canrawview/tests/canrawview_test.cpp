@@ -7,7 +7,7 @@
 #include <Qt>
 #include <QtWidgets/QApplication>
 #include <catch.hpp>
-#include <context.h>
+#include <componentcontext.h>
 #include <fakeit.hpp>
 
 #include <canrawview.h>

@@ -5,7 +5,7 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <canrawsender.h>
-#include <context.h>
+#include <componentcontext.h>
 #define CATCH_CONFIG_RUNNER
 #include <QApplication>
 #include <QSignalSpy>

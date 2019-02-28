@@ -5,7 +5,7 @@
 #include <QtSerialBus/QCanBusDevice>
 #include <candeviceinterface.h>
 #include <catch.hpp>
-#include <context.h>
+#include <componentcontext.h>
 #include <fakeit.hpp>
 #include <log.h>
 

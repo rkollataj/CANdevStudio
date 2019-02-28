@@ -4,7 +4,7 @@
 #include <QScopedPointer>
 #include <QWidget>
 #include <componentinterface.h>
-#include <context.h>
+#include <componentcontext.h>
 
 class CanDevicePrivate;
 class QCanBusFrame;

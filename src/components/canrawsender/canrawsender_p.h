@@ -6,7 +6,7 @@
 #include "newlinemanager.h"
 #include <QJsonObject>
 #include <QtGui/QStandardItemModel>
-#include <context.h>
+#include <componentcontext.h>
 #include <memory>
 #include <nlmfactory.h>
 

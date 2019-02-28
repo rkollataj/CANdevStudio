@@ -11,6 +11,8 @@ add_library(rwqueue INTERFACE)
 target_include_directories(rwqueue INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/readerwriterqueue)
 
 add_subdirectory(nodeeditor)
+add_subdirectory(PythonQt)
+target_include_directories(PythonQt INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/PythonQt/src)
 
 if(LINUX)
     add_subdirectory(3rdParty/qtCannelloniCanBus)

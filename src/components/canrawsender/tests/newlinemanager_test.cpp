@@ -2,7 +2,7 @@
 #include <QtWidgets/QApplication>
 #include <canrawsender.h>
 #include <catch.hpp>
-#include <context.h>
+#include <componentcontext.h>
 #include <fakeit.hpp>
 #include <gui/crsguiinterface.h>
 #include <log.h>

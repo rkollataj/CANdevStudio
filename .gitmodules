@@ -22,3 +22,6 @@
 [submodule "3rdParty/catch"]
 	path = 3rdParty/catch
 	url = https://github.com/catchorg/Catch2
+[submodule "3rdParty/PythonQt"]
+	path = 3rdParty/PythonQt
+	url = https://github.com/commontk/PythonQt.git

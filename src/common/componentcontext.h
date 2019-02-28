@@ -1,5 +1,5 @@
-#ifndef __CONTEXT_H
-#define __CONTEXT_H
+#ifndef __COMPONENTCONTEXT_H
+#define __COMPONENTCONTEXT_H
 
 #include <memory>
 #include <tuple>
@@ -47,4 +47,4 @@ typedef Context<CRSGuiInterface, NLMFactoryInterface> CanRawSenderCtx;
 struct CRVGuiInterface;
 typedef Context<CRVGuiInterface> CanRawViewCtx;
 
-#endif /* !__CONTEXT_H */
+#endif /* !__COMPONENTCONTEXT_H */

@@ -1,5 +1,5 @@
-#ifndef CANRAWLOGGER_H
-#define CANRAWLOGGER_H
+#ifndef PYSCRIPTER_H
+#define PYSCRIPTER_H
 
 #include <QWidget>
 #include <QtCore/QScopedPointer>
@@ -7,19 +7,18 @@
 #include <componentcontext.h>
 #include <memory>
 
-class QCanBusFrame;
-class CanRawLoggerPrivate;
+class PyScripterPrivate;
 class QWidget;
-typedef Context<> CanRawLoggerCtx;
+typedef Context<> PyScripterCtx;
 
-class CanRawLogger : public QObject, public ComponentInterface {
+class PyScripter : public QObject, public ComponentInterface {
     Q_OBJECT
-    Q_DECLARE_PRIVATE(CanRawLogger)
+    Q_DECLARE_PRIVATE(PyScripter)
 
 public:
-    CanRawLogger();
-    explicit CanRawLogger(CanRawLoggerCtx&& ctx);
-    ~CanRawLogger();
+    PyScripter();
+    explicit PyScripter(PyScripterCtx&& ctx);
+    ~PyScripter();
 
     QWidget* mainWidget() override;
     void setConfig(const QJsonObject& json) override;
@@ -36,11 +35,9 @@ signals:
 public slots:
     void stopSimulation() override;
     void startSimulation() override;
-    void frameReceived(const QCanBusFrame& frame);
-    void frameSent(bool status, const QCanBusFrame& frame);
 
 private:
-    QScopedPointer<CanRawLoggerPrivate> d_ptr;
+    QScopedPointer<PyScripterPrivate> d_ptr;
 };
 
-#endif //CANRAWLOGGER_H
+#endif //PYSCRIPTER_H

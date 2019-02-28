@@ -2,7 +2,7 @@
 #define PROJECTCONFIG_H
 
 #include <QtWidgets/QWidget>
-#include <context.h>
+#include <componentcontext.h>
 
 struct PCInterface;
 typedef Context<PCInterface> ProjectConfigCtx;
