@@ -6,6 +6,7 @@
 #include <componentinterface.h>
 #include <componentcontext.h>
 #include <memory>
+#include <QJsonArray>
 
 class PyScripterPrivate;
 class QWidget;
@@ -28,6 +29,7 @@ public:
     void configChanged() override;
     bool mainWidgetDocked() const override;
     ComponentInterface::ComponentProperties getSupportedProperties() const override;
+    QJsonArray inTypes() const;
 
 signals:
     void mainWidgetDockToggled(QWidget* widget) override;

@@ -4,6 +4,7 @@
 #include "pyscripter.h"
 #include <PythonQt.h>
 #include <memory>
+#include <propertyfields.h>
 
 class PyScripter;
 
@@ -16,6 +17,7 @@ public:
     ComponentInterface::ComponentProperties getSupportedProperties() const;
     QJsonObject getSettings();
     void setSettings(const QJsonObject& json);
+    void loadScript(const QString& script);
 
 private:
     void initProps();
@@ -24,21 +26,22 @@ public:
     bool _simStarted{ false };
     PyScripterCtx _ctx;
     std::map<QString, QVariant> _props;
+    PythonQtObjectPtr _pyModule;
 
 private:
     PyScripter* q_ptr;
     const QString _nameProperty = "name";
+    const QString _scriptProperty = "script";
 
     // workaround for clang 3.5
     using cf = ComponentInterface::CustomEditFieldCbk;
 
     // clang-format off
     ComponentInterface::ComponentProperties _supportedProps = {
-            std::make_tuple(_nameProperty, QVariant::String, true, cf(nullptr))
+            std::make_tuple(_nameProperty, QVariant::String, true, cf(nullptr)),
+            std::make_tuple(_scriptProperty, QVariant::String, true, cf([] { return new PropertyFieldPath; } )),
     };
     // clang-format on
-
-    PythonQtObjectPtr _pyModule;
 };
 
 #endif // PYSCRIPTER_P_H

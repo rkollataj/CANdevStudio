@@ -1,12 +1,14 @@
 #include "pyscripter_p.h"
+#include <QJsonArray>
 #include <log.h>
 
 PyScripterPrivate::PyScripterPrivate(PyScripter* q, PyScripterCtx&& ctx)
     : _ctx(std::move(ctx))
     , q_ptr(q)
-    , _pyModule(PythonQt::self()->getMainModule())
 {
     initProps();
+
+    PythonQt::init();
 }
 
 void PyScripterPrivate::initProps()
@@ -39,4 +41,10 @@ void PyScripterPrivate::setSettings(const QJsonObject& json)
         if (json.contains(propName))
             _props[propName] = json[propName].toVariant();
     }
+}
+
+void PyScripterPrivate::loadScript(const QString& script)
+{
+    _pyModule = PythonQt::self()->getMainModule();
+    _pyModule.evalFile(script);
 }

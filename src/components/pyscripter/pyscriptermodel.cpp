@@ -37,17 +37,14 @@ QtNodes::NodePainterDelegate* PyScripterModel::painterDelegate() const
 
 unsigned int PyScripterModel::nPorts(PortType portType) const
 {
-    return portMappings.at(portType).size();
+    QJsonArray t = _component.inTypes();
+
+    return t.size();
 }
 
 NodeDataType PyScripterModel::dataType(PortType portType, PortIndex ndx) const
 {
-    if (portMappings.at(portType).size() > static_cast<uint32_t>(ndx)) {
-        return portMappings.at(portType)[ndx];
-    }
-
-    cds_error("No port mapping for ndx: {}", ndx);
-    return { };
+    return NodeDataType{"rawfilter", "RAW"};
 }
 
 std::shared_ptr<NodeData> PyScripterModel::outData(PortIndex)

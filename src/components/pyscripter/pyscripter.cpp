@@ -51,6 +51,11 @@ std::shared_ptr<QWidget> PyScripter::getQConfig() const
 
 void PyScripter::configChanged()
 {
+    QString scriptName = getQConfig()->property(d_ptr->_scriptProperty.toStdString().c_str()).toString();
+
+    cds_info("Script to open: '{}'", scriptName.toStdString());
+
+    d_ptr->loadScript(scriptName);
 }
 
 bool PyScripter::mainWidgetDocked() const
@@ -76,4 +81,27 @@ void PyScripter::startSimulation()
     Q_D(PyScripter);
 
     d->_simStarted = true;
+}
+
+QJsonArray PyScripter::inTypes() const
+{
+    QJsonArray a;
+
+    //d_ptr->_pyModule.evalScript(R"(
+//def inTypes():
+    //return [
+        //{
+          //"id"   : "rawframe",
+          //"name" : "RAW",
+          //"func" : "inFunc1"
+        //}]
+//)");
+
+    QVariant v = d_ptr->_pyModule.call("inTypes");
+
+    if (v.isValid()) {
+        a = v.toJsonArray();
+    }
+
+    return a;
 }
