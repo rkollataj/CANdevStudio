@@ -1,16 +1,16 @@
 #ifndef __PCIMPL_H
 #define __PCIMPL_H
 
-#include <QObject>
-#include <QMenu>
-#include "pcinterface.h"
 #include "componentinterface.h"
 #include "componentmodel.h"
+#include "pcinterface.h"
+#include <QMenu>
+#include <QObject>
 #include <propertyeditordialog.h>
 
 class PCImpl : public PCInterface {
 public:
-    virtual void setNodeCreatedCallback(QtNodes::FlowScene* scene, const node_t& cb) override 
+    virtual void setNodeCreatedCallback(QtNodes::FlowScene* scene, const node_t& cb) override
     {
         QObject::connect(scene, &QtNodes::FlowScene::nodeCreated, cb);
     }
@@ -43,15 +43,17 @@ public:
             auto nodeCaption = conf->property("name");
             if (nodeCaption.isValid()) {
                 iface.setCaption(nodeCaption.toString());
-                node.nodeGraphicsObject().update();
             }
 
             component.setConfig(*conf);
             component.configChanged();
+
+            node.nodeState().updateConnectionsCount();
+            node.nodeGraphicsObject().update();
         }
     }
 
-    virtual void showContextMenu(QMenu &menu, const QPoint& pos) override
+    virtual void showContextMenu(QMenu& menu, const QPoint& pos) override
     {
         auto pos1 = pos;
         pos1.setX(pos1.x() + 32); // FIXME: these values are hardcoded and should not be here

@@ -43,7 +43,7 @@ public:
 
     virtual ~ComponentModel()
     {
-        if(_thread) {
+        if (_thread) {
             _thread->exit();
             _thread->wait();
         }
@@ -60,10 +60,12 @@ public:
         setCaption(node.nodeDataModel()->caption());
         setColorMode(darkMode);
 
-        connect((Derived*)this, &Derived::requestRedraw,[&node] { node.nodeGraphicsObject().update(); });
+        connect((Derived*)this, &Derived::requestRedraw, [&node] { node.nodeGraphicsObject().update(); });
         connect(this, &ComponentModelInterface::startSimulation, &_component, &C::startSimulation);
         connect(this, &ComponentModelInterface::stopSimulation, &_component, &C::stopSimulation);
         connect(&_component, &C::mainWidgetDockToggled, this, &ComponentModelInterface::handleDock);
+
+        node.nodeState().updateConnectionsCount();
 
         if (hasSeparateThread()) {
             _thread = std::make_unique<QThread>();
