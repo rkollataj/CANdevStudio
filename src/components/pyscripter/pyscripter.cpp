@@ -87,17 +87,20 @@ QJsonArray PyScripter::inTypes() const
 {
     QJsonArray a;
 
-    //d_ptr->_pyModule.evalScript(R"(
-//def inTypes():
-    //return [
-        //{
-          //"id"   : "rawframe",
-          //"name" : "RAW",
-          //"func" : "inFunc1"
-        //}]
-//)");
-
     QVariant v = d_ptr->_pyModule.call("inTypes");
+
+    if (v.isValid()) {
+        a = v.toJsonArray();
+    }
+
+    return a;
+}
+
+QJsonArray PyScripter::outTypes() const
+{
+    QJsonArray a;
+
+    QVariant v = d_ptr->_pyModule.call("outTypes");
 
     if (v.isValid()) {
         a = v.toJsonArray();

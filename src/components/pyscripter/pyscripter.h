@@ -30,6 +30,7 @@ public:
     bool mainWidgetDocked() const override;
     ComponentInterface::ComponentProperties getSupportedProperties() const override;
     QJsonArray inTypes() const;
+    QJsonArray outTypes() const;
 
 signals:
     void mainWidgetDockToggled(QWidget* widget) override;

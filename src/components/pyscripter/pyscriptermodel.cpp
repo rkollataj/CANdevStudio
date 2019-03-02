@@ -2,25 +2,6 @@
 #include "pyscripterplugin.h"
 #include <log.h>
 
-namespace {
-
-// clang-format off
-const std::map<PortType, std::vector<NodeDataType>> portMappings = {
-    { PortType::In, 
-        {
-            //{CanRawData{}.type() }
-        }
-    },
-    { PortType::Out, 
-        {
-            //{CanRawData{}.type() }
-        }
-    }
-};
-// clang-format on
-
-} // namespace
-
 PyScripterModel::PyScripterModel()
     : ComponentModel("PyScripter")
     , _painter(std::make_unique<NodePainter>(PyScripterPlugin::PluginType::sectionColor()))
@@ -37,14 +18,41 @@ QtNodes::NodePainterDelegate* PyScripterModel::painterDelegate() const
 
 unsigned int PyScripterModel::nPorts(PortType portType) const
 {
-    QJsonArray t = _component.inTypes();
+    QJsonArray t;
+
+    if (portType == PortType::In) {
+        t = _component.inTypes();
+    } else if (portType == PortType::Out) {
+        t = _component.outTypes();
+    }
 
     return t.size();
 }
 
 NodeDataType PyScripterModel::dataType(PortType portType, PortIndex ndx) const
 {
-    return NodeDataType{"rawfilter", "RAW"};
+    QJsonArray t;
+
+    if (portType == PortType::In) {
+        t = _component.inTypes();
+    } else if (portType == PortType::Out) {
+        t = _component.outTypes();
+    }
+
+    QJsonObject o;
+    if (ndx < t.size()) {
+        auto v = t[ndx];
+
+        if (v.isObject()) {
+            o = v.toObject();
+        } else {
+            cds_error("QJsonObject expected");
+        }
+    } else {
+        cds_error("Wrong size ndx {}, t {}", ndx, t.size());
+    }
+
+    return NodeDataType{ o["id"].toString(), o["name"].toString() };
 }
 
 std::shared_ptr<NodeData> PyScripterModel::outData(PortIndex)
@@ -52,7 +60,7 @@ std::shared_ptr<NodeData> PyScripterModel::outData(PortIndex)
     // example
     // return std::make_shared<CanRawData>(_frame, _direction, _status);
 
-    return { };
+    return {};
 }
 
 void PyScripterModel::setInData(std::shared_ptr<NodeData> nodeData, PortIndex)
@@ -65,5 +73,5 @@ void PyScripterModel::setInData(std::shared_ptr<NodeData> nodeData, PortIndex)
     // } else {
     //     cds_warn("Incorrect nodeData");
     // }
-    (void) nodeData;
+    (void)nodeData;
 }
