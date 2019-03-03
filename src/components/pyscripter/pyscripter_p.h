@@ -6,10 +6,19 @@
 #include <QCanBusFrame>
 #include <memory>
 #include <propertyfields.h>
+#include <log.h>
 
 Q_DECLARE_METATYPE(QCanBusFrame);
 
 class PyScripter;
+
+class OutHandler : public QObject {
+    Q_OBJECT
+
+public slots:
+    void sendFrame(const QCanBusFrame& frame) {
+    }
+};
 
 class PyScripterPrivate : public QObject {
     Q_OBJECT
@@ -35,6 +44,7 @@ private:
     PyScripter* q_ptr;
     const QString _nameProperty = "name";
     const QString _scriptProperty = "script";
+    std::unique_ptr<OutHandler> _outHandler;
 
     // workaround for clang 3.5
     using cf = ComponentInterface::CustomEditFieldCbk;

@@ -61,4 +61,7 @@ void PyScripterPrivate::loadScript(const QString& script)
 {
     _pyModule = PythonQt::self()->createUniqueModule();
     _pyModule.evalFile(script);
+
+    _outHandler = std::make_unique<OutHandler>();
+    PythonQt::self()->addObject(_pyModule, "outHandler", _outHandler.get());
 }
