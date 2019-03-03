@@ -1,4 +1,5 @@
 #include "pyscripter_p.h"
+#include "qcanbusframedecorator.h"
 #include <QJsonArray>
 #include <log.h>
 
@@ -8,7 +9,8 @@ void initPythonQt()
 {
     if (!pythonInitiated) {
         PythonQt::init(PythonQt::IgnoreSiteModule);
-        PythonQt::self()->addDecorators(new QCanBusFrameDecorator());
+        PythonQt::self()->registerCPPClass(
+            "QCanBusFrame", nullptr, nullptr, PythonQtCreateObject<QCanBusFrameDecorator>);
     }
 
     pythonInitiated = true;
