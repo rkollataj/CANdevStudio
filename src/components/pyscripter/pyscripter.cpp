@@ -108,14 +108,12 @@ QJsonArray PyScripter::outTypes() const
     return a;
 }
 
-void PyScripter::frameReceived(const QCanBusFrame& frame, int portNdx)
+void PyScripter::receive(const QVariantList& list, int portNdx)
 {
     QJsonArray a;
     QString cbk;
-    QVariant vf;
     QVariant v = d_ptr->_pyModule.call("inTypes");
 
-    vf.setValue(frame);
 
     if (v.isValid()) {
         a = v.toJsonArray();
@@ -128,7 +126,7 @@ void PyScripter::frameReceived(const QCanBusFrame& frame, int portNdx)
     }
 
     if (cbk.length() > 0) {
-        d_ptr->_pyModule.call(cbk, QVariantList() << vf);
+        d_ptr->_pyModule.call(cbk, list);
     } else {
         cds_warn("Callback in python script for port {} not found", portNdx);
     }

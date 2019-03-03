@@ -27,10 +27,11 @@ public:
     QtNodes::NodePainterDelegate* painterDelegate() const override;
 
 public slots:
+    void send(const QVariantList& list);
 
 signals:
     void requestRedraw();
-    void frameReceived(const QCanBusFrame& frame, int portNdx);
+    void receive(const QVariantList& list, int ndx);
 
 private:
     std::unique_ptr<NodePainter> _painter;

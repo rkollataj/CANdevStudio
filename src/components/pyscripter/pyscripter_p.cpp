@@ -23,6 +23,9 @@ PyScripterPrivate::PyScripterPrivate(PyScripter* q, PyScripterCtx&& ctx)
 {
     initProps();
     initPythonQt();
+
+    _outHandler = std::make_unique<OutHandler>();
+    connect(_outHandler.get(), &OutHandler::send, q_ptr, &PyScripter::send);
 }
 
 void PyScripterPrivate::initProps()
@@ -62,6 +65,5 @@ void PyScripterPrivate::loadScript(const QString& script)
     _pyModule = PythonQt::self()->createUniqueModule();
     _pyModule.evalFile(script);
 
-    _outHandler = std::make_unique<OutHandler>();
     PythonQt::self()->addObject(_pyModule, "outHandler", _outHandler.get());
 }

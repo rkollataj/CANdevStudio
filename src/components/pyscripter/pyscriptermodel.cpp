@@ -11,7 +11,7 @@ PyScripterModel::PyScripterModel()
     _label->setFixedSize(75, 25);
     _label->setAttribute(Qt::WA_TranslucentBackground);
 
-    connect(this, &PyScripterModel::frameReceived, &_component, &PyScripter::frameReceived);
+    connect(this, &PyScripterModel::receive, &_component, &PyScripter::receive);
 }
 
 QtNodes::NodePainterDelegate* PyScripterModel::painterDelegate() const
@@ -89,14 +89,18 @@ void PyScripterModel::setInData(std::shared_ptr<NodeData> nodeData, PortIndex nd
     }
 
     if (o["id"] == "rawframe") {
-        auto d = std::dynamic_pointer_cast<CanRawData>(nodeData);
+        auto d = std::dynamic_pointer_cast<CdsDataBase>(nodeData);
 
         if (d) {
-            emit frameReceived(d->frame(), ndx);
+            emit receive(d->toVariant(), ndx);
         } else {
             cds_error("Failed to convert nodeData to CanRawData");
         }
     } else {
         cds_warn("Unkown '{}' datatype received", o["id"].toString().toStdString());
     }
+}
+
+void PyScripterModel::send(const QVariantList& list)
+{
 }

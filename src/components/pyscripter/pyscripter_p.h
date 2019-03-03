@@ -15,9 +15,8 @@ class PyScripter;
 class OutHandler : public QObject {
     Q_OBJECT
 
-public slots:
-    void sendFrame(const QCanBusFrame& frame) {
-    }
+signals:
+    void send(QVariantList list);
 };
 
 class PyScripterPrivate : public QObject {

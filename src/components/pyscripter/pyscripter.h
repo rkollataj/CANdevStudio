@@ -35,11 +35,12 @@ public:
 
 signals:
     void mainWidgetDockToggled(QWidget* widget) override;
+    void send(QVariantList list);
 
 public slots:
     void stopSimulation() override;
     void startSimulation() override;
-    void frameReceived(const QCanBusFrame& frame, int portNdx);
+    void receive(const QVariantList& list, int portNdx);
 
 private:
     QScopedPointer<PyScripterPrivate> d_ptr;
