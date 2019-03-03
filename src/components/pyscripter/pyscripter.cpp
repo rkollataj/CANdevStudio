@@ -110,8 +110,26 @@ QJsonArray PyScripter::outTypes() const
 
 void PyScripter::frameReceived(const QCanBusFrame& frame, int portNdx)
 {
-    QVariant v;
-    v.setValue(frame);
+    QJsonArray a;
+    QString cbk;
+    QVariant vf;
+    QVariant v = d_ptr->_pyModule.call("inTypes");
 
-    d_ptr->_pyModule.call("testM", QVariantList() << v);
+    vf.setValue(frame);
+
+    if (v.isValid()) {
+        a = v.toJsonArray();
+    }
+
+    if (portNdx < a.size()) {
+        if (a[portNdx].isObject()) {
+            cbk = a[portNdx].toObject()["callback"].toString();
+        }
+    }
+
+    if (cbk.length() > 0) {
+        d_ptr->_pyModule.call(cbk, QVariantList() << vf);
+    } else {
+        cds_warn("Callback in python script for port {} not found", portNdx);
+    }
 }
