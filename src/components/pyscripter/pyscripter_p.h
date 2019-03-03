@@ -5,8 +5,22 @@
 #include <PythonQt.h>
 #include <memory>
 #include <propertyfields.h>
+#include <QCanBusFrame>
+
+Q_DECLARE_METATYPE(QCanBusFrame);
 
 class PyScripter;
+
+// This allows to access QCanBusFrame from Python
+class QCanBusFrameDecorator : public QObject {
+    Q_OBJECT
+
+public slots:
+    quint32 frameId(QCanBusFrame* obj)
+    {
+        return obj->frameId();
+    }
+};
 
 class PyScripterPrivate : public QObject {
     Q_OBJECT

@@ -1,5 +1,6 @@
 #include "pyscripter.h"
 #include "pyscripter_p.h"
+#include <QCanBusFrame>
 #include <confighelpers.h>
 #include <log.h>
 
@@ -13,9 +14,7 @@ PyScripter::PyScripter(PyScripterCtx&& ctx)
 {
 }
 
-PyScripter::~PyScripter()
-{
-}
+PyScripter::~PyScripter() {}
 
 QWidget* PyScripter::mainWidget()
 {
@@ -111,4 +110,8 @@ QJsonArray PyScripter::outTypes() const
 
 void PyScripter::frameReceived(const QCanBusFrame& frame, int portNdx)
 {
+    QVariant v;
+    v.setValue(frame);
+
+    d_ptr->_pyModule.call("testM", QVariantList() << v);
 }

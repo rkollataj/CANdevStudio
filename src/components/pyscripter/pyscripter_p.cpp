@@ -2,13 +2,25 @@
 #include <QJsonArray>
 #include <log.h>
 
+namespace {
+static bool pythonInitiated = false;
+void initPythonQt()
+{
+    if (!pythonInitiated) {
+        PythonQt::init(PythonQt::IgnoreSiteModule);
+        PythonQt::self()->addDecorators(new QCanBusFrameDecorator());
+    }
+
+    pythonInitiated = true;
+}
+} // namespace
+
 PyScripterPrivate::PyScripterPrivate(PyScripter* q, PyScripterCtx&& ctx)
     : _ctx(std::move(ctx))
     , q_ptr(q)
 {
     initProps();
-
-    PythonQt::init(PythonQt::IgnoreSiteModule );
+    initPythonQt();
 }
 
 void PyScripterPrivate::initProps()
