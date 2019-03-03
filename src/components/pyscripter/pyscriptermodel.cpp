@@ -1,5 +1,6 @@
 #include "pyscriptermodel.h"
 #include "pyscripterplugin.h"
+#include <datamodeltypes/canrawdata.h>
 #include <log.h>
 
 PyScripterModel::PyScripterModel()
@@ -9,6 +10,8 @@ PyScripterModel::PyScripterModel()
     _label->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
     _label->setFixedSize(75, 25);
     _label->setAttribute(Qt::WA_TranslucentBackground);
+
+    connect(this, &PyScripterModel::frameReceived, &_component, &PyScripter::frameReceived);
 }
 
 QtNodes::NodePainterDelegate* PyScripterModel::painterDelegate() const
@@ -63,15 +66,37 @@ std::shared_ptr<NodeData> PyScripterModel::outData(PortIndex)
     return {};
 }
 
-void PyScripterModel::setInData(std::shared_ptr<NodeData> nodeData, PortIndex)
+void PyScripterModel::setInData(std::shared_ptr<NodeData> nodeData, PortIndex ndx)
 {
-    // example
-    // if (nodeData) {
-    //     auto d = std::dynamic_pointer_cast<CanRawData>(nodeData);
-    //     assert(nullptr != d);
-    //     emit sendFrame(d->frame());
-    // } else {
-    //     cds_warn("Incorrect nodeData");
-    // }
-    (void)nodeData;
+    QJsonArray t = _component.inTypes();
+    QJsonObject o;
+
+    if (ndx < t.size()) {
+        auto v = t[ndx];
+
+        if (v.isObject()) {
+            o = v.toObject();
+        } else {
+            cds_error("QJsonObject expected");
+        }
+    } else {
+        cds_error("Wrong size ndx {}, t {}", ndx, t.size());
+    }
+
+    if (!nodeData) {
+        cds_error("nodeData is NULL!");
+        return;
+    }
+
+    if (o["id"] == "rawframe") {
+        auto d = std::dynamic_pointer_cast<CanRawData>(nodeData);
+
+        if (d) {
+            emit frameReceived(d->frame(), ndx);
+        } else {
+            cds_error("Failed to convert nodeData to CanRawData");
+        }
+    } else {
+        cds_warn("Unkown '{}' datatype received", o["id"].toString().toStdString());
+    }
 }

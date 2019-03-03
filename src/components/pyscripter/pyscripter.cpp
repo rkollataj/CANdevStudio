@@ -108,3 +108,7 @@ QJsonArray PyScripter::outTypes() const
 
     return a;
 }
+
+void PyScripter::frameReceived(const QCanBusFrame& frame, int portNdx)
+{
+}

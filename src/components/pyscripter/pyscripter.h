@@ -1,13 +1,14 @@
 #ifndef PYSCRIPTER_H
 #define PYSCRIPTER_H
 
+#include <QJsonArray>
 #include <QWidget>
 #include <QtCore/QScopedPointer>
-#include <componentinterface.h>
 #include <componentcontext.h>
+#include <componentinterface.h>
 #include <memory>
-#include <QJsonArray>
 
+class QCanBusFrame;
 class PyScripterPrivate;
 class QWidget;
 typedef Context<> PyScripterCtx;
@@ -38,9 +39,10 @@ signals:
 public slots:
     void stopSimulation() override;
     void startSimulation() override;
+    void frameReceived(const QCanBusFrame& frame, int portNdx);
 
 private:
     QScopedPointer<PyScripterPrivate> d_ptr;
 };
 
-#endif //PYSCRIPTER_H
+#endif // PYSCRIPTER_H

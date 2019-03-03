@@ -8,7 +8,7 @@ PyScripterPrivate::PyScripterPrivate(PyScripter* q, PyScripterCtx&& ctx)
 {
     initProps();
 
-    PythonQt::init();
+    PythonQt::init(PythonQt::IgnoreSiteModule );
 }
 
 void PyScripterPrivate::initProps()
@@ -45,6 +45,6 @@ void PyScripterPrivate::setSettings(const QJsonObject& json)
 
 void PyScripterPrivate::loadScript(const QString& script)
 {
-    _pyModule = PythonQt::self()->getMainModule();
+    _pyModule = PythonQt::self()->createUniqueModule();
     _pyModule.evalFile(script);
 }

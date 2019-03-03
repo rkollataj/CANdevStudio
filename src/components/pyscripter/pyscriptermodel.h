@@ -12,6 +12,7 @@ using QtNodes::PortIndex;
 using QtNodes::PortType;
 
 enum class Direction;
+class QCanBusFrame;
 
 class PyScripterModel : public ComponentModel<PyScripter, PyScripterModel> {
     Q_OBJECT
@@ -29,6 +30,7 @@ public slots:
 
 signals:
     void requestRedraw();
+    void frameReceived(const QCanBusFrame& frame, int portNdx);
 
 private:
     std::unique_ptr<NodePainter> _painter;
