@@ -68,27 +68,7 @@ std::shared_ptr<NodeData> PyScripterModel::outData(PortIndex)
 
 void PyScripterModel::setInData(std::shared_ptr<NodeData> nodeData, PortIndex ndx)
 {
-    QJsonArray t = _component.inTypes();
-    QJsonObject o;
-
-    if (ndx < t.size()) {
-        auto v = t[ndx];
-
-        if (v.isObject()) {
-            o = v.toObject();
-        } else {
-            cds_error("QJsonObject expected");
-        }
-    } else {
-        cds_error("Wrong size ndx {}, t {}", ndx, t.size());
-    }
-
-    if (!nodeData) {
-        cds_error("nodeData is NULL!");
-        return;
-    }
-
-    if (o["id"] == "rawframe") {
+    if (nodeData) {
         auto d = std::dynamic_pointer_cast<CdsDataBase>(nodeData);
 
         if (d) {
@@ -97,10 +77,10 @@ void PyScripterModel::setInData(std::shared_ptr<NodeData> nodeData, PortIndex nd
             cds_error("Failed to convert nodeData to CanRawData");
         }
     } else {
-        cds_warn("Unkown '{}' datatype received", o["id"].toString().toStdString());
+        cds_error("nodeData is NULL!");
     }
 }
 
-void PyScripterModel::send(const QVariantList& list)
+void PyScripterModel::send(const QCanBusFrame& frame, int ndx)
 {
 }

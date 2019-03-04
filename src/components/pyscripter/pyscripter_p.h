@@ -1,23 +1,17 @@
 #ifndef PYSCRIPTER_P_H
 #define PYSCRIPTER_P_H
 
+#include "outhandler.h"
 #include "pyscripter.h"
 #include <PythonQt.h>
 #include <QCanBusFrame>
+#include <log.h>
 #include <memory>
 #include <propertyfields.h>
-#include <log.h>
 
 Q_DECLARE_METATYPE(QCanBusFrame);
 
 class PyScripter;
-
-class OutHandler : public QObject {
-    Q_OBJECT
-
-signals:
-    void send(QVariantList list);
-};
 
 class PyScripterPrivate : public QObject {
     Q_OBJECT

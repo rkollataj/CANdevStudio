@@ -12,6 +12,7 @@ set(SRC
     pyscripter_p.cpp
     pyscriptermodel.cpp
     qcanbusframedecorator.h
+    outhandler.h
 )
 
 add_library(${COMPONENT_NAME} ${SRC})

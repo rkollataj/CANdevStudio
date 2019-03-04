@@ -27,7 +27,7 @@ public:
     QtNodes::NodePainterDelegate* painterDelegate() const override;
 
 public slots:
-    void send(const QVariantList& list);
+    void send(const QCanBusFrame& frame, int ndx);
 
 signals:
     void requestRedraw();

@@ -35,7 +35,7 @@ public:
 
 signals:
     void mainWidgetDockToggled(QWidget* widget) override;
-    void send(QVariantList list);
+    void send(const QCanBusFrame& frame, int ndx);
 
 public slots:
     void stopSimulation() override;
