@@ -9,8 +9,6 @@
 #include <memory>
 #include <propertyfields.h>
 
-Q_DECLARE_METATYPE(QCanBusFrame);
-
 class PyScripter;
 
 class PyScripterPrivate : public QObject {

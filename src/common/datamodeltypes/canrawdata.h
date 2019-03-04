@@ -3,6 +3,7 @@
 
 #include "cdsdatabase.h"
 #include <QCanBusFrame>
+#include <QObject>
 #include <nodes/NodeDataModel>
 
 using QtNodes::NodeDataType;
@@ -14,6 +15,7 @@ enum class Direction { RX, TX, Uninitialized };
 
 Q_DECLARE_METATYPE(QCanBusFrame);
 Q_DECLARE_METATYPE(Direction);
+Q_DECLARE_METATYPE(QtNodes::NodeDataType);
 
 /**
  *   @brief The class describing data model used as output for CanDevice node
@@ -97,4 +99,13 @@ private:
     bool _status; // used only for frameSent, ignored for frameReceived
 };
 
+class CanRawDataDecorator : public QObject {
+    Q_OBJECT
+
+public slots:
+    NodeDataType* static_CanRawData_type()
+    {
+        return new NodeDataType(CanRawData().type());
+    }
+};
 #endif /* !__CANRAWDATA_H */

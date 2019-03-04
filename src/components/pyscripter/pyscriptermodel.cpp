@@ -41,21 +41,27 @@ NodeDataType PyScripterModel::dataType(PortType portType, PortIndex ndx) const
     } else if (portType == PortType::Out) {
         t = _component.outTypes();
     }
-
-    QJsonObject o;
+    
+    // TODO: get NodeDataType from python
+    QVariant v;
     if (ndx < t.size()) {
-        auto v = t[ndx];
-
-        if (v.isObject()) {
-            o = v.toObject();
-        } else {
-            cds_error("QJsonObject expected");
-        }
-    } else {
-        cds_error("Wrong size ndx {}, t {}", ndx, t.size());
+        v = t[0];
     }
 
-    return NodeDataType{ o["id"].toString(), o["name"].toString() };
+    //QJsonObject o;
+    //if (ndx < t.size()) {
+        //auto v = t[ndx];
+
+        //if (v.isObject()) {
+            //o = v.toObject();
+        //} else {
+            //cds_error("QJsonObject expected");
+        //}
+    //} else {
+        //cds_error("Wrong size ndx {}, t {}", ndx, t.size());
+    //}
+
+    //return NodeDataType{ o["id"].toString(), o["name"].toString() };
 }
 
 std::shared_ptr<NodeData> PyScripterModel::outData(PortIndex)

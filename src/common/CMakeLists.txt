@@ -4,6 +4,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/common ${CMAKE_SOURCE_DIR}/3rdParty/
 set(SRC
     componentmodel.h
     propertyfields.h
+    datamodeltypes/canrawdata.h
     )
 
 add_library(cds-common STATIC ${SRC})

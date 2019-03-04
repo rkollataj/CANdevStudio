@@ -2,6 +2,7 @@
 #include "qcanbusframedecorator.h"
 #include <QJsonArray>
 #include <log.h>
+#include <datamodeltypes/canrawdata.h>
 
 namespace {
 static bool pythonInitiated = false;
@@ -11,6 +12,9 @@ void initPythonQt()
         PythonQt::init(PythonQt::IgnoreSiteModule);
         PythonQt::self()->registerCPPClass(
             "QCanBusFrame", nullptr, nullptr, PythonQtCreateObject<QCanBusFrameDecorator>);
+        PythonQt::self()->registerCPPClass(
+            "CanRawData", nullptr, nullptr, PythonQtCreateObject<CanRawDataDecorator>);
+        //PythonQt::self()->addDecorators(new CanRawDataDecorator);
     }
 
     pythonInitiated = true;
