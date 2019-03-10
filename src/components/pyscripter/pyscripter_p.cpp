@@ -13,7 +13,7 @@ void initPythonQt()
         PythonQt::self()->registerCPPClass(
             "QCanBusFrame", nullptr, nullptr, PythonQtCreateObject<QCanBusFrameDecorator>);
         PythonQt::self()->registerCPPClass(
-            "CanRawData", nullptr, nullptr, PythonQtCreateObject<CanRawDataDecorator>);
+            "PortTypes", nullptr, nullptr, PythonQtCreateObject<PortTypes>);
         //PythonQt::self()->addDecorators(new CanRawDataDecorator);
     }
 

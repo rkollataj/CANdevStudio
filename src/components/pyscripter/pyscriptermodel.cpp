@@ -21,47 +21,33 @@ QtNodes::NodePainterDelegate* PyScripterModel::painterDelegate() const
 
 unsigned int PyScripterModel::nPorts(PortType portType) const
 {
-    QJsonArray t;
+    std::vector<QtNodes::NodeDataType> dt;
 
     if (portType == PortType::In) {
-        t = _component.inTypes();
+        dt = _component.inTypes();
     } else if (portType == PortType::Out) {
-        t = _component.outTypes();
+        dt = _component.outTypes();
     }
 
-    return t.size();
+    return dt.size();
 }
 
 NodeDataType PyScripterModel::dataType(PortType portType, PortIndex ndx) const
 {
-    QJsonArray t;
+    std::vector<QtNodes::NodeDataType> dt;
 
     if (portType == PortType::In) {
-        t = _component.inTypes();
+        dt = _component.inTypes();
     } else if (portType == PortType::Out) {
-        t = _component.outTypes();
-    }
-    
-    // TODO: get NodeDataType from python
-    QVariant v;
-    if (ndx < t.size()) {
-        v = t[0];
+        dt = _component.outTypes();
     }
 
-    //QJsonObject o;
-    //if (ndx < t.size()) {
-        //auto v = t[ndx];
+    if (ndx < static_cast<PortIndex>(dt.size())) {
+        return dt[ndx];
+    }
 
-        //if (v.isObject()) {
-            //o = v.toObject();
-        //} else {
-            //cds_error("QJsonObject expected");
-        //}
-    //} else {
-        //cds_error("Wrong size ndx {}, t {}", ndx, t.size());
-    //}
-
-    //return NodeDataType{ o["id"].toString(), o["name"].toString() };
+    cds_warn("Failed to get data type for port {}", ndx);
+    return {};
 }
 
 std::shared_ptr<NodeData> PyScripterModel::outData(PortIndex)
@@ -82,11 +68,7 @@ void PyScripterModel::setInData(std::shared_ptr<NodeData> nodeData, PortIndex nd
         } else {
             cds_error("Failed to convert nodeData to CanRawData");
         }
-    } else {
-        cds_error("nodeData is NULL!");
     }
 }
 
-void PyScripterModel::send(const QCanBusFrame& frame, int ndx)
-{
-}
+void PyScripterModel::send(const QCanBusFrame& frame, int ndx) {}

@@ -2,6 +2,7 @@
 #include "pyscripter_p.h"
 #include <QCanBusFrame>
 #include <confighelpers.h>
+#include <datamodeltypes/canrawdata.h>
 #include <log.h>
 
 PyScripter::PyScripter()
@@ -55,6 +56,58 @@ void PyScripter::configChanged()
     cds_info("Script to open: '{}'", scriptName.toStdString());
 
     d_ptr->loadScript(scriptName);
+
+    auto&& initPortTypes = [this](std::vector<QtNodes::NodeDataType>& vec, const QString& func) {
+        QVariantList vl;
+        QVariant v = d_ptr->_pyModule.call(func);
+        vec.clear();
+
+        // Allow handling arrays and value
+        if (v.isValid() && v.canConvert<QVariantList>()) {
+            vl = v.value<QVariantList>();
+        } else {
+            vl << v;
+        }
+
+        int ndx = 0;
+        for (auto& port : vl) {
+            PortTypes::PortType pt = PortTypes::Invalid;
+
+            if (port.canConvert<QVariantList>()) {
+                // In ports are defined as a tuple
+                QVariantList vl2 = port.value<QVariantList>();
+
+                if (vl2.size() > 1) {
+                    port = vl2[0];
+
+                    if (vl2[1].canConvert<QString>()) {
+                        d_ptr->_inClbks.push_back(vl2[1].value<QString>());
+                    }
+                }
+            }
+
+            if (port.canConvert<PortTypes::PortType>()) {
+                pt = port.value<PortTypes::PortType>();
+            }
+
+            switch (pt) {
+            case PortTypes::RawFrame:
+                vec.push_back(CanRawData().type());
+                break;
+
+            case PortTypes::Invalid:
+            default:
+                cds_warn("Failed to recognize port, {}, {}", func.toStdString(), ndx);
+                break;
+            }
+
+            ndx++;
+        }
+    };
+
+    d_ptr->_inClbks.clear();
+    initPortTypes(d_ptr->_inTypes, "inTypes");
+    initPortTypes(d_ptr->_outTypes, "outTypes");
 }
 
 bool PyScripter::mainWidgetDocked() const
@@ -82,51 +135,20 @@ void PyScripter::startSimulation()
     d->_simStarted = true;
 }
 
-QJsonArray PyScripter::inTypes() const
+std::vector<QtNodes::NodeDataType> PyScripter::inTypes() const
 {
-    QJsonArray a;
-
-    QVariant v = d_ptr->_pyModule.call("inTypes");
-
-    if (v.isValid()) {
-        a = v.toJsonArray();
-    }
-
-    return a;
+    return d_ptr->_inTypes;
 }
 
-QJsonArray PyScripter::outTypes() const
+std::vector<QtNodes::NodeDataType> PyScripter::outTypes() const
 {
-    QJsonArray a;
-
-    QVariant v = d_ptr->_pyModule.call("outTypes");
-
-    if (v.isValid()) {
-        a = v.toJsonArray();
-    }
-
-    return a;
+    return d_ptr->_outTypes;
 }
 
 void PyScripter::receive(const QVariantList& list, int portNdx)
 {
-    QJsonArray a;
-    QString cbk;
-    QVariant v = d_ptr->_pyModule.call("inTypes");
-
-
-    if (v.isValid()) {
-        a = v.toJsonArray();
-    }
-
-    if (portNdx < a.size()) {
-        if (a[portNdx].isObject()) {
-            cbk = a[portNdx].toObject()["callback"].toString();
-        }
-    }
-
-    if (cbk.length() > 0) {
-        d_ptr->_pyModule.call(cbk, list);
+    if (portNdx < static_cast<int>(d_ptr->_inClbks.size())) {
+        d_ptr->_pyModule.call(d_ptr->_inClbks[portNdx], list);
     } else {
         cds_warn("Callback in python script for port {} not found", portNdx);
     }

@@ -1,33 +1,16 @@
-from PythonQt.private import QCanBusFrame, CanRawData
+from PythonQt.private import QCanBusFrame, PortTypes
 
 def outTypes():
-    return  [
-                {
-                    "id" : "rawframe",
-                    "name" : "RAW"
-                }
-            ]
+    return PortTypes.RawFrame
 
 def inTypes():
-    return [ (CanRawData.type(), "inPort1Cbk") ]
-    # return [
-                # {
-                    # "id" : "rawframe",
-                    # "name" : "RAW",
-                    # "callback": "inPort1Cbk"
-                # },
-                # {
-                    # "id" : "rawfddrame",
-                    # "name" : "DD",
-                    # "callback": "inPort2Cbk"
-                # }
-            # ]
+    return [ (PortTypes.RawFrame, "inPort1Cbk"), (PortTypes.RawFrame, "inPort2Cbk") ]
 
 def inPort1Cbk(frame, dir, status):
     out.send(frame, 1)
     print("Port 1:", frame.frameId())
 
-def inPort2Cbk(canrawdata):
-    print("Port 2:")
+def inPort2Cbk(frame, dir, status):
+    print("Port 2:", frame.frameId())
 
 

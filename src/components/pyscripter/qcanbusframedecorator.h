@@ -46,7 +46,7 @@ public slots:
         return new QCanBusFrame(type);
     }
 
-    void delete_QCanBusFrame(QCanBusFrame *obj)
+    void delete_QCanBusFrame(QCanBusFrame* obj)
     {
         delete obj;
     }

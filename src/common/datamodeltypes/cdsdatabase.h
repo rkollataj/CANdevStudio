@@ -11,4 +11,12 @@ public:
     virtual void fromVariant(const QVariantList& list) = 0;
 };
 
+class PortTypes : public QObject {
+    Q_OBJECT
+
+public:
+    enum PortType { Invalid = 0, RawFrame = 1 };
+    Q_ENUM(PortType);
+};
+
 #endif /* !__CDSDATABASE_H */

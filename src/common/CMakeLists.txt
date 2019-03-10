@@ -5,6 +5,7 @@ set(SRC
     componentmodel.h
     propertyfields.h
     datamodeltypes/canrawdata.h
+    datamodeltypes/cdsdatabase.h
     )
 
 add_library(cds-common STATIC ${SRC})

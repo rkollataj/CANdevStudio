@@ -36,6 +36,9 @@ private:
     const QString _nameProperty = "name";
     const QString _scriptProperty = "script";
     std::unique_ptr<OutHandler> _outHandler;
+    std::vector<QtNodes::NodeDataType> _inTypes;
+    std::vector<QtNodes::NodeDataType> _outTypes;
+    std::vector<QString> _inClbks;
 
     // workaround for clang 3.5
     using cf = ComponentInterface::CustomEditFieldCbk;

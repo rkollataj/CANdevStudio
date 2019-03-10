@@ -7,6 +7,7 @@
 #include <componentcontext.h>
 #include <componentinterface.h>
 #include <memory>
+#include <nodes/NodeData>
 
 class QCanBusFrame;
 class PyScripterPrivate;
@@ -30,8 +31,8 @@ public:
     void configChanged() override;
     bool mainWidgetDocked() const override;
     ComponentInterface::ComponentProperties getSupportedProperties() const override;
-    QJsonArray inTypes() const;
-    QJsonArray outTypes() const;
+    std::vector<QtNodes::NodeDataType> inTypes() const;
+    std::vector<QtNodes::NodeDataType> outTypes() const;
 
 signals:
     void mainWidgetDockToggled(QWidget* widget) override;
