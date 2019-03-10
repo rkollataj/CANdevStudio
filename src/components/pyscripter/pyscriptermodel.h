@@ -5,6 +5,7 @@
 #include "nodepainter.h"
 #include <QtCore/QObject>
 #include <pyscripter.h>
+#include <readerwriterqueue.h>
 
 using QtNodes::NodeData;
 using QtNodes::NodeDataType;
@@ -27,14 +28,21 @@ public:
     QtNodes::NodePainterDelegate* painterDelegate() const override;
 
 public slots:
-    void send(const QCanBusFrame& frame, int ndx);
+    void send(const QVariant& data);
+    void send(const QVariant& data, int ndx);
+    void scriptLoaded();
 
 signals:
     void requestRedraw();
     void receive(const QVariantList& list, int ndx);
 
 private:
+    void enqueueData(const QVariant &data, int ndx);
+
+private:
     std::unique_ptr<NodePainter> _painter;
+    using queueType_t = moodycamel::ReaderWriterQueue<std::shared_ptr<NodeData>>;
+    std::vector<std::shared_ptr<queueType_t>> _queues;
 };
 
 #endif // PYSCRIPTERMODEL_H

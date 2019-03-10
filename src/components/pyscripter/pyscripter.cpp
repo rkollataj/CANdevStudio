@@ -108,6 +108,8 @@ void PyScripter::configChanged()
     d_ptr->_inClbks.clear();
     initPortTypes(d_ptr->_inTypes, "inTypes");
     initPortTypes(d_ptr->_outTypes, "outTypes");
+
+    emit scriptLoaded();
 }
 
 bool PyScripter::mainWidgetDocked() const

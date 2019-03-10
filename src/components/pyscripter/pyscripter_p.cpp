@@ -1,8 +1,8 @@
 #include "pyscripter_p.h"
 #include "qcanbusframedecorator.h"
 #include <QJsonArray>
-#include <log.h>
 #include <datamodeltypes/canrawdata.h>
+#include <log.h>
 
 namespace {
 static bool pythonInitiated = false;
@@ -12,9 +12,7 @@ void initPythonQt()
         PythonQt::init(PythonQt::IgnoreSiteModule);
         PythonQt::self()->registerCPPClass(
             "QCanBusFrame", nullptr, nullptr, PythonQtCreateObject<QCanBusFrameDecorator>);
-        PythonQt::self()->registerCPPClass(
-            "PortTypes", nullptr, nullptr, PythonQtCreateObject<PortTypes>);
-        //PythonQt::self()->addDecorators(new CanRawDataDecorator);
+        PythonQt::self()->registerCPPClass("PortTypes", nullptr, nullptr, PythonQtCreateObject<PortTypes>);
     }
 
     pythonInitiated = true;
@@ -29,7 +27,8 @@ PyScripterPrivate::PyScripterPrivate(PyScripter* q, PyScripterCtx&& ctx)
     initPythonQt();
 
     _outHandler = std::make_unique<OutHandler>();
-    connect(_outHandler.get(), &OutHandler::send, q_ptr, &PyScripter::send);
+    connect(_outHandler.get(), qOverload<const QVariant&>(&OutHandler::send), q_ptr, qOverload<const QVariant&>(&PyScripter::send));
+    connect(_outHandler.get(), qOverload<const QVariant&, int>(&OutHandler::send), q_ptr, qOverload<const QVariant&, int>(&PyScripter::send));
 }
 
 void PyScripterPrivate::initProps()
