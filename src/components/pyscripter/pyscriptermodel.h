@@ -37,7 +37,7 @@ signals:
     void receive(const QVariantList& list, int ndx);
 
 private:
-    void enqueueData(const QVariant &data, int ndx);
+    void enqueueData(const QVariant& data, int ndx);
 
 private:
     std::unique_ptr<NodePainter> _painter;

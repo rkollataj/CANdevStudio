@@ -8,6 +8,7 @@
 #include <log.h>
 #include <memory>
 #include <propertyfields.h>
+#include <QTimer>
 
 class PyScripter;
 
@@ -21,6 +22,8 @@ public:
     QJsonObject getSettings();
     void setSettings(const QJsonObject& json);
     void loadScript(const QString& script);
+    void initPortTypes(const QString& func);
+    void initTimerTypes();
 
 private:
     void initProps();
@@ -39,6 +42,7 @@ private:
     std::vector<QtNodes::NodeDataType> _inTypes;
     std::vector<QtNodes::NodeDataType> _outTypes;
     std::vector<QString> _inClbks;
+    std::vector<std::shared_ptr<QTimer>> _timerTypes;
 
     // workaround for clang 3.5
     using cf = ComponentInterface::CustomEditFieldCbk;
