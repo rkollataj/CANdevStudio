@@ -57,10 +57,21 @@ void PyScripter::configChanged()
 
     d_ptr->loadScript(scriptName);
 
-    auto&& initPortTypes = [this](std::vector<QtNodes::NodeDataType>& vec, const QString& func) {
+    auto&& initPortTypes = [this](const QString& func) {
         QVariantList vl;
         QVariant v = d_ptr->_pyModule.call(func);
-        vec.clear();
+        std::vector<QtNodes::NodeDataType>* vec = nullptr;
+
+        if (func == "inTypes") {
+            vec = &d_ptr->_inTypes;
+        } else if (func == "outTypes") {
+            vec = &d_ptr->_outTypes;
+        } else {
+            cds_error("Wrong function passed '{}'", func.toStdString());
+            return;
+        }
+
+        vec->clear();
 
         // Allow handling arrays and value
         if (v.isValid() && v.canConvert<QVariantList>()) {
@@ -71,17 +82,34 @@ void PyScripter::configChanged()
 
         int ndx = 0;
         for (auto& port : vl) {
+            QString altName = "";
             PortTypes::PortType pt = PortTypes::Invalid;
 
             if (port.canConvert<QVariantList>()) {
-                // In ports are defined as a tuple
                 QVariantList vl2 = port.value<QVariantList>();
 
-                if (vl2.size() > 1) {
-                    port = vl2[0];
+                if (func == "inTypes") {
+                    if (vl2.size() >= 2) {
+                        port = vl2[0];
 
-                    if (vl2[1].canConvert<QString>()) {
-                        d_ptr->_inClbks.push_back(vl2[1].value<QString>());
+                        if (vl2[1].canConvert<QString>()) {
+                            d_ptr->_inClbks.push_back(vl2[1].value<QString>());
+                        }
+                    }
+
+                    if (vl2.size() >= 3) {
+                        if (vl2[2].canConvert<QString>()) {
+                            altName = vl2[2].value<QString>();
+                        }
+                    }
+
+                } else {
+                    if (vl2.size() >= 2) {
+                        port = vl2[0];
+
+                        if (vl2[1].canConvert<QString>()) {
+                            altName = vl2[1].value<QString>();
+                        }
                     }
                 }
             }
@@ -92,7 +120,11 @@ void PyScripter::configChanged()
 
             switch (pt) {
             case PortTypes::RawFrame:
-                vec.push_back(CanRawData().type());
+                if (altName.length() > 0) {
+                    vec->push_back(NodeDataType{ "rawframe", altName });
+                } else {
+                    vec->push_back(CanRawData().type());
+                }
                 break;
 
             case PortTypes::Invalid:
@@ -106,8 +138,8 @@ void PyScripter::configChanged()
     };
 
     d_ptr->_inClbks.clear();
-    initPortTypes(d_ptr->_inTypes, "inTypes");
-    initPortTypes(d_ptr->_outTypes, "outTypes");
+    initPortTypes("inTypes");
+    initPortTypes("outTypes");
 
     emit scriptLoaded();
 }
