@@ -9,10 +9,11 @@
 #include <fakeit.hpp>
 #include <log.h>
 
+Q_DECLARE_METATYPE(QCanBusFrame);
+
 std::shared_ptr<spdlog::logger> kDefaultLogger;
 // needed for QSignalSpy cause according to qtbug 49623 comments
 // automatic detection of types is "flawed" in moc
-Q_DECLARE_METATYPE(QCanBusFrame);
 
 namespace {
 

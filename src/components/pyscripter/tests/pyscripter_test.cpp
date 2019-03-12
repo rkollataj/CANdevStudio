@@ -67,7 +67,7 @@ TEST_CASE("getSupportedProperties", "[pyscripter]")
 
     auto props = c.getSupportedProperties();
 
-    REQUIRE(props.size() == 1);
+    REQUIRE(props.size() == 2);
 
     REQUIRE(ComponentInterface::propertyName(props[0]) == "name");
     REQUIRE(ComponentInterface::propertyType(props[0]) == QVariant::String);
@@ -83,7 +83,6 @@ int main(int argc, char* argv[])
         kDefaultLogger->set_level(spdlog::level::debug);
     }
     cds_debug("Starting unit tests");
-    qRegisterMetaType<QCanBusFrame>(); // required by QSignalSpy
     QApplication a(argc, argv); // QApplication must exist when constructing QWidgets TODO check QTest
     return Catch::Session().run(argc, argv);
 }

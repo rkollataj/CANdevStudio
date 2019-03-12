@@ -10,7 +10,6 @@
 std::shared_ptr<spdlog::logger> kDefaultLogger;
 // needed for QSignalSpy cause according to qtbug 49623 comments
 // automatic detection of types is "flawed" in moc
-Q_DECLARE_METATYPE(QCanBusFrame);
 
 TEST_CASE("Test basic functionality", "[canloadModel]")
 {
@@ -103,7 +102,6 @@ int main(int argc, char* argv[])
         kDefaultLogger->set_level(spdlog::level::debug);
     }
     cds_debug("Staring unit tests");
-    qRegisterMetaType<QCanBusFrame>(); // required by QSignalSpy
     QApplication a(argc, argv); // QApplication must exist when contructing QWidgets TODO check QTest
     return Catch::Session().run(argc, argv);
 }
