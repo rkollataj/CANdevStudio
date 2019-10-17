@@ -13,7 +13,7 @@ struct CanSignalSenderGuiInt {
     using dockUndock_t = std::function<void()>;
     using remove_t = std::function<void()>;
     using add_t = std::function<void()>;
-    using send_t = std::function<void(const QString&, const QString&, const QVariant&)>;
+    using send_t = std::function<void(const QString&, const QString&, const QVariant&, bool, uint32_t)>;
 
     virtual ~CanSignalSenderGuiInt()
     {

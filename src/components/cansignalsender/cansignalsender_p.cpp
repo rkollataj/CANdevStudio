@@ -3,7 +3,7 @@
 CanSignalSenderPrivate::CanSignalSenderPrivate(CanSignalSender* q, CanSignalSenderCtx&& ctx)
     : _ctx(std::move(ctx))
     , _ui(_ctx.get<CanSignalSenderGuiInt>())
-    , _tvColumns({ "Id", "Signal name", "Value", "" })
+    , _tvColumns({ "Id", "Signal name", "Value", "Loop", "Interval", "" })
     , q_ptr(q)
 {
     initProps();
@@ -31,10 +31,36 @@ CanSignalSenderPrivate::CanSignalSenderPrivate(CanSignalSender* q, CanSignalSend
         }
     });
 
-    _ui.setSendCbk([this](const QString& id, const QString& name, const QVariant& val) {
+    _ui.setSendCbk([this](const QString& id, const QString& name, const QVariant& val, bool checked, uint32_t ival) {
         uint32_t idNum = id.toUInt(nullptr, 16);
         std::string sigName = fmt::format("0x{:03x}{}_{}", idNum, idNum > 0x7ff ? "x" : "", name.toStdString());
-        emit q_ptr->sendSignal(sigName.c_str(), val);
+
+        if (checked) {
+            // Timer was set. Disable it.
+            if (_timerMap[sigName]) {
+                _timerMap[sigName]->stop();
+                _timerMap[sigName] = nullptr;
+            } else {
+                _timerMap[sigName] = std::make_unique<QTimer>();
+                _timerMap[sigName]->setInterval(ival);
+
+                connect(_timerMap[sigName].get(), &QTimer::timeout,
+                    [sigName, val, this] { emit q_ptr->sendSignal(sigName.c_str(), val); });
+
+                if (_simStarted) {
+                    _timerMap[sigName]->start();
+                }
+            }
+        } else {
+            // Timer was set. Disable it.
+            if (_timerMap[sigName]) {
+                _timerMap[sigName]->stop();
+                _timerMap[sigName] = nullptr;
+            } else {
+                // single shot
+                emit q_ptr->sendSignal(sigName.c_str(), val);
+            }
+        }
     });
 }
 

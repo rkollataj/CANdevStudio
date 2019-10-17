@@ -3,12 +3,13 @@
 
 #include "cansignalsenderguiint.h"
 #include "ui_cansignalsender.h"
+#include <QCheckBox>
 #include <QComboBox>
+#include <QJsonObject>
 #include <QLineEdit>
 #include <QStandardItemModel>
 #include <QWidget>
 #include <log.h>
-#include <QJsonObject>
 
 struct CanSignalSenderGuiImpl : public CanSignalSenderGuiInt {
     CanSignalSenderGuiImpl()
@@ -58,16 +59,15 @@ struct CanSignalSenderGuiImpl : public CanSignalSenderGuiInt {
     {
         // It seems that QItemDelegate should be used here instead
 
-
         if (!_model) {
             cds_error("_model is NULL");
             return;
         }
 
-        if(id.length() > 0 && sig.length() > 0) {
+        if (id.length() > 0 && sig.length() > 0) {
             // Hack to allow set ComboBox before _sigNames gets populated
             uint32_t numId = id.toUInt(nullptr, 16);
-            if(!(*_sigNames)[numId].contains(sig)) {
+            if (!(*_sigNames)[numId].contains(sig)) {
                 (*_sigNames)[numId].append(sig);
             }
         }
@@ -85,6 +85,9 @@ struct CanSignalSenderGuiImpl : public CanSignalSenderGuiInt {
 
         QComboBox* idCmb = new QComboBox();
         idCmb->setProperty("type", "nlmItem");
+
+        QCheckBox* chBox = new QCheckBox();
+        chBox->setProperty("type", "nlmItem");
 
         QObject::connect(idCmb, &QComboBox::currentTextChanged, [this, sigCmb](const QString& text) {
             uint32_t id = text.toUInt(nullptr, 16);
@@ -104,12 +107,18 @@ struct CanSignalSenderGuiImpl : public CanSignalSenderGuiInt {
         QLineEdit* le = new QLineEdit();
         le->setProperty("type", "nlmItem");
 
-        QObject::connect(bt, &QPushButton::pressed, [idCmb, sigCmb, le, this] {
+        QLineEdit* ival = new QLineEdit();
+        ival->setProperty("type", "nlmItem");
+        ival->setValidator(new QIntValidator());
+
+        QObject::connect(chBox, &QCheckBox::pressed, [bt, chBox] { bt->setCheckable(!chBox->isChecked()); });
+
+        QObject::connect(bt, &QPushButton::pressed, [idCmb, sigCmb, le, bt, chBox, ival, this] {
             if (_sendCbk) {
                 if (idCmb->currentText().length() > 0 && sigCmb->currentText().length() > 0
                     && le->text().length() > 0) {
 
-                    _sendCbk(idCmb->currentText(), sigCmb->currentText(), QVariant(le->text()));
+                    _sendCbk(idCmb->currentText(), sigCmb->currentText(), QVariant(le->text()), chBox->isChecked(), ival->text().toUInt());
                 }
             }
         });
@@ -123,10 +132,16 @@ struct CanSignalSenderGuiImpl : public CanSignalSenderGuiInt {
         auto leNdx = _model->index(_model->rowCount() - 1, 2);
         _ui->tv->setIndexWidget(leNdx, le);
 
+        auto cbNdx = _model->index(_model->rowCount() - 1, 3);
+        _ui->tv->setIndexWidget(cbNdx, chBox);
+
+        auto ivalNdx = _model->index(_model->rowCount() - 1, 4);
+        _ui->tv->setIndexWidget(ivalNdx, ival);
+
         auto pbNdx = _model->index(_model->rowCount() - 1, _model->columnCount() - 1);
         _ui->tv->setIndexWidget(pbNdx, bt);
-        
-        if(id.length() > 0 && sig.length() > 0) {
+
+        if (id.length() > 0 && sig.length() > 0) {
             idCmb->setCurrentText(id);
             sigCmb->setCurrentText(sig);
         }
@@ -139,10 +154,10 @@ struct CanSignalSenderGuiImpl : public CanSignalSenderGuiInt {
         QJsonArray ret;
         QJsonObject item;
 
-        for(int i = 0; i < _model->rowCount(); ++i) {
-            auto id = reinterpret_cast<QComboBox *>(_ui->tv->indexWidget(_model->index(i, 0)));
-            auto sig = reinterpret_cast<QComboBox *>(_ui->tv->indexWidget(_model->index(i, 1)));
-            auto val = reinterpret_cast<QLineEdit *>(_ui->tv->indexWidget(_model->index(i, 2)));
+        for (int i = 0; i < _model->rowCount(); ++i) {
+            auto id = reinterpret_cast<QComboBox*>(_ui->tv->indexWidget(_model->index(i, 0)));
+            auto sig = reinterpret_cast<QComboBox*>(_ui->tv->indexWidget(_model->index(i, 1)));
+            auto val = reinterpret_cast<QLineEdit*>(_ui->tv->indexWidget(_model->index(i, 2)));
 
             item["id"] = id->currentText();
             item["sig"] = sig->currentText();
@@ -165,6 +180,7 @@ private:
     std::map<uint32_t, QStringList>* _sigNames;
     Ui::CanSignalSenderPrivate* _ui;
     QWidget* _widget;
+    std::vector<QTimer*> _timerVec;
 };
 
 #endif // CANSIGNALSENDERGUIIMPL_H

@@ -7,6 +7,7 @@
 #include "cansignalsender.h"
 #include <QStandardItemModel>
 #include <cantypes.hpp>
+#include <QTimer>
 
 class CanSignalSender;
 
@@ -40,6 +41,7 @@ private:
     ComponentInterface::ComponentProperties _supportedProps = {
             {_nameProperty,   {QVariant::String, true}}
     };
+    std::map<std::string, std::unique_ptr<QTimer>> _timerMap;
 };
 
 #endif // CANSIGNALSENDER_P_H
