@@ -11,6 +11,81 @@
 #include <log.h>
 #include <QButtonGroup>
 
+class IntervalLE : public QLineEdit
+{
+public:
+    IntervalLE(uint32_t, QWidget *parent) : QLineEdit(parent)
+    {
+        QRegExp qRegExp("[0-9]*");
+        auto v = new QRegExpValidator(qRegExp, this);
+        setValidator(v);
+    }
+};
+
+class InitValLE : public QLineEdit
+{
+public:
+    InitValLE(uint32_t len, QWidget *parent) : QLineEdit(parent)
+    {
+        QRegExp qRegExp("[0-9A-Fa-f]*");
+        auto v = new QRegExpValidator(qRegExp, this);
+        setValidator(v);
+    }
+};
+
+template<typename T>
+class EditorCreator : public QItemEditorCreatorBase
+{
+public:
+    EditorCreator(uint32_t len) :
+        _len(len)
+    {
+    } 
+
+    QWidget* createWidget(QWidget *parent) const override
+    {
+        cds_error("createWidget!");
+        return  new T(_len, parent);
+    }
+
+    QByteArray valuePropertyName() const override
+    {
+        return {};
+    }
+
+private:
+    uint32_t _len;
+};
+
+class MyDelegate : public QStyledItemDelegate
+{
+public:
+    MyDelegate(QObject *parent = nullptr) : QStyledItemDelegate(parent)
+    {
+    }
+
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override 
+    {
+        cds_warn("row {}, column {}", index.row(), index.column());
+
+        QStyledItemDelegate::setEditorData(editor, index);
+    }
+
+    virtual QWidget * createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override
+    {
+        cds_error("createEditor!");
+        return QStyledItemDelegate::createEditor(parent, option, index);
+    }
+
+private:
+    virtual bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) override
+    {
+        cds_error("aaaaaaaaaaaaaaaa {}", event->type());
+
+        return QStyledItemDelegate::editorEvent(event, model, option, index);
+    }
+};
+
 struct CanSignalDataGuiImpl : public CanSignalDataGuiInt {
     CanSignalDataGuiImpl()
         : _ui(new Ui::CanSignalDataPrivate)
@@ -45,10 +120,10 @@ struct CanSignalDataGuiImpl : public CanSignalDataGuiInt {
     }
 
     template <typename F>
-    void setDelegate(QTableView* tv, int col, QStyledItemDelegate& del, const std::function<void()>& cb)
+    void setDelegate(QTableView* tv, int col, MyDelegate& del, const std::function<void()>& cb)
     {
         QItemEditorFactory* factory = new QItemEditorFactory;
-        QItemEditorCreatorBase* editor = new QStandardItemEditorCreator<F>();
+        QItemEditorCreatorBase* editor = new EditorCreator<F>(10);
         factory->registerEditor(QVariant::String, editor);
         del.setItemEditorFactory(factory);
         tv->setItemDelegateForColumn(col, &del);
@@ -71,8 +146,8 @@ struct CanSignalDataGuiImpl : public CanSignalDataGuiInt {
 
         _settingsState = _ui->tv->horizontalHeader()->saveState();
 
-        setDelegate<QLineEdit>(_ui->tv, 4, _cycleDelegate, std::bind(&CanSignalDataGuiImpl::msgSettingUpdated, this));
-        setDelegate<QLineEdit>(_ui->tv, 5, _initValDelegate, std::bind(&CanSignalDataGuiImpl::msgSettingUpdated, this));
+        setDelegate<IntervalLE>(_ui->tv, 4, _cycleDelegate, std::bind(&CanSignalDataGuiImpl::msgSettingUpdated, this));
+        setDelegate<InitValLE>(_ui->tv, 5, _initValDelegate, std::bind(&CanSignalDataGuiImpl::msgSettingUpdated, this));
     }
 
     void msgSettingUpdated()
@@ -112,8 +187,8 @@ private:
     QWidget* _widget;
     QByteArray _settingsState;
     QByteArray _tableState;
-    QStyledItemDelegate _cycleDelegate;
-    QStyledItemDelegate _initValDelegate;
+    MyDelegate _cycleDelegate;
+    MyDelegate _initValDelegate;
     msgSettingsUpdated_t _msgSettingsUpdatedCbk{ nullptr };
 };
 
