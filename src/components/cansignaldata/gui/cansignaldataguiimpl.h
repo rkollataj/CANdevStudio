@@ -64,26 +64,22 @@ public:
     {
     }
 
-    void setEditorData(QWidget *editor, const QModelIndex &index) const override 
-    {
-        cds_warn("row {}, column {}", index.row(), index.column());
-
-        QStyledItemDelegate::setEditorData(editor, index);
-    }
-
     virtual QWidget * createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override
     {
-        cds_error("createEditor!");
+        uint32_t dlc = _model->data(_model->index(index.row(), 2)).toUInt();
+
         return QStyledItemDelegate::createEditor(parent, option, index);
     }
 
 private:
     virtual bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) override
     {
-        cds_error("aaaaaaaaaaaaaaaa {}", event->type());
+        _model = model;
 
         return QStyledItemDelegate::editorEvent(event, model, option, index);
     }
+
+    QAbstractItemModel *_model;
 };
 
 struct CanSignalDataGuiImpl : public CanSignalDataGuiInt {
