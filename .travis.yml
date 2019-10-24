@@ -10,19 +10,34 @@ matrix:
       sudo: required
       services: docker
       group: edge
-      env: CDS_BUILD_NUMBER=1
+      env:
+         - CC=gcc-6
+         - CXX=g++-6
+         - CMAKE_BUILD_TYPE=Debug
+         - WITH_COVERAGE=ON
+         - PACKAGE=OFF
     - os: linux
       dist: trusty
       sudo: required
       services: docker
       group: edge
-      env: CDS_BUILD_NUMBER=2
+      env:
+         - CC=gcc-53
+         - CXX=g++-53
+         - CMAKE_BUILD_TYPE=Release
+         - WITH_COVERAGE=OFF
+         - PACKAGE=ON
     - os: linux
       dist: trusty
       sudo: required
       services: docker
       group: edge
-      env: CDS_BUILD_NUMBER=3
+      env:
+          - CC=clang-3.5
+          - CXX=clang++-3.5
+          - CMAKE_BUILD_TYPE=Debug
+          - WITH_COVERAGE=OFF
+          - PACKAGE=OFF
     - os: osx
       osx_image: xcode9.4
 
