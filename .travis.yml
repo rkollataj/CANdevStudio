@@ -10,6 +10,13 @@ matrix:
       sudo: required
       services: docker
       group: edge
+      env: WITH_COVERAGE=ON
+    - os: linux
+      dist: trusty
+      sudo: required
+      services: docker
+      group: edge
+      env: WITH_COVERAGE=OFF
     - os: osx
       osx_image: xcode9.4
 
