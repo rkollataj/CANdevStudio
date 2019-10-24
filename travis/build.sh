@@ -3,12 +3,13 @@
 set -e
 
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-    if [ "$WITH_COVERAGE" == "ON" ]; then
+    if [ "$CDS_BUILD_NUMBER" == "1" ]; then
         export CC=gcc-6 CXX=g++-6 CMAKE_BUILD_TYPE=Debug WITH_COVERAGE=ON PACKAGE=OFF
         ./travis/docker_compile.sh
-    else
+    elif [ "$CDS_BUILD_NUMBER" == "2" ]; then
         export CC=gcc-53 CXX=g++-53 CMAKE_BUILD_TYPE=Release WITH_COVERAGE=OFF PACKAGE=ON
         ./travis/docker_compile.sh
+    else
         export CC=clang-3.5 CXX=clang++-3.5 CMAKE_BUILD_TYPE=Debug WITH_COVERAGE=OFF PACKAGE=OFF
         ./travis/docker_compile.sh
     fi

@@ -10,13 +10,19 @@ matrix:
       sudo: required
       services: docker
       group: edge
-      env: WITH_COVERAGE=ON
+      env: CDS_BUILD_NUMBER=1
     - os: linux
       dist: trusty
       sudo: required
       services: docker
       group: edge
-      env: WITH_COVERAGE=OFF
+      env: CDS_BUILD_NUMBER=2
+    - os: linux
+      dist: trusty
+      sudo: required
+      services: docker
+      group: edge
+      env: CDS_BUILD_NUMBER=3
     - os: osx
       osx_image: xcode9.4
 
