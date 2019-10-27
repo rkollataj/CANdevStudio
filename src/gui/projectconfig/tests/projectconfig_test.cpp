@@ -128,6 +128,7 @@ TEST_CASE("callbacks test", "[projectconfig]")
     When(Method(pcMock, setNodeDeletedCallback)).Do([&](auto, auto&& fn) { nodeDeleted = fn; });
     When(Method(pcMock, setNodeDoubleClickedCallback)).Do([&](auto, auto&& fn) { nodeClicked = fn; });
     When(Method(pcMock, setNodeContextMenuCallback)).Do([&](auto, auto&& fn) { nodeMenu = fn; });
+    Fake(Method(pcMock, setConfigChangedCbk));
     Fake(Method(pcMock, showContextMenu));
     Fake(Method(pcMock, openProperties));
 
