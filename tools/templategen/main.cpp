@@ -83,10 +83,12 @@ public:
 
 signals:
     void mainWidgetDockToggled(QWidget* widget) override;
+    void simBcastSnd(const QJsonObject &msg, const QVariant &param = QVariant());
 
 public slots:
     void stopSimulation() override;
     void startSimulation() override;
+    void simBcastRcv(const QJsonObject &msg, const QVariant &param) override;
 
 private:
     QScopedPointer<{name}Private> d_ptr;
@@ -179,6 +181,12 @@ void {name}::startSimulation()
     Q_D({name});
 
     d->_simStarted = true;
+}}
+
+void {name}::simBcastRcv(const QJsonObject &msg, const QVariant &param)
+{{
+    Q_UNUSED(msg);
+    Q_UNUSED(param);
 }}
 )",
         "name"_a = name, "nameLower"_a = str_tolower(name));
@@ -351,10 +359,12 @@ public:
 
 signals:
     void mainWidgetDockToggled(QWidget* widget) override;
+    void simBcastSnd(const QJsonObject &msg, const QVariant &param = QVariant());
 
 public slots:
     void stopSimulation() override;
     void startSimulation() override;
+    void simBcastRcv(const QJsonObject &msg, const QVariant &param) override;
 
 private:
     QScopedPointer<{name}Private> d_ptr;
@@ -447,6 +457,12 @@ void {name}::startSimulation()
     Q_D({name});
 
     d->_simStarted = true;
+}}
+
+void {name}::simBcastRcv(const QJsonObject &msg, const QVariant &param)
+{{
+    Q_UNUSED(msg);
+    Q_UNUSED(param);
 }}
 )",
         "name"_a = name, "nameLower"_a = str_tolower(name));

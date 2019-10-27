@@ -7,6 +7,7 @@
 #include <QWindow>
 #include <candevicemodel.h>
 #include <canrawviewmodel.h>
+#include <cansignaldata.h>
 #include <catch.hpp>
 #include <fakeit.hpp>
 #include <log.h>
@@ -150,6 +151,8 @@ TEST_CASE("callbacks test", "[projectconfig]")
 
     pc.simulationStopped();
 
+    auto& node3 = fs->createNode(std::make_unique<CanSignalDataModel>());
+
     nodeClicked(node);
     nodeMenu(node, QPointF());
     nodeClicked(node2);
@@ -159,6 +162,7 @@ TEST_CASE("callbacks test", "[projectconfig]")
 
     fs->removeNode(node);
     fs->removeNode(node2);
+    fs->removeNode(node3);
 }
 
 TEST_CASE("Plugin loading - sections not initialized", "[common]")
