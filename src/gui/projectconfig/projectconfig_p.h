@@ -59,11 +59,6 @@ public:
             auto propObj = component.getQConfig();
             auto prop = propObj->property("exposedProperties");
 
-            if (prop.isNull() || !prop.isValid()) {
-                cds_error("No exposed properties");
-                return;
-            }
-
             QJsonObject confObj;
             for (const auto& p : prop.toStringList()) {
                 confObj[p] = propObj->property(p.toStdString().c_str()).toString();
