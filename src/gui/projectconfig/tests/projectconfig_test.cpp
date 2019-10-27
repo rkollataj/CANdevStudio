@@ -116,6 +116,7 @@ TEST_CASE("callbacks test", "[projectconfig]")
     PCInterface::node_t nodeCreated;
     PCInterface::node_t nodeDeleted;
     PCInterface::node_t nodeClicked;
+    PCInterface::node_t configChanged;
     PCInterface::menu_t nodeMenu;
     QtNodes::FlowScene* fs;
 
@@ -128,7 +129,7 @@ TEST_CASE("callbacks test", "[projectconfig]")
     When(Method(pcMock, setNodeDeletedCallback)).Do([&](auto, auto&& fn) { nodeDeleted = fn; });
     When(Method(pcMock, setNodeDoubleClickedCallback)).Do([&](auto, auto&& fn) { nodeClicked = fn; });
     When(Method(pcMock, setNodeContextMenuCallback)).Do([&](auto, auto&& fn) { nodeMenu = fn; });
-    Fake(Method(pcMock, setConfigChangedCbk));
+    When(Method(pcMock, setConfigChangedCbk)).Do([&](auto&& fn) { configChanged = fn; });
     Fake(Method(pcMock, showContextMenu));
     Fake(Method(pcMock, openProperties));
 
@@ -153,6 +154,8 @@ TEST_CASE("callbacks test", "[projectconfig]")
     nodeMenu(node, QPointF());
     nodeClicked(node2);
     nodeMenu(node2, QPointF());
+
+    configChanged(node2);
 
     fs->removeNode(node);
     fs->removeNode(node2);
