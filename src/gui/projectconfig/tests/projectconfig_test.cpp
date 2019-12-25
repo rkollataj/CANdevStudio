@@ -20,6 +20,11 @@
 #include <QPushButton>
 #include <iconlabel.h>
 #include <plugins.hpp>
+#include <shmemmgr.h>
+
+namespace CdsShMem {
+const std::string id = QUuid::createUuid().toString().toStdString();
+};
 
 std::shared_ptr<spdlog::logger> kDefaultLogger;
 
@@ -189,5 +194,10 @@ int main(int argc, char* argv[])
     }
     cds_debug("Starting unit tests");
     QApplication a(argc, argv);
+
+    // shared memory will be automatically destroyed in destructor
+    ShMemMgr shm;
+    shm.createShm(CdsShMem::id);
+
     return Catch::Session().run(argc, argv);
 }

@@ -6,6 +6,12 @@
 #include <log.h>
 #include <projectconfigvalidator.h>
 #include <propertyeditordialog.h>
+#include <QUuid>
+#include <shmemmgr.h>
+
+namespace CdsShMem {
+const std::string id = QUuid::createUuid().toString().toStdString();
+};
 
 std::shared_ptr<spdlog::logger> kDefaultLogger;
 

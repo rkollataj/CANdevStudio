@@ -9,10 +9,8 @@ PythonBackend::PythonBackend()
     _shm.openShm(CdsShMem::id);
 
     // queues will be automatically destroyed with _shm object
-    _shm.createQueue(_outQueueName.toStdString());
-    _shm.createQueue(_inQueueName.toStdString());
-    _outQueue = _shm.openQueue(_outQueueName.toStdString());
-    _inQueue = _shm.openQueue(_inQueueName.toStdString());
+    _outQueue = _shm.createQueue(_outQueueName.toStdString());
+    _inQueue = _shm.createQueue(_inQueueName.toStdString());
 }
 
 bool PythonBackend::start(const QString& scriptName)

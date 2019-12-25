@@ -13,6 +13,8 @@ namespace CdsShMem {
 extern const std::string id;
 };
 
+namespace bip = boost::interprocess;
+
 class ShMemMgr {
     using shmVectorAlloc_t
         = boost::interprocess::allocator<uint8_t, boost::interprocess::managed_shared_memory::segment_manager>;
@@ -32,13 +34,14 @@ public:
     std::vector<uint8_t> readQueue(queue_t* queue);
 
 private:
-    bool removeQueue(const std::string& name);
+    void removeQueue(const std::string& name);
     bool removeShm(const std::string& name);
 
 private:
     std::string _shmId;
     std::vector<std::string> _queueId;
     boost::interprocess::managed_shared_memory _segment;
+    std::map<queue_t*, std::pair<bip::interprocess_condition*, bip::interprocess_mutex*>> _condMap;
 };
 
 #endif /* !__SHMEMMGR_H */

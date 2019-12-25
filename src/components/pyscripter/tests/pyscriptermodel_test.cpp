@@ -6,6 +6,12 @@
 #include <QSignalSpy>
 #include <catch.hpp>
 #include <fakeit.hpp>
+#include <QUuid>
+#include <shmemmgr.h>
+
+namespace CdsShMem {
+const std::string id = QUuid::createUuid().toString().toStdString();
+};
 
 std::shared_ptr<spdlog::logger> kDefaultLogger;
 // needed for QSignalSpy cause according to qtbug 49623 comments
@@ -82,5 +88,10 @@ int main(int argc, char* argv[])
     cds_debug("Starting unit tests");
     qRegisterMetaType<QCanBusFrame>(); // required by QSignalSpy
     QApplication a(argc, argv); // QApplication must exist when constructing QWidgets TODO check QTest
+
+    // shared memory will be automatically destroyed in destructor
+    ShMemMgr shm;
+    shm.createShm(CdsShMem::id);
+
     return Catch::Session().run(argc, argv);
 }
