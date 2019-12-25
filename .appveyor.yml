@@ -7,22 +7,44 @@ environment:
   - GENERATOR: '"Visual Studio 14 2015"'
     BUILD_TYPE: Release
     QT_PATH: C:\Qt\5.6\msvc2015
+    BOOST_ROOT: C:\Libraries\boost_1_67_0
+    BOOST_LIBRARYDIR: C:\Libraries\boost_1_67_0\lib32-msvc-14.0
+    BOOST_INCLUDEDIR: C:\Libraries\boost_1_67_0\boost
   - GENERATOR: '"MinGW Makefiles"'
+    MINGW_ROOT: C:\msys64\mingw32
+    MINGW_ARCH: i686
     BUILD_TYPE: Release
     QT_PATH: C:\Qt\5.11\mingw53_32
     PACKAGE: 1
+    BOOST_ROOT: C:\msys64\mingw32
+    BOOST_LIBRARYDIR: C:\msys64\mingw32\lib
+    BOOST_INCLUDEDIR: C:\msys64\mingw32\include\boost
   - GENERATOR: '"MinGW Makefiles"'
+    MINGW_ROOT: C:\msys64\mingw32
+    MINGW_ARCH: i686
     BUILD_TYPE: Debug
     QT_PATH: C:\Qt\5.11\mingw53_32
+    BOOST_ROOT: C:\msys64\mingw32
+    BOOST_LIBRARYDIR: C:\msys64\mingw32\lib
+    BOOST_INCLUDEDIR: C:\msys64\mingw32\include\boost
   - GENERATOR: '"Visual Studio 14 2015"'
     BUILD_TYPE: Debug
     QT_PATH: C:\Qt\5.6\msvc2015
+    BOOST_ROOT: C:\Libraries\boost_1_67_0
+    BOOST_LIBRARYDIR: C:\Libraries\boost_1_67_0\lib32-msvc-14.0
+    BOOST_INCLUDEDIR: C:\Libraries\boost_1_67_0\boost
   - GENERATOR: '"Visual Studio 14 2015 Win64"'
     BUILD_TYPE: Debug
     QT_PATH: C:\Qt\5.11\msvc2015_64
+    BOOST_ROOT: C:\Libraries\boost_1_67_0
+    BOOST_LIBRARYDIR: C:\Libraries\boost_1_67_0\lib64-msvc-14.0
+    BOOST_INCLUDEDIR: C:\Libraries\boost_1_67_0\boost
   - GENERATOR: '"Visual Studio 14 2015 Win64"'
     BUILD_TYPE: Release
     QT_PATH: C:\Qt\5.11\msvc2015_64
+    BOOST_ROOT: C:\Libraries\boost_1_67_0
+    BOOST_LIBRARYDIR: C:\Libraries\boost_1_67_0\lib64-msvc-14.0
+    BOOST_INCLUDEDIR: C:\Libraries\boost_1_67_0\boost
 install:
 - cmd: git submodule update --init --recursive
 build_script:
@@ -31,11 +53,19 @@ build_script:
 
     cd build
 
+    set PATH_OLD=%PATH%
+
+    if defined MINGW_ROOT set PATH=%MINGW_ROOT%\bin;C:\msys64\usr\bin\;%PATH%
+
+    if defined MINGW_ARCH bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost"
+
+    set PATH=%PATH_OLD%
+
     set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
 
-    set PATH=C:\mingw-w64\i686-5.3.0-posix-dwarf-rt_v4-rev0\mingw32\bin;%PATH%
+    set PATH=C:\mingw-w64\i686-5.3.0-posix-dwarf-rt_v4-rev0\mingw32\bin;%BOOST_LIBRARYDIR%;%PATH%
 
-    cmake .. -G %GENERATOR% -DCMAKE_PREFIX_PATH=%QT_PATH% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DBOOST_INCLUDEDIR=C:\Libraries\boost_1_67_0
+    cmake .. -G %GENERATOR% -DCMAKE_PREFIX_PATH=%QT_PATH% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DBOOST_LIBRARYDIR=%BOOST_LIBRARYDIR% -DBOOST_INCLUDEDIR=%BOOST_INCLUDEDIR%
 
     cmake --build . --config %BUILD_TYPE%
 

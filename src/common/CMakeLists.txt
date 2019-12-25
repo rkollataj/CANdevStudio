@@ -14,10 +14,10 @@ set(SRC
 
 add_library(cds-common STATIC ${SRC})
 target_include_directories(cds-common INTERFACE ${CMAKE_SOURCE_DIR}/src/common ${CMAKE_SOURCE_DIR}/3rdParty/spdlog/include)
-target_link_libraries(cds-common ${CMAKE_THREAD_LIBS_INIT} Qt5::SerialBus nodes CANdb Qt5::Svg ${Boost_LIBRARIES} ${LIBRT})
+target_link_libraries(cds-common ${CMAKE_THREAD_LIBS_INIT} Qt5::SerialBus nodes CANdb Qt5::Svg Boost::system ${LIBRT})
 
 add_executable(cds-python pythonfrontend.cpp shmemmgr.cpp)
-target_link_libraries(cds-python ${Boost_LIBRARIES} ${LIBRT} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(cds-python ${LIBRT} ${CMAKE_THREAD_LIBS_INIT} Boost::system)
 
 if(WITH_TESTS)
     add_executable(common_test tests/common_test.cpp)
