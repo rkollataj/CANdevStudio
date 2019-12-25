@@ -1,7 +1,8 @@
 #include "pyscripter_p.h"
+#include <QUuid>
 #include <log.h>
 
-PyScripterPrivate::PyScripterPrivate(PyScripter *q, PyScripterCtx&& ctx)
+PyScripterPrivate::PyScripterPrivate(PyScripter* q, PyScripterCtx&& ctx)
     : _ctx(std::move(ctx))
     , q_ptr(q)
 {
@@ -10,7 +11,7 @@ PyScripterPrivate::PyScripterPrivate(PyScripter *q, PyScripterCtx&& ctx)
 
 void PyScripterPrivate::initProps()
 {
-    for (const auto& p: _supportedProps) {
+    for (const auto& p : _supportedProps) {
         _props[ComponentInterface::propertyName(p)];
     }
 }

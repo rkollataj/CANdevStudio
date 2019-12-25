@@ -3,6 +3,7 @@
 
 #include "pyscripter.h"
 #include <memory>
+#include <pythonbackend.h>
 
 class PyScripter;
 
@@ -23,6 +24,7 @@ public:
     bool _simStarted{ false };
     PyScripterCtx _ctx;
     std::map<QString, QVariant> _props;
+    PythonBackend _pyHandler;
 
 private:
     PyScripter* q_ptr;
