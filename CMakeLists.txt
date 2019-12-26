@@ -50,6 +50,8 @@ find_package(Qt5Widgets ${QT_REQUIRED_VERSION} REQUIRED)
 find_package(Qt5Test ${QT_REQUIRED_VERSION} REQUIRED)
 find_package(Qt5Svg ${QT_REQUIRED_VERSION} REQUIRED)
 message(STATUS "Qt Version found: ${Qt5Core_VERSION}")
+
+set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost COMPONENTS system REQUIRED)
 
 if(MSVC)
