@@ -6,8 +6,8 @@
 #include <QtCore/QtGlobal>
 #include <QtWidgets/QApplication>
 #include <boost/interprocess/managed_shared_memory.hpp>
+#include <cds-python/shmemmgr.h>
 #include <nodes/Connection>
-#include <shmemmgr.h>
 
 #include "log.h"
 

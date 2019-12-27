@@ -43,6 +43,7 @@ else()
     set(INSTALL_DEST_BIN CANdevStudio)
 endif()
 
+find_package(Threads REQUIRED)
 set(QT_REQUIRED_VERSION "5.6")
 find_package(Qt5Core ${QT_REQUIRED_VERSION} REQUIRED)
 find_package(Qt5SerialBus ${QT_REQUIRED_VERSION} REQUIRED)

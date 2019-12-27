@@ -18,9 +18,9 @@
 
 #include "ui_projectconfig.h"
 #include <QPushButton>
+#include <cds-python/shmemmgr.h>
 #include <iconlabel.h>
 #include <plugins.hpp>
-#include <shmemmgr.h>
 
 namespace CdsShMem {
 const std::string id = QUuid::createUuid().toString().toStdString();

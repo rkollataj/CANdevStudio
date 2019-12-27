@@ -4,10 +4,10 @@
 #include "log.h"
 #include <QCanBusFrame>
 #include <QSignalSpy>
-#include <catch.hpp>
-#include <fakeit.hpp>
 #include <QUuid>
-#include <shmemmgr.h>
+#include <catch.hpp>
+#include <cds-python/shmemmgr.h>
+#include <fakeit.hpp>
 
 namespace CdsShMem {
 const std::string id = QUuid::createUuid().toString().toStdString();
