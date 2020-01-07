@@ -54,6 +54,7 @@ message(STATUS "Qt Version found: ${Qt5Core_VERSION}")
 
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost COMPONENTS system REQUIRED)
+find_package (Python3 COMPONENTS Interpreter Development)
 
 if(MSVC)
     include_directories(${Boost_INCLUDE_DIRS})
