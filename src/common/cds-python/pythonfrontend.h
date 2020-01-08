@@ -3,11 +3,17 @@
 
 #include "shmemmgr.h"
 #include <QObject>
+#include <iostream>
 
 class CommClass : public QObject {
     Q_OBJECT
 Q_SIGNALS:
     void dupa(int a);
+
+public Q_SLOTS:
+    void dupaSlot() {
+        std::cout << "AAA BBB CCCi\n"; 
+    }
 
 public:
     int abc(){ return 123; };
