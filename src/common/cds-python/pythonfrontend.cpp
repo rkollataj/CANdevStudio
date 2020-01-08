@@ -15,7 +15,7 @@ static PyMethodDef PythonQtMethods[] = {
   {NULL, NULL, 0, NULL}
 };
 
-const char* moduleName = "CDSPython";
+const char* moduleName = "PythonQt";
 
 static PyModuleDef PythonQtModuleDef = {
   PyModuleDef_HEAD_INIT,
@@ -32,7 +32,7 @@ static PyModuleDef PythonQtModuleDef = {
 
 QHash<QByteArray, PythonQtClassInfo*> _knownClassInfos;
 QHash<QByteArray, PyObject*> _packages;
-PythonQtObjectPtr _pythonQtModule = PyModule_Create(&PythonQtModuleDef);
+PythonQtObjectPtr _pythonQtModule;
 QByteArray _pythonQtModuleName = moduleName;
 PythonQtClassInfo* _currentClassInfoForClassWrapperCreation;
 QHash<void*, PythonQtInstanceWrapper*> _wrappedObjects;
@@ -211,6 +211,7 @@ PyObject* wrapQObject(QObject* obj)
         Py_INCREF(Py_None);
         return Py_None;
     }
+
     PythonQtInstanceWrapper* wrap = findWrapperAndRemoveUnused(obj);
     if (wrap && wrap->_wrappedPtr) {
         // uh oh, we want to wrap a QObject, but have a C++ wrapper at that
@@ -219,6 +220,7 @@ PyObject* wrapQObject(QObject* obj)
         // Do not use the old wrapper anymore.
         wrap = NULL;
     }
+
     if (!wrap) {
         // smuggling it in...
         PythonQtClassInfo* classInfo = _knownClassInfos.value(obj->metaObject()->className());
@@ -230,6 +232,7 @@ PyObject* wrapQObject(QObject* obj)
     } else {
         Py_INCREF(wrap);
     }
+
     return (PyObject*)wrap;
 }
 
@@ -242,6 +245,30 @@ void addObject(PyObject* object, const QString& name, QObject* qObject)
     } else {
         PyObject_SetAttrString(object, QStringToPythonCharPointer(name), wrapQObject(qObject));
     }
+}
+
+PythonQtClassInfo* currentClassInfoForClassWrapperCreation()
+{
+    PythonQtClassInfo* info = _currentClassInfoForClassWrapperCreation;
+    _currentClassInfoForClassWrapperCreation = NULL;
+    return info;
+}
+
+extern void initializeSlots(PythonQtClassWrapper* wrap);
+
+static PyObject* PythonQtClassWrapper_alloc(PyTypeObject* self, Py_ssize_t nitems)
+{
+    // call the default type alloc
+    PyObject* obj = PyType_Type.tp_alloc(self, nitems);
+
+    // take current class type, if we are called via newPythonQtClassWrapper()
+    PythonQtClassWrapper* wrap = (PythonQtClassWrapper*)obj;
+    wrap->_classInfo = currentClassInfoForClassWrapperCreation();
+    if (wrap->_classInfo) {
+        initializeSlots(wrap);
+    }
+
+    return obj;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -271,6 +298,20 @@ bool PythonFrontend::start()
     std::cout << "Bye bye!" << std::endl;
 
     return false;
+}
+
+PyObject* evalScript(PyObject* object, const QString& script, int start = Py_file_input)
+{
+    PythonQtObjectPtr p;
+    PyObject* dict = NULL;
+
+    if (PyModule_Check(object)) {
+        dict = PyModule_GetDict(object);
+    } else if (PyDict_Check(object)) {
+        dict = object;
+    }
+
+    return PyRun_String(QStringToPythonCharPointer(script), start, dict, dict);
 }
 
 int main(int argc, char** argv)
@@ -303,6 +344,47 @@ int main(int argc, char** argv)
     // pf.start();
 
     QApplication qapp(argc, argv);
+    CommClass comm;
+
+    wchar_t* program = Py_DecodeLocale(argv[0], NULL);
+    if (program == NULL) {
+        fprintf(stderr, "Fatal error: cannot decode argv[0]\n");
+        exit(1);
+    }
+    Py_SetProgramName(program);
+    Py_Initialize();
+
+    PyObject* dict = PyImport_GetModuleDict();
+    PyObject* obj = PyDict_GetItemString(dict, "__main__");
+
+    PythonQtClassWrapper_Type.tp_base = &PyType_Type;
+    PythonQtClassWrapper_Type.tp_alloc = PythonQtClassWrapper_alloc;
+
+    // add our own python object types for classes
+    if (PyType_Ready(&PythonQtClassWrapper_Type) < 0) {
+        std::cerr << "could not initialize PythonQtClassWrapper_Type"
+                  << ", in " << __FILE__ << ":" << __LINE__ << std::endl;
+    }
+    Py_INCREF(&PythonQtClassWrapper_Type);
+
+    _pythonQtModule = PyModule_Create(&PythonQtModuleDef);
+
+    addObject(obj, "comm", &comm);
+
+    evalScript(obj, R"(
+
+from time import time,ctime
+#print('Today is ', comm.abc())
+print('Today is ')
+
+)");
+
+    if (Py_FinalizeEx() < 0) {
+        exit(120);
+    }
+
+    PyMem_RawFree(program);
+
     // init PythonQt and Python itself
     // PythonQt::init();
     // get a smart pointer to the __main__ module of the Python interpreter

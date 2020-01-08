@@ -2,6 +2,16 @@
 #define __PYTHONFRONTEND_H
 
 #include "shmemmgr.h"
+#include <QObject>
+
+class CommClass : public QObject {
+    Q_OBJECT
+Q_SIGNALS:
+    void dupa(int a);
+
+public:
+    int abc(){ return 123; };
+};
 
 class PythonFrontend {
 public:

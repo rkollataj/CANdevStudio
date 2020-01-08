@@ -223,7 +223,7 @@ BINARY_OP_INPLACE(mod)
 BINARY_OP_INPLACE(lshift)
 BINARY_OP_INPLACE(rshift)
 
-static void initializeSlots(PythonQtClassWrapper* wrap)
+void initializeSlots(PythonQtClassWrapper* wrap)
 {
   int typeSlots = wrap->classInfo()->typeSlots();
   if (typeSlots) {
