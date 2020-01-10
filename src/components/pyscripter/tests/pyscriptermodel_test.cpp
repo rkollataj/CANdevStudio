@@ -84,5 +84,7 @@ int main(int argc, char* argv[])
     qRegisterMetaType<QCanBusFrame>(); // required by QSignalSpy
     QApplication a(argc, argv); // QApplication must exist when constructing QWidgets TODO check QTest
 
+    PyScripter::typeInit();
+
     return Catch::Session().run(argc, argv);
 }

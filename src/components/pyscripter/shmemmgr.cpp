@@ -32,8 +32,6 @@ void ShMemMgr::createShm(const std::string& name)
     _shmId = name;
     _segment = managed_shared_memory(create_only, _shmId.c_str(), 65536);
     _opened = true;
-
-    std::cout << "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZ " << name;
 }
 
 void ShMemMgr::openShm(const std::string& name)
@@ -43,8 +41,6 @@ void ShMemMgr::openShm(const std::string& name)
     if (!_opened) {
         _segment = managed_shared_memory(open_only, name.c_str());
         _opened = true;
-
-    std::cout << "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZ " << name;
     }
 }
 
