@@ -1,7 +1,7 @@
 set(COMPONENT_NAME pyscripter)
 
 set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost COMPONENTS system REQUIRED)
+find_package(Boost COMPONENTS system date_time REQUIRED)
 find_package (Python3 COMPONENTS Interpreter Development)
 
 if(MSVC)
@@ -22,7 +22,7 @@ set(SRC
 )
 
 add_library(${COMPONENT_NAME} ${SRC})
-target_link_libraries(${COMPONENT_NAME} Qt5::Widgets Qt5::Core Qt5::SerialBus nodes cds-common Boost::system ${LIBRT})
+target_link_libraries(${COMPONENT_NAME} Qt5::Widgets Qt5::Core Qt5::SerialBus nodes cds-common Boost::system Boost::date_time ${LIBRT})
 target_include_directories(${COMPONENT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 include_directories(${CMAKE_SOURCE_DIR}/3rdParty/cxxopts/include)
@@ -38,7 +38,7 @@ target_compile_definitions(CANdevStudio-python PUBLIC QT_NO_KEYWORDS)
 add_custom_command(
         TARGET CANdevStudio-python POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
-                ${CMAKE_CURRENT_BINARY_DIR}/CANdevStudio-python
+                $<TARGET_FILE:CANdevStudio-python>
                 ${CMAKE_BINARY_DIR}/src/gui)
 
 install(TARGETS CANdevStudio-python
