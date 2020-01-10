@@ -72,6 +72,9 @@ public:
     explicit {name}({name}Ctx&& ctx);
     ~{name}();
 
+    // Invoked automatically by PluginLoader before component is created for the first time
+    static void typeInit() {{}}
+
     QWidget* mainWidget() override;
     void setConfig(const QJsonObject& json) override;
     void setConfig(const QWidget& qobject) override;
@@ -347,6 +350,9 @@ public:
     {name}();
     explicit {name}({name}Ctx&& ctx);
     ~{name}();
+
+    // Invoked automatically by PluginLoader before component is created for the first time
+    static void typeInit() {{}}
 
     QWidget* mainWidget() override;
     void setConfig(const QJsonObject& json) override;

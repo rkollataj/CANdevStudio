@@ -4,25 +4,11 @@
 #include <QUuid>
 #include <log.h>
 
-//#include <utility>
-
 namespace CdsShMem {
 const std::string id = QUuid::createUuid().toString().toStdString();
 };
 
 ShMemMgr PythonBackend::_appShm;
-
-//#include <iostream>
-
-//namespace {
-//static auto callOnce = [] {
-//    CdsShMem::id = QUuid::createUuid().toString().toStdString();
-
-//    auto shm = std::make_shared<ShMemMgr>();
-//    shm->createShm(CdsShMem::id);
-//    return shm;
-//}();
-//}
 
 PythonBackend::PythonBackend()
     : _outQueueName(QUuid::createUuid().toString())
