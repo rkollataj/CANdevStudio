@@ -1,5 +1,6 @@
 #include "pyscripter.h"
 #include "pyscripter_p.h"
+#include "pythonbackend.h"
 #include <confighelpers.h>
 #include <log.h>
 
@@ -13,8 +14,12 @@ PyScripter::PyScripter(PyScripterCtx&& ctx)
 {
 }
 
-PyScripter::~PyScripter()
+PyScripter::~PyScripter() {}
+
+void PyScripter::typeInit()
 {
+    cds_warn("============================================");
+    PythonBackend::_appShm.createShm(CdsShMem::id);
 }
 
 QWidget* PyScripter::mainWidget()
@@ -49,9 +54,7 @@ std::shared_ptr<QWidget> PyScripter::getQConfig() const
     return configHelpers::getQConfig(getSupportedProperties(), d->_props);
 }
 
-void PyScripter::configChanged()
-{
-}
+void PyScripter::configChanged() {}
 
 bool PyScripter::mainWidgetDocked() const
 {
@@ -80,7 +83,7 @@ void PyScripter::startSimulation()
     d->_pyHandler.start("");
 }
 
-void PyScripter::simBcastRcv(const QJsonObject &msg, const QVariant &param)
+void PyScripter::simBcastRcv(const QJsonObject& msg, const QVariant& param)
 {
     Q_UNUSED(msg);
     Q_UNUSED(param);

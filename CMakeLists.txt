@@ -52,20 +52,6 @@ find_package(Qt5Test ${QT_REQUIRED_VERSION} REQUIRED)
 find_package(Qt5Svg ${QT_REQUIRED_VERSION} REQUIRED)
 message(STATUS "Qt Version found: ${Qt5Core_VERSION}")
 
-set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost COMPONENTS system REQUIRED)
-find_package (Python3 COMPONENTS Interpreter Development)
-
-if(MSVC)
-    include_directories(${Boost_INCLUDE_DIRS})
-    link_directories(${BOOST_LIBRARYDIR})
-endif()
-
-if(UNIX AND NOT APPLE)
-    find_library(LIBRT rt)
-endif()
-
-
 set_property(TARGET Qt5::SerialBus PROPERTY INTERFACE_COMPILE_FEATURES "")
 set_property(TARGET Qt5::Core PROPERTY INTERFACE_COMPILE_FEATURES "")
 

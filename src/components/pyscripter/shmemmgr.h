@@ -9,10 +9,6 @@
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/lockfree/spsc_queue.hpp>
 
-namespace CdsShMem {
-extern const std::string id;
-};
-
 namespace bip = boost::interprocess;
 
 class ShMemMgr {
@@ -42,6 +38,7 @@ private:
     std::vector<std::string> _queueId;
     boost::interprocess::managed_shared_memory _segment;
     std::map<queue_t*, std::pair<bip::interprocess_condition*, bip::interprocess_mutex*>> _condMap;
+    bool _opened{ false };
 };
 
 #endif /* !__SHMEMMGR_H */

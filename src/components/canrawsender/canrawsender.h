@@ -19,6 +19,8 @@ public:
     explicit CanRawSender(CanRawSenderCtx&& ctx);
     ~CanRawSender();
 
+    static void typeInit() {}
+
     // TODO this should go as config parameter!
     int getLineCount() const;
 

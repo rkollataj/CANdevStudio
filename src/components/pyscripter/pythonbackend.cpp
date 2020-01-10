@@ -4,6 +4,26 @@
 #include <QUuid>
 #include <log.h>
 
+//#include <utility>
+
+namespace CdsShMem {
+const std::string id = QUuid::createUuid().toString().toStdString();
+};
+
+ShMemMgr PythonBackend::_appShm;
+
+//#include <iostream>
+
+//namespace {
+//static auto callOnce = [] {
+//    CdsShMem::id = QUuid::createUuid().toString().toStdString();
+
+//    auto shm = std::make_shared<ShMemMgr>();
+//    shm->createShm(CdsShMem::id);
+//    return shm;
+//}();
+//}
+
 PythonBackend::PythonBackend()
     : _outQueueName(QUuid::createUuid().toString())
     , _inQueueName(QUuid::createUuid().toString())
@@ -27,8 +47,8 @@ bool PythonBackend::start(const QString& scriptName)
 
     // CANdevStudio-python shall be located in the same folder as main executable
     QFileInfo fi(QCoreApplication::applicationFilePath());
-    auto frontendPath
-        = QCoreApplication::applicationDirPath() + fi.completeBaseName().replace("CANdevStudio", "/CANdevStudio-python");
+    auto frontendPath = QCoreApplication::applicationDirPath()
+        + fi.completeBaseName().replace("CANdevStudio", "/CANdevStudio-python");
 
     _process.setProcessChannelMode(QProcess::ForwardedChannels);
     _process.start(frontendPath, args);

@@ -10,8 +10,8 @@ class CanDevicePrivate;
 class QCanBusFrame;
 
 /**
-*   @brief The class provides abstraction layer for CAN BUS hardware
-*/
+ *   @brief The class provides abstraction layer for CAN BUS hardware
+ */
 class CanDevice : public QObject, public ComponentInterface {
     Q_OBJECT
     Q_DECLARE_PRIVATE(CanDevice)
@@ -20,6 +20,8 @@ public:
     explicit CanDevice();
     explicit CanDevice(CanDeviceCtx&& ctx);
     ~CanDevice();
+
+    static void typeInit() {}
 
     /**
      * @brief  Configures CAN BUS backend and interface
@@ -31,13 +33,13 @@ public:
     bool init();
 
     /**
-    *   @see ComponentInterface
-    */
+     *   @see ComponentInterface
+     */
     QWidget* mainWidget() override;
 
     /**
-    *   @see ComponentInterface
-    */
+     *   @see ComponentInterface
+     */
     void setConfig(const QJsonObject& json) override;
 
     /**
@@ -46,18 +48,18 @@ public:
     void setConfig(const QWidget& qobject) override;
 
     /**
-    *   @see ComponentInterface
-    */
+     *   @see ComponentInterface
+     */
     QJsonObject getConfig() const override;
 
     /**
-    *   @see ComponentInterface
-    */
+     *   @see ComponentInterface
+     */
     std::shared_ptr<QWidget> getQConfig() const override;
 
     /**
-    *   @see ComponentInterface
-    */
+     *   @see ComponentInterface
+     */
     virtual void configChanged() override;
 
     /**
@@ -70,31 +72,30 @@ public:
      */
     ComponentProperties getSupportedProperties() const override;
 
-
 signals:
     void frameReceived(const QCanBusFrame& frame);
     void frameSent(bool status, const QCanBusFrame& frame);
 
     /**
-    *   @see ComponentInterface
-    */
+     *   @see ComponentInterface
+     */
     void mainWidgetDockToggled(QWidget* widget) override;
-    void simBcastSnd(const QJsonObject &msg, const QVariant &param = QVariant()) override;
+    void simBcastSnd(const QJsonObject& msg, const QVariant& param = QVariant()) override;
 
 public slots:
     void sendFrame(const QCanBusFrame& frame);
 
     /**
-    *   @see ComponentInterface
-    */
+     *   @see ComponentInterface
+     */
     void startSimulation() override;
 
     /**
-    *   @see ComponentInterface
-    */
+     *   @see ComponentInterface
+     */
     void stopSimulation() override;
 
-    void simBcastRcv(const QJsonObject &msg, const QVariant &param) override;
+    void simBcastRcv(const QJsonObject& msg, const QVariant& param) override;
 
 private slots:
     void errorOccurred(int error);

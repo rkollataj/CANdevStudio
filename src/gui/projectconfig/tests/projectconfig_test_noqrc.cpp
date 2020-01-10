@@ -1,17 +1,11 @@
 #define CATCH_CONFIG_RUNNER
 #include <QApplication>
-#include <QUuid>
 #include <candevice.h>
 #include <catch.hpp>
-#include <cds-python/shmemmgr.h>
 #include <fakeit.hpp>
 #include <log.h>
 #include <projectconfigvalidator.h>
 #include <propertyeditordialog.h>
-
-namespace CdsShMem {
-const std::string id = QUuid::createUuid().toString().toStdString();
-};
 
 std::shared_ptr<spdlog::logger> kDefaultLogger;
 

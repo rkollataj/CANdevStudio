@@ -16,18 +16,7 @@ target_include_directories(CANdevStudio
         "${CMAKE_SOURCE_DIR}/components/"
         "${CMAKE_BINARY_DIR}/generated"
 )
-
-include_directories(${CMAKE_SOURCE_DIR}/3rdParty/cxxopts/include)
-
-add_executable(CANdevStudio-python 
-    ${CMAKE_SOURCE_DIR}/src/common/cds-python/pythonfrontend.cpp 
-    ${CMAKE_SOURCE_DIR}/src/common/cds-python/shmemmgr.cpp)
-target_link_libraries(CANdevStudio-python ${LIBRT} ${CMAKE_THREAD_LIBS_INIT} Boost::system Python3::Python Qt5::Widgets Qt5::Core)
-
-# To avoid error in Python/object.h that is using slots keyword
-target_compile_definitions(CANdevStudio-python PUBLIC QT_NO_KEYWORDS) 
-
-install(TARGETS CANdevStudio CANdevStudio-python
+install(TARGETS CANdevStudio 
     BUNDLE DESTINATION . COMPONENT Runtime
     RUNTIME DESTINATION ${INSTALL_DEST_BIN} COMPONENT Runtime
 )

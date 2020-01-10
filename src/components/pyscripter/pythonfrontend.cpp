@@ -74,11 +74,11 @@ import sys
 from PySide2.QtCore import QObject, Signal, Slot
 from PySide2.QtWidgets import QApplication
 
-class Communicate(QObject):                                                 
-    # create two new signals on the fly: one will handle                    
-    # int type, the other will handle strings                               
-    speak_number = Signal(int)                                              
-    speak_word = Signal(str)    
+class Communicate(QObject):
+    # create two new signals on the fly: one will handle
+    # int type, the other will handle strings
+    speak_number = Signal(int)
+    speak_word = Signal(str)
 
 app = QApplication(sys.argv)
 
@@ -92,7 +92,7 @@ app = QApplication(sys.argv)
         
         auto state = PyGILState_Ensure();
 
-        PyRun_SimpleString("cds.speak_word.emit(' o w morde!')");
+        PyRun_SimpleString("cds.speak_word.emit(' o w mordeeeee!')");
 
         PyGILState_Release(state);
     });

@@ -37,6 +37,8 @@ signals:
 template <typename C, typename Derived> class ComponentModel : public ComponentModelInterface {
 
 public:
+    using ComponentType = C;
+
     ComponentModel() = default;
 
     ComponentModel(const QString& name)

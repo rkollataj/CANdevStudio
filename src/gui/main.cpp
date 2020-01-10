@@ -1,12 +1,9 @@
 #include "mainwindow.h"
-#include <QCanBusFrame>
 #include <QFile>
-#include <QUuid>
 #include <QtCore/QtDebug>
 #include <QtCore/QtGlobal>
 #include <QtWidgets/QApplication>
-#include <boost/interprocess/managed_shared_memory.hpp>
-#include <cds-python/shmemmgr.h>
+#include <QCanBusFrame>
 #include <nodes/Connection>
 
 #include "log.h"
@@ -55,10 +52,6 @@ void setupLogger(bool verbose)
     });
 }
 
-namespace CdsShMem {
-const std::string id = QUuid::createUuid().toString().toStdString();
-};
-
 int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
@@ -74,10 +67,6 @@ int main(int argc, char* argv[])
     cds_debug("Starting CANdevStudio");
 
     qDebug() << "Qt message ";
-
-    // shared memory will be automatically destroyed in destructor
-    ShMemMgr shm;
-    shm.createShm(CdsShMem::id);
 
     MainWindow w;
     w.show();

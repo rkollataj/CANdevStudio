@@ -21,6 +21,8 @@ public:
     explicit CanLoad(CanLoadCtx&& ctx);
     ~CanLoad();
 
+    static void typeInit() {}
+
     QWidget* mainWidget() override;
     void setConfig(const QJsonObject& json) override;
     void setConfig(const QWidget& qobject) override;

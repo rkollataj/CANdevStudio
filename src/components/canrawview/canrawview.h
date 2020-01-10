@@ -20,6 +20,8 @@ public:
     explicit CanRawView(CanRawViewCtx&& ctx);
     ~CanRawView();
 
+    static void typeInit() {}
+
     /**
     *   @see ComponentInterface
     */

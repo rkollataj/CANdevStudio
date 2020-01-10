@@ -18,11 +18,13 @@ template <class T, class U, class... Types> struct section_ndx<T, std::tuple<U, 
 template <typename T> void registerModel(QtNodes::DataModelRegistry& registry)
 {
     registry.registerModel<typename T::Model>();
+    T::Model::ComponentType::typeInit();
 }
 
 template <typename W, typename Z, typename... Args> void registerModel(QtNodes::DataModelRegistry& registry)
 {
     registerModel<W>(registry);
+    W::Model::ComponentType::typeInit();
     registerModel<Z, Args...>(registry);
 }
 

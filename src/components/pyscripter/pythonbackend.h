@@ -1,8 +1,12 @@
 #ifndef __PYTHONBACKEND_H
 #define __PYTHONBACKEND_H
 
-#include <QProcess>
 #include "shmemmgr.h"
+#include <QProcess>
+
+namespace CdsShMem {
+extern const std::string id;
+};
 
 class PythonBackend {
 public:
@@ -11,6 +15,9 @@ public:
     bool start(const QString& scriptName);
     void stop();
 
+public:
+    static ShMemMgr _appShm;
+
 private:
     QProcess _process;
     ShMemMgr _shm;
@@ -18,7 +25,6 @@ private:
     ShMemMgr::queue_t* _outQueue;
     QString _outQueueName;
     QString _inQueueName;
-
 };
 
 #endif /* !__PYTHONBACKEND_H */

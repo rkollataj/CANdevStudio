@@ -20,6 +20,8 @@ public:
     explicit PyScripter(PyScripterCtx&& ctx);
     ~PyScripter();
 
+    static void typeInit();
+
     QWidget* mainWidget() override;
     void setConfig(const QJsonObject& json) override;
     void setConfig(const QWidget& qobject) override;
@@ -31,15 +33,15 @@ public:
 
 signals:
     void mainWidgetDockToggled(QWidget* widget) override;
-    void simBcastSnd(const QJsonObject &msg, const QVariant &param = QVariant()) override;
+    void simBcastSnd(const QJsonObject& msg, const QVariant& param = QVariant()) override;
 
 public slots:
     void stopSimulation() override;
     void startSimulation() override;
-    void simBcastRcv(const QJsonObject &msg, const QVariant &param) override;
+    void simBcastRcv(const QJsonObject& msg, const QVariant& param) override;
 
 private:
     QScopedPointer<PyScripterPrivate> d_ptr;
 };
 
-#endif //PYSCRIPTER_H
+#endif // PYSCRIPTER_H

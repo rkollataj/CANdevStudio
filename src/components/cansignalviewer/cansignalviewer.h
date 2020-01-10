@@ -22,6 +22,8 @@ public:
     explicit CanSignalViewer(CanSignalViewerCtx&& ctx);
     ~CanSignalViewer();
 
+    static void typeInit() {}
+
     QWidget* mainWidget() override;
     void setConfig(const QJsonObject& json) override;
     void setConfig(const QWidget& qobject) override;

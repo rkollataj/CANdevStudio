@@ -104,8 +104,8 @@ struct ComponentInterface {
      */
     virtual bool mainWidgetDocked() const = 0;
 
-    virtual void simBcastSnd(const QJsonObject &msg, const QVariant &param = QVariant()) = 0;
-    virtual void simBcastRcv(const QJsonObject &msg, const QVariant &param) = 0;
+    virtual void simBcastSnd(const QJsonObject& msg, const QVariant& param = QVariant()) = 0;
+    virtual void simBcastRcv(const QJsonObject& msg, const QVariant& param) = 0;
 };
 
 #endif /* !__COMPONENTINTERFACE_H */

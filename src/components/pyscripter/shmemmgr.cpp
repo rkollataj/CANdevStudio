@@ -1,4 +1,5 @@
 #include "shmemmgr.h"
+#include <QUuid>
 #include <boost/interprocess/sync/interprocess_condition.hpp>
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 
@@ -18,6 +19,8 @@ ShMemMgr::~ShMemMgr()
     }
 }
 
+#include <iostream>
+
 void ShMemMgr::createShm(const std::string& name)
 {
     using namespace boost::interprocess;
@@ -28,13 +31,21 @@ void ShMemMgr::createShm(const std::string& name)
 
     _shmId = name;
     _segment = managed_shared_memory(create_only, _shmId.c_str(), 65536);
+    _opened = true;
+
+    std::cout << "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZ " << name;
 }
 
 void ShMemMgr::openShm(const std::string& name)
 {
     using namespace boost::interprocess;
 
-    _segment = managed_shared_memory(open_only, name.c_str());
+    if (!_opened) {
+        _segment = managed_shared_memory(open_only, name.c_str());
+        _opened = true;
+
+    std::cout << "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZ " << name;
+    }
 }
 
 bool ShMemMgr::removeShm(const std::string& name)

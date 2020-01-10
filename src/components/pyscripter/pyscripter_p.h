@@ -2,7 +2,7 @@
 #define PYSCRIPTER_P_H
 
 #include "pyscripter.h"
-#include <cds-python/pythonbackend.h>
+#include "pythonbackend.h"
 #include <memory>
 
 class PyScripter;

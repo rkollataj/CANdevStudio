@@ -6,12 +6,12 @@ namespace {
 
 // clang-format off
 const std::map<PortType, std::vector<NodeDataType>> portMappings = {
-    { PortType::In, 
+    { PortType::In,
         {
             //{CanRawData{}.type() }
         }
     },
-    { PortType::Out, 
+    { PortType::Out,
         {
             //{CanRawData{}.type() }
         }
