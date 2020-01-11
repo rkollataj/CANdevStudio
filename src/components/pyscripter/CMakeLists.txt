@@ -10,18 +10,19 @@ if(WIN32)
 endif()
 
 find_package(Boost COMPONENTS ${CDS_BOOST_FIND} REQUIRED)
-find_package(PythonLibs 3)
 
-if(UNIX AND NOT APPLE)
-    find_library(LIBRT rt)
-endif()
-
-if(MSVC)
+if(WIN32)
     include_directories(${Boost_INCLUDE_DIRS})
     link_directories(${BOOST_LIBRARYDIR})
 endif()
 
+find_package(PythonLibs 3)
+
 include_directories(${PYTHON_INCLUDE_DIRS})
+
+if(UNIX AND NOT APPLE)
+    find_library(LIBRT rt)
+endif()
 
 set(SRC
     pyscripter.cpp
