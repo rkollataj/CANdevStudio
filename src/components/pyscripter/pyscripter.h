@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QtCore/QScopedPointer>
 #include <componentinterface.h>
-#include <context.h>
+#include <common/context.h>
 #include <memory>
 
 class PyScripterPrivate;

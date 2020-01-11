@@ -33,7 +33,8 @@ set(SRC
 
 add_library(${COMPONENT_NAME} ${SRC})
 target_link_libraries(${COMPONENT_NAME} Qt5::Widgets Qt5::Core Qt5::SerialBus nodes cds-common ${CDS_BOOST_LIBS} ${LIBRT})
-target_include_directories(${COMPONENT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+# ${CMAKE_SOURCE_DIR}/src to fix filename clash with Python context.h
+target_include_directories(${COMPONENT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR} PUBLIC ${CMAKE_SOURCE_DIR}/src)
 
 include_directories(${CMAKE_SOURCE_DIR}/3rdParty/cxxopts/include)
 
