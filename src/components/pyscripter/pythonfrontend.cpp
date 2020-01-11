@@ -85,32 +85,32 @@ app = QApplication(sys.argv)
 )");
 
 
-    auto th = QThread::create([]{
-        std::cout<<"przed sleep\n";
-        QThread::sleep(2);
-        std::cout<<"po sleep\n";
+    //auto th = QThread::create([]{
+    //    std::cout<<"przed sleep\n";
+    //    QThread::sleep(2);
+    //    std::cout<<"po sleep\n";
         
-        auto state = PyGILState_Ensure();
+    //    auto state = PyGILState_Ensure();
 
-        PyRun_SimpleString("cds.speak_word.emit(' o w mordeeeee!')");
+    //    PyRun_SimpleString("cds.speak_word.emit(' o w mordeeeee!')");
 
-        PyGILState_Release(state);
-    });
+    //    PyGILState_Release(state);
+    //});
 
-    QObject::connect(th, &QThread::started, [] {
+    //QObject::connect(th, &QThread::started, [] {
 
-            std::cout<<"th started\n";
+    //        std::cout<<"th started\n";
 
-        });
+    //    });
 
 
-    QObject::connect(th, &QThread::finished, [] {
+    //QObject::connect(th, &QThread::finished, [] {
 
-            std::cout<<"th finished\n";
+    //        std::cout<<"th finished\n";
 
-        });
+    //    });
 
-    th->start();
+    //th->start();
 
     auto state = PyGILState_Ensure();
 

@@ -1,17 +1,27 @@
 set(COMPONENT_NAME pyscripter)
 
 set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost COMPONENTS system date_time REQUIRED)
-find_package (Python3 COMPONENTS Interpreter Development)
+
+set(CDS_BOOST_FIND system)
+set(CDS_BOOST_LIBS Boost::system)
+if(WIN32)
+    list(APPEND CDS_BOOST_FIND date_time)
+    list(APPEND CDS_BOOST_LIBS Boost::date_time)
+endif()
+
+find_package(Boost COMPONENTS ${CDS_BOOST_FIND} REQUIRED)
+find_package(PythonLibs 3)
+
+if(UNIX AND NOT APPLE)
+    find_library(LIBRT rt)
+endif()
 
 if(MSVC)
     include_directories(${Boost_INCLUDE_DIRS})
     link_directories(${BOOST_LIBRARYDIR})
 endif()
 
-if(UNIX AND NOT APPLE)
-    find_library(LIBRT rt)
-endif()
+include_directories(${PYTHON_INCLUDE_DIRS})
 
 set(SRC
     pyscripter.cpp
@@ -22,13 +32,13 @@ set(SRC
 )
 
 add_library(${COMPONENT_NAME} ${SRC})
-target_link_libraries(${COMPONENT_NAME} Qt5::Widgets Qt5::Core Qt5::SerialBus nodes cds-common Boost::system Boost::date_time ${LIBRT})
+target_link_libraries(${COMPONENT_NAME} Qt5::Widgets Qt5::Core Qt5::SerialBus nodes cds-common ${CDS_BOOST_LIBS} ${LIBRT})
 target_include_directories(${COMPONENT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 include_directories(${CMAKE_SOURCE_DIR}/3rdParty/cxxopts/include)
 
 add_executable(CANdevStudio-python pythonfrontend.cpp shmemmgr.cpp)
-target_link_libraries(CANdevStudio-python ${LIBRT} ${CMAKE_THREAD_LIBS_INIT} Boost::system Python3::Python Qt5::Widgets Qt5::Core)
+target_link_libraries(CANdevStudio-python ${LIBRT} ${CMAKE_THREAD_LIBS_INIT} ${CDS_BOOST_LIB} ${PYTHON_LIBRARIES} Qt5::Widgets Qt5::Core)
 
 # To avoid error in Python/object.h that is using slots keyword
 target_compile_definitions(CANdevStudio-python PUBLIC QT_NO_KEYWORDS)
