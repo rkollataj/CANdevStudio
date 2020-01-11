@@ -1,0 +1,266 @@
+932e08b27 src/common/pythonfrontend.cpp                (Remigiusz Kołłątaj 2019-12-25 13:22:45 +0100   1) #include "pythonfrontend.h"
+932e08b27 src/common/pythonfrontend.cpp                (Remigiusz Kołłątaj 2019-12-25 13:22:45 +0100   2) #include <cxxopts.hpp>
+932e08b27 src/common/pythonfrontend.cpp                (Remigiusz Kołłątaj 2019-12-25 13:22:45 +0100   3) 
+a0d685dfb src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-07 16:28:49 +0100   4) #include <QApplication>
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100   5) #include <QThread>
+a0d685dfb src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-07 16:28:49 +0100   6) 
+a0d685dfb src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-07 16:28:49 +0100   7) #include <Python.h>
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100   8) 
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100   9) static PyObject* SpamError;
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  10) 
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  11) static PyObject* spam_system(PyObject* self, PyObject* args)
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  12) {
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  13)     const char* command;
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  14)     int sts;
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  15) 
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  16)     if (!PyArg_ParseTuple(args, "s", &command))
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  17)         return NULL;
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  18)     sts = system(command);
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  19)     if (sts < 0) {
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  20)         PyErr_SetString(SpamError, "System command failed");
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  21)         return NULL;
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  22)     }
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  23)     return PyLong_FromLong(sts);
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  24) }
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  25) 
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  26) static PyObject* spam_dupaSlot(PyObject* self, PyObject* args)
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  27) {
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  28)     int sts = 0;
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  29) 
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  30)     std::cout << "Dupa Slot!\n";
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  31) 
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  32)     return PyLong_FromLong(sts);
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  33) }
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  34) 
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  35) static PyMethodDef SpamMethods[] = {
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  36)     { "system", spam_system, METH_VARARGS, "Execute a shell command." },
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  37)     { "dupaSlot", spam_dupaSlot, METH_VARARGS, "Execute a shell command." }, { NULL, NULL, 0, NULL } /* Sentinel */
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  38) };
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  39) 
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  40) static struct PyModuleDef spammodule = { PyModuleDef_HEAD_INIT, "spam", /* name of module */
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  41)     nullptr, /* module documentation, may be NULL */
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  42)     -1, /* size of per-interpreter state of the module,
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  43)            or -1 if the module keeps state in global variables. */
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  44)     SpamMethods };
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  45) 
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  46) PyMODINIT_FUNC PyInit_spam(void)
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  47) {
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  48)     return PyModule_Create(&spammodule);
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  49) }
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  50) 
+932e08b27 src/common/pythonfrontend.cpp                (Remigiusz Kołłątaj 2019-12-25 13:22:45 +0100  51) int main(int argc, char** argv)
+932e08b27 src/common/pythonfrontend.cpp                (Remigiusz Kołłątaj 2019-12-25 13:22:45 +0100  52) {
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  53)     cxxopts::Options options(argv[0], "CANdevStudio Python scripts launcher");
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  54) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  55)     // clang-format off
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  56)      options.add_options()
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  57)     ("m,memory", "Shared memory name", cxxopts::value<std::string>(), "name")
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  58)     ("o,output", "Shared memory output queue name", cxxopts::value<std::string>(), "name")
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  59)     ("i,input", "Shared memory input queue name", cxxopts::value<std::string>(), "name")
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  60)     ("s,script", "Python script path", cxxopts::value<std::string>(), "path")
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  61)     ("h,help", "Show help message");
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  62)     // clang-format on
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  63) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  64)     const auto&& result = options.parse(argc, argv);
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  65) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  66)     if ((result.count("m") == 0) || (result.count("o") == 0) || (result.count("i") == 0) || (result.count("s") == 0)
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  67)         || result.count("h")) {
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  68)         std::cerr << options.help() << std::endl;
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  69)         return -1;
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  70)     }
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  71) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  72)     auto shmId = result["m"].as<std::string>();
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  73)     auto inQueue = result["i"].as<std::string>();
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  74)     auto outQueue = result["o"].as<std::string>();
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  75)     auto scriptName = result["s"].as<std::string>();
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  76) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  77)     PythonFrontend pf(shmId, inQueue, outQueue);
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  78)     pf.start();
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  79) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  80)     return 0;
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  81) }
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  82) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  83) // int main(int argc, char** argv)
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  84) //{
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  85) //    wchar_t* program = Py_DecodeLocale(argv[0], NULL);
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  86) //    if (program == NULL) {
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  87) //        fprintf(stderr, "Fatal error: cannot decode argv[0]\n");
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  88) //        exit(1);
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  89) //    }
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  90) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  91) //    [> Add a built-in module, before Py_Initialize <]
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  92) //    PyImport_AppendInittab("spam", PyInit_spam);
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  93) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  94) //    [> Pass argv[0] to the Python interpreter <]
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  95) //    Py_SetProgramName(program);
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  96) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  97) //    [> Initialize the Python interpreter.  Required. <]
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100  98) //    Py_Initialize();
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100  99) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 100) //    PyEval_InitThreads();
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 101) //    //PyEval_SaveThread();
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 102) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 103) //    PyRun_SimpleString(R"(
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 104) // import sys
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 105) // from PySide2.QtCore import QObject, Signal, Slot
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 106) // from PySide2.QtWidgets import QApplication
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 107) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 108) // class Communicate(QObject):
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 109) //    # create two new signals on the fly: one will handle
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 110) //    # int type, the other will handle strings
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 111) //    speak_number = Signal(int)
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 112) //    speak_word = Signal(str)
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 113) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 114) // app = QApplication(sys.argv)
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 115) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 116) //)");
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 117) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 118) // auto th = QThread::create([]{
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 119) //    std::cout<<"przed sleep\n";
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 120) //    QThread::sleep(2);
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 121) //    std::cout<<"po sleep\n";
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 122) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 123) //    auto state = PyGILState_Ensure();
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 124) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 125) //    PyRun_SimpleString("cds.speak_word.emit(' o w mordeeeee!')");
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 126) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 127) //    PyGILState_Release(state);
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 128) //});
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 129) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 130) // QObject::connect(th, &QThread::started, [] {
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 131) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 132) //        std::cout<<"th started\n";
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 133) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 134) //    });
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 135) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 136) // QObject::connect(th, &QThread::finished, [] {
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 137) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 138) //        std::cout<<"th finished\n";
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 139) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 140) //    });
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 141) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 142) // th->start();
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 143) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 144) //    auto state = PyGILState_Ensure();
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 145) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 146) //    PyRun_SimpleString(R"(
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 147) // import sys
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 148) // import spam
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 149) // from PySide2.QtWidgets import QApplication, QPushButton, QWidget, QVBoxLayout, QLabel
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 150) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 151) // def func(word):
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 152) //    label.setText("A qq " + word)
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 153) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 154) // layout = QVBoxLayout()
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 155) // widget = QWidget()
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 156) // widget.setLayout(layout)
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 157) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 158) // button = QPushButton("Call func")
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 159) // button.clicked.connect(spam.dupaSlot)
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 160) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 161) // label = QLabel("Dummy text")
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 162) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 163) // layout.addWidget(button)
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 164) // layout.addWidget(label)
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 165) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 166) // widget.show()
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 167) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 168) // cds = Communicate()
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 169) // cds.speak_word.connect(func)
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 170) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 171) // cds.speak_word.emit("aaaaaa")
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 172) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 173) // app.exec_()
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 174) //)");
+dbddb444d src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 19:50:57 +0100 175) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 176) //        PyGILState_Release(state);
+932e08b27 src/common/pythonfrontend.cpp                (Remigiusz Kołłątaj 2019-12-25 13:22:45 +0100 177) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 178) //            std::cout<<"zzzzz\n";
+932e08b27 src/common/pythonfrontend.cpp                (Remigiusz Kołłątaj 2019-12-25 13:22:45 +0100 179) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 180) //    PyMem_RawFree(program);
+932e08b27 src/common/pythonfrontend.cpp                (Remigiusz Kołłątaj 2019-12-25 13:22:45 +0100 181) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 182) // cxxopts::Options options(argv[0], "CANdevStudio Python scripts launcher");
+a0d685dfb src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-07 16:28:49 +0100 183) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 184) //// clang-format off
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 185) // options.add_options()
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 186) //("m,memory", "Shared memory name", cxxopts::value<std::string>(), "name")
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 187) //("o,output", "Shared memory output queue name", cxxopts::value<std::string>(), "name")
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 188) //("i,input", "Shared memory input queue name", cxxopts::value<std::string>(), "name")
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 189) //("s,script", "Python script path", cxxopts::value<std::string>(), "path")
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 190) //("h,help", "Show help message");
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 191) //// clang-format on
+932e08b27 src/common/pythonfrontend.cpp                (Remigiusz Kołłątaj 2019-12-25 13:22:45 +0100 192) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 193) // const auto&& result = options.parse(argc, argv);
+932e08b27 src/common/pythonfrontend.cpp                (Remigiusz Kołłątaj 2019-12-25 13:22:45 +0100 194) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 195) // if ((result.count("m") == 0) || (result.count("o") == 0) || (result.count("i") == 0) || (result.count("s") == 0)
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 196) //    || result.count("h")) {
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 197) //    std::cerr << options.help() << std::endl;
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 198) //    return -1;
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 199) //}
+15645acda src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 10:51:56 +0100 200) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 201) // auto shmId = result["m"].as<std::string>();
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 202) // auto inQueue = result["i"].as<std::string>();
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 203) // auto outQueue = result["o"].as<std::string>();
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 204) // auto scriptName = result["s"].as<std::string>();
+15645acda src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 10:51:56 +0100 205) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 206) // PythonFrontend pf(shmId, inQueue, outQueue);
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 207) // pf.start();
+15645acda src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 10:51:56 +0100 208) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 209) //    QApplication qapp(argc, argv);
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 210) //    CommClass comm;
+15645acda src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 10:51:56 +0100 211) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 212) //    wchar_t* program = Py_DecodeLocale(argv[0], NULL);
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 213) //    if (program == NULL) {
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 214) //        fprintf(stderr, "Fatal error: cannot decode argv[0]\n");
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 215) //        exit(1);
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 216) //    }
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 217) //    Py_SetProgramName(program);
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 218) //    Py_Initialize();
+15645acda src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 10:51:56 +0100 219) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 220) //    PyObject* dict = PyImport_GetModuleDict();
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 221) //    PyObject* obj = PyDict_GetItemString(dict, "__main__");
+15645acda src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 10:51:56 +0100 222) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 223) //    PythonQtClassWrapper_Type.tp_base = &PyType_Type;
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 224) //    PythonQtClassWrapper_Type.tp_alloc = PythonQtClassWrapper_alloc;
+15645acda src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 10:51:56 +0100 225) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 226) //    // add our own python object types for classes
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 227) //    if (PyType_Ready(&PythonQtClassWrapper_Type) < 0) {
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 228) //        std::cerr << "could not initialize PythonQtClassWrapper_Type"
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 229) //                  << ", in " << __FILE__ << ":" << __LINE__ << std::endl;
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 230) //    }
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 231) //    Py_INCREF(&PythonQtClassWrapper_Type);
+15645acda src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 10:51:56 +0100 232) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 233) //    _pythonQtModule = PyModule_Create(&PythonQtModuleDef);
+15645acda src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 10:51:56 +0100 234) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 235) //    addObject(obj, "comm", &comm);
+15645acda src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 10:51:56 +0100 236) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 237) //    evalScript(obj, R"(
+15645acda src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 10:51:56 +0100 238) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 239) // from time import time,ctime
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 240) //#print('Today is ', comm.abc())
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 241) // print('Today is ')
+15645acda src/common/cds-python/pythonfrontend.cpp     (Remigiusz Kołłątaj 2020-01-08 10:51:56 +0100 242) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 243) //)");
+932e08b27 src/common/pythonfrontend.cpp                (Remigiusz Kołłątaj 2019-12-25 13:22:45 +0100 244) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 245) //    if (Py_FinalizeEx() < 0) {
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 246) //        exit(120);
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 247) //    }
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 248) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 249) //    PyMem_RawFree(program);
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 250) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 251) // init PythonQt and Python itself
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 252) // PythonQt::init();
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 253) // get a smart pointer to the __main__ module of the Python interpreter
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 254) // PythonQtObjectPtr context = PythonQt::self()->getMainModule();
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 255) // add a QObject as variable of name "example" to the namespace of the __main__ module
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 256) // PyExampleObject example;
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 257) // context.addObject("example", &example);
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 258) // do something
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 259) // context.evalScript("print example");
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 260) // context.evalScript("def multiply(a,b):\n  return a*b;\n");
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 261) // QVariantList args;
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 262) // args << 42 << 47;
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 263) // QVariant result = context.call("multiply", args);
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 264) 
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 265) //    return 0;
+000000000 src/components/pyscripter/pythonfrontend.cpp (Not Committed Yet  2020-01-11 22:07:26 +0100 266) //}

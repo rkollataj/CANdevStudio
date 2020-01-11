@@ -4,6 +4,7 @@
 #include "shmemmgr.h"
 #include <QObject>
 #include <iostream>
+#include <QThread>
 
 class CommClass : public QObject {
     Q_OBJECT
@@ -19,10 +20,14 @@ public:
     int abc(){ return 123; };
 };
 
-class PythonFrontend {
+class PythonFrontend : public QThread {
+    Q_OBJECT
+
 public:
     PythonFrontend(const std::string& shmId, const std::string& inQueueName, const std::string& outQueueName);
-    bool start();
+
+private:
+    void run() override;
 
 private:
     ShMemMgr _shm;

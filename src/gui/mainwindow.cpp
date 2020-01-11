@@ -210,6 +210,7 @@ void MainWindow::closeEvent(QCloseEvent* e)
     userReply = QMessageBox::question(
         this, "Exit", "Are you sure you want to quit CANdevStudio?", QMessageBox::Yes | QMessageBox::No);
     if (userReply == QMessageBox::Yes) {
+        _projectConfig->simulationStopped();
         saveSettings();
         QApplication::quit();
     } else {

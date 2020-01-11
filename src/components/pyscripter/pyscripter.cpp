@@ -18,7 +18,6 @@ PyScripter::~PyScripter() {}
 
 void PyScripter::typeInit()
 {
-    cds_warn("============================================");
     PythonBackend::_appShm.createShm(CdsShMem::id);
 }
 
@@ -88,3 +87,15 @@ void PyScripter::simBcastRcv(const QJsonObject& msg, const QVariant& param)
     Q_UNUSED(msg);
     Q_UNUSED(param);
 }
+
+void PyScripter::rcvFrame(const QCanBusFrame& frame, Direction const direction, bool status)
+{
+    Q_D(PyScripter);
+
+    if (d->_simStarted && status) {
+        d->_pyHandler.sendMsgFrame(frame);
+
+        cds_warn("Rameczka!");
+    }
+}
+

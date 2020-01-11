@@ -11,6 +11,9 @@ class PyScripterPrivate;
 class QWidget;
 typedef Context<> PyScripterCtx;
 
+class QCanBusFrame;
+enum class Direction;
+
 class PyScripter : public QObject, public ComponentInterface {
     Q_OBJECT
     Q_DECLARE_PRIVATE(PyScripter)
@@ -39,6 +42,7 @@ public slots:
     void stopSimulation() override;
     void startSimulation() override;
     void simBcastRcv(const QJsonObject& msg, const QVariant& param) override;
+    void rcvFrame(const QCanBusFrame& frame, Direction const direction, bool status);
 
 private:
     QScopedPointer<PyScripterPrivate> d_ptr;

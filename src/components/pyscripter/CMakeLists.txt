@@ -30,6 +30,7 @@ set(SRC
     pyscriptermodel.cpp
     pythonbackend.cpp
     shmemmgr.cpp
+    psmessage.cpp
 )
 
 add_library(${COMPONENT_NAME} ${SRC})
@@ -39,8 +40,8 @@ target_include_directories(${COMPONENT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DI
 
 include_directories(${CMAKE_SOURCE_DIR}/3rdParty/cxxopts/include)
 
-add_executable(CANdevStudio-python pythonfrontend.cpp shmemmgr.cpp)
-target_link_libraries(CANdevStudio-python ${LIBRT} ${CMAKE_THREAD_LIBS_INIT} ${CDS_BOOST_LIB} ${PYTHON_LIBRARIES} Qt5::Widgets Qt5::Core)
+add_executable(CANdevStudio-python pythonfrontend.cpp shmemmgr.cpp psmessage.cpp)
+target_link_libraries(CANdevStudio-python ${LIBRT} ${CMAKE_THREAD_LIBS_INIT} ${CDS_BOOST_LIB} ${PYTHON_LIBRARIES} Qt5::Widgets Qt5::Core Qt5::SerialBus)
 
 # To avoid error in Python/object.h that is using slots keyword
 target_compile_definitions(CANdevStudio-python PUBLIC QT_NO_KEYWORDS)

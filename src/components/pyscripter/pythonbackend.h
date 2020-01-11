@@ -8,12 +8,17 @@ namespace CdsShMem {
 extern const std::string id;
 };
 
+class QCanBusFrame;
+
 class PythonBackend {
 public:
     PythonBackend();
 
     bool start(const QString& scriptName);
     void stop();
+
+    void sendMsgFrame(const QCanBusFrame& frame);
+    void sendMsgClose();
 
 public:
     static ShMemMgr _appShm;

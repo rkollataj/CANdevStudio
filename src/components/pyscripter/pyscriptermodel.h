@@ -12,6 +12,7 @@ using QtNodes::PortIndex;
 using QtNodes::PortType;
 
 enum class Direction;
+class QCanBusFrame;
 
 class PyScripterModel : public ComponentModel<PyScripter, PyScripterModel> {
     Q_OBJECT
@@ -29,9 +30,12 @@ public slots:
 
 signals:
     void requestRedraw();
+    void sndFrame(const QCanBusFrame& frame, Direction const direction, bool status);
 
 private:
     std::unique_ptr<NodePainter> _painter;
+    const QString _rawType{ "RAW" };
+    const QString _signalType{ "SIG" };
 };
 
 #endif // PYSCRIPTERMODEL_H

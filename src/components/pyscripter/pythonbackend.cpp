@@ -1,8 +1,10 @@
 #include "pythonbackend.h"
+#include "psmessage.h"
 #include <QCoreApplication>
 #include <QFileInfo>
 #include <QUuid>
 #include <log.h>
+#include <QCanBusFrame>
 
 namespace CdsShMem {
 const std::string id = QUuid::createUuid().toString().toStdString();
@@ -39,16 +41,22 @@ bool PythonBackend::start(const QString& scriptName)
     _process.setProcessChannelMode(QProcess::ForwardedChannels);
     _process.start(frontendPath, args);
 
-    std::string str("Test str");
-    std::vector<uint8_t> vec(str.begin(), str.end());
-    _shm.writeQueue(_outQueue, vec);
-
     return false;
 }
 
 void PythonBackend::stop()
 {
-    std::string str("End");
-    std::vector<uint8_t> vec(str.begin(), str.end());
-    _shm.writeQueue(_outQueue, vec);
+    sendMsgClose();
+    _process.waitForFinished();
 }
+
+void PythonBackend::sendMsgFrame(const QCanBusFrame& frame)
+{
+    _shm.writeQueue(_outQueue, PsMessage::fromFrame(frame).toArray());
+}
+
+void PythonBackend::sendMsgClose()
+{
+    _shm.writeQueue(_outQueue, PsMessage::createCloseMessage().toArray());
+}
+
