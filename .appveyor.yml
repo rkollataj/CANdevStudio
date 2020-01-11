@@ -10,7 +10,7 @@ environment:
     BOOST_ROOT: C:\Libraries\boost_1_67_0
     BOOST_LIBRARYDIR: C:\Libraries\boost_1_67_0\lib32-msvc-14.0
     BOOST_INCLUDEDIR: C:\Libraries\boost_1_67_0\boost
-    PYTHON: "C:\Python38"
+    PYTHON: C:\Python38
   - GENERATOR: '"MinGW Makefiles"'
     MINGW_ROOT: C:\msys64\mingw32
     MINGW_ARCH: i686
@@ -20,7 +20,7 @@ environment:
     BOOST_ROOT: C:\msys64\mingw32
     BOOST_LIBRARYDIR: C:\msys64\mingw32\lib
     BOOST_INCLUDEDIR: C:\msys64\mingw32\include\boost
-    PYTHON: "C:\Python38"
+    PYTHON: C:\Python38
   - GENERATOR: '"MinGW Makefiles"'
     MINGW_ROOT: C:\msys64\mingw32
     MINGW_ARCH: i686
@@ -29,28 +29,28 @@ environment:
     BOOST_ROOT: C:\msys64\mingw32
     BOOST_LIBRARYDIR: C:\msys64\mingw32\lib
     BOOST_INCLUDEDIR: C:\msys64\mingw32\include\boost
-    PYTHON: "C:\Python38"
+    PYTHON: C:\Python38
   - GENERATOR: '"Visual Studio 14 2015"'
     BUILD_TYPE: Debug
     QT_PATH: C:\Qt\5.6\msvc2015
     BOOST_ROOT: C:\Libraries\boost_1_67_0
     BOOST_LIBRARYDIR: C:\Libraries\boost_1_67_0\lib32-msvc-14.0
     BOOST_INCLUDEDIR: C:\Libraries\boost_1_67_0\boost
-    PYTHON: "C:\Python38"
+    PYTHON: C:\Python38
   - GENERATOR: '"Visual Studio 14 2015 Win64"'
     BUILD_TYPE: Debug
     QT_PATH: C:\Qt\5.11\msvc2015_64
     BOOST_ROOT: C:\Libraries\boost_1_67_0
     BOOST_LIBRARYDIR: C:\Libraries\boost_1_67_0\lib64-msvc-14.0
     BOOST_INCLUDEDIR: C:\Libraries\boost_1_67_0\boost
-    PYTHON: "C:\Python38-x64"
+    PYTHON: C:\Python38-x64
   - GENERATOR: '"Visual Studio 14 2015 Win64"'
     BUILD_TYPE: Release
     QT_PATH: C:\Qt\5.11\msvc2015_64
     BOOST_ROOT: C:\Libraries\boost_1_67_0
     BOOST_LIBRARYDIR: C:\Libraries\boost_1_67_0\lib64-msvc-14.0
     BOOST_INCLUDEDIR: C:\Libraries\boost_1_67_0\boost
-    PYTHON: "C:\Python38-x64"
+    PYTHON: C:\Python38-x64
 install:
 - cmd: git submodule update --init --recursive
 build_script:
