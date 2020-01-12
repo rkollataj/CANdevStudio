@@ -6,12 +6,58 @@
 #include <cxxopts.hpp>
 #include <spdlog/fmt/fmt.h>
 
+namespace {
+PyMethodDef cdsCommMethods[] = { { "sndFrame", PythonFrontend::sndFrame, METH_VARARGS, "" }, { NULL, NULL, 0, NULL } };
+
+PyModuleDef cdsCommModule
+    = { PyModuleDef_HEAD_INIT, "cdsCommModule", NULL, -1, cdsCommMethods, NULL, NULL, NULL, NULL };
+
+PyObject* PyInit_cdsCommModule(void)
+{
+    return PyModule_Create(&cdsCommModule);
+}
+} // namespace
+
 PythonFrontend::PythonFrontend(
     const std::string& shmId, const std::string& inQueueName, const std::string& outQueueName)
 {
     _shm.openShm(shmId);
     _inQueue = _shm.openQueue(inQueueName);
     _outQueue = _shm.openQueue(outQueueName);
+
+    PythonFrontend& _thisWrapper = *this;
+}
+
+PyObject* PythonFrontend::sndFrame(PyObject* self, PyObject* args)
+{
+    uint32_t id;
+    std::vector<uint8_t> payload;
+    PyObject* pList;
+
+    if (!PyArg_ParseTuple(args, "IO!", &id, &PyList_Type, &pList)) {
+        PyErr_SetString(PyExc_TypeError, "expected parameters (uint, list).");
+        return nullptr;
+    }
+
+    Py_ssize_t n = PyList_Size(pList);
+    for (int i = 0; i < n; i++) {
+        PyObject* pItem = PyList_GetItem(pList, i);
+        if (!PyLong_Check(pItem)) {
+            PyErr_SetString(PyExc_TypeError, "list items must be integers.");
+            return nullptr;
+        }
+
+        payload.push_back(PyLong_AsUnsignedLong(pItem));
+    }
+
+    std::cout << "Send Frame " << id << ":";
+    for (uint8_t p : payload) {
+        std::cout << " " << std::hex << (uint32_t) p;
+    }
+    std::cout << "\n";
+
+    Py_INCREF(Py_None);
+    return Py_None;
 }
 
 void PythonFrontend::run()
@@ -88,6 +134,8 @@ int main(int argc, char** argv)
     // Pass argv[0] to the Python interpreter
     Py_SetProgramName(program);
 
+    PyImport_AppendInittab("cdsCommModule", &PyInit_cdsCommModule);
+
     // Initialize the Python interpreter.  Required.
     Py_Initialize();
 
@@ -95,13 +143,15 @@ int main(int argc, char** argv)
 
     PyRun_SimpleString(R"(
 import sys
+import cdsCommModule
 from PySide2.QtCore import QObject, Signal, Slot
 from PySide2.QtWidgets import QApplication
 
 class CdsComm(QObject):
-    # create two new signals on the fly: one will handle
-    # int type, the other will handle strings
     rcvFrame = Signal(int, list, str)
+
+    def sndFrame(self, id, payload):
+        cdsCommModule.sndFrame(id, payload)
 
 app = QApplication(sys.argv)
 cdsComm = CdsComm()
@@ -113,7 +163,8 @@ cdsComm = CdsComm()
 
     auto state = PyGILState_Ensure();
     PyRun_SimpleString(R"(
-cdsComm.rcvFrame.connect(lambda id, payload, dir: print("Frame: ", id, " ", payload, " ", dir))
+#cdsComm.rcvFrame.connect(lambda id, payload, dir: print("Frame: ", id, " ", payload, " ", dir))
+cdsComm.rcvFrame.connect(cdsComm.sndFrame)
 app.exec_()
 )");
     PyGILState_Release(state);

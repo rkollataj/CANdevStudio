@@ -19,8 +19,6 @@ ShMemMgr::~ShMemMgr()
     }
 }
 
-#include <iostream>
-
 void ShMemMgr::createShm(const std::string& name)
 {
     using namespace boost::interprocess;
