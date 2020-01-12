@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <QString>
 
 class QCanBusFrame;
 
@@ -15,7 +16,7 @@ public:
     bool toFrame(uint32_t& id, std::vector<uint8_t>& payload);
 
 public:
-    static PsMessage fromFrame(const QCanBusFrame& frame);
+    static PsMessage fromFrame(const QCanBusFrame& frame, const QString& dir);
     static PsMessage fromData(const std::vector<uint8_t>& data);
     static PsMessage createCloseMessage();
 

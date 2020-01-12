@@ -11,7 +11,7 @@ std::vector<uint8_t> PsMessage::toArray()
     return _data;
 }
 
-PsMessage PsMessage::fromFrame(const QCanBusFrame& frame)
+PsMessage PsMessage::fromFrame(const QCanBusFrame& frame, const QString& dir)
 {
     PsMessage msg;
     msg.insert(PsMessageType::FRAME);

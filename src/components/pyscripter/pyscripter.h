@@ -42,7 +42,7 @@ public slots:
     void stopSimulation() override;
     void startSimulation() override;
     void simBcastRcv(const QJsonObject& msg, const QVariant& param) override;
-    void rcvFrame(const QCanBusFrame& frame, Direction const direction, bool status);
+    void rcvFrame(const QCanBusFrame& frame, Direction direction, bool status);
 
 private:
     QScopedPointer<PyScripterPrivate> d_ptr;
