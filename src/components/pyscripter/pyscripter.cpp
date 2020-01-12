@@ -2,8 +2,8 @@
 #include "pyscripter_p.h"
 #include "pythonbackend.h"
 #include <confighelpers.h>
-#include <log.h>
 #include <datamodeltypes/datadirection.h>
+#include <log.h>
 
 PyScripter::PyScripter()
     : d_ptr(new PyScripterPrivate(this))
@@ -94,18 +94,7 @@ void PyScripter::rcvFrame(const QCanBusFrame& frame, Direction direction, bool s
     Q_D(PyScripter);
 
     if (d->_simStarted && status) {
-        QString dir;
-
-        if (direction == Direction::TX) {
-            dir = "TX";
-        } else if (direction == Direction::RX) {
-            dir = "RX";
-        } else {
-            cds_error("Wrong direction!");
-            return;
-        }
-
-        d->_pyHandler.sendMsgFrame(frame, dir);
+        d->_pyHandler.sendMsgFrame(frame, direction);
     }
 }
 

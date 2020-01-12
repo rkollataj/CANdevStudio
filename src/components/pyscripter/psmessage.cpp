@@ -1,5 +1,6 @@
 #include "psmessage.h"
 #include <QCanBusFrame>
+#include <datamodeltypes/datadirection.h>
 
 PsMessageType PsMessage::type()
 {
@@ -11,17 +12,18 @@ std::vector<uint8_t> PsMessage::toArray()
     return _data;
 }
 
-PsMessage PsMessage::fromFrame(const QCanBusFrame& frame, const QString& dir)
+PsMessage PsMessage::fromFrame(const QCanBusFrame& frame, int32_t dir)
 {
     PsMessage msg;
     msg.insert(PsMessageType::FRAME);
     msg.insert(frame.frameId());
+    msg.insert(dir);
     msg.insert(frame.payload().data(), frame.payload().size());
 
     return msg;
 }
 
-bool PsMessage::toFrame(uint32_t& id, std::vector<uint8_t>& payload)
+bool PsMessage::toFrame(uint32_t& id, std::vector<uint8_t>& payload, std::string& dir)
 {
     bool ret = false;
 
@@ -29,7 +31,23 @@ bool PsMessage::toFrame(uint32_t& id, std::vector<uint8_t>& payload)
 
     if (msgType == PsMessageType::FRAME) {
         id = reinterpret_cast<uint32_t*>(_data.data())[1];
-        payload.insert(payload.end(), _data.data() + 8, _data.data() + _data.size());
+        int32_t dirInt = reinterpret_cast<int32_t*>(_data.data())[2];
+
+        switch (dirInt) {
+            case Direction::RX:
+                dir = "RX";
+                break;
+
+            case Direction::TX:
+                dir = "TX";
+                break;
+
+            default:
+                dir = "Unknown";
+                break;
+        }
+
+        payload.insert(payload.end(), _data.data() + 12, _data.data() + _data.size());
         ret = true;
     }
 

@@ -5,6 +5,7 @@
 #include "componentmodel.h"
 #include "nodepainter.h"
 #include <QtCore/QObject>
+#include <datamodeltypes/datadirection.h>
 
 using QtNodes::NodeData;
 using QtNodes::NodeDataType;
@@ -12,7 +13,6 @@ using QtNodes::PortIndex;
 using QtNodes::PortType;
 
 class QCanBusFrame;
-enum class Direction;
 
 class CanRawLoggerModel : public ComponentModel<CanRawLogger, CanRawLoggerModel> {
     Q_OBJECT

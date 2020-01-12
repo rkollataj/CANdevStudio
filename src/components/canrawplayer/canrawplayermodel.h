@@ -6,14 +6,13 @@
 #include "nodepainter.h"
 #include <QCanBusFrame>
 #include <QtCore/QObject>
+#include <datamodeltypes/datadirection.h>
 #include <readerwriterqueue.h>
 
 using QtNodes::NodeData;
 using QtNodes::NodeDataType;
 using QtNodes::PortIndex;
 using QtNodes::PortType;
-
-enum class Direction;
 
 class CanRawPlayerModel : public ComponentModel<CanRawPlayer, CanRawPlayerModel> {
     Q_OBJECT

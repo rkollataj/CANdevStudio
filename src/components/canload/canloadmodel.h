@@ -5,13 +5,12 @@
 #include "canloadpainter.h"
 #include "componentmodel.h"
 #include <QtCore/QObject>
+#include <datamodeltypes/datadirection.h>
 
 using QtNodes::NodeData;
 using QtNodes::NodeDataType;
 using QtNodes::PortIndex;
 using QtNodes::PortType;
-
-enum class Direction;
 
 class CanLoadModel : public ComponentModel<CanLoad, CanLoadModel> {
     Q_OBJECT

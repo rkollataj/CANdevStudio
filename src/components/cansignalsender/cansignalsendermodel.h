@@ -6,14 +6,13 @@
 #include <QtCore/QObject>
 #include <candbpainter.h>
 #include <cansignalsender.h>
+#include <datamodeltypes/datadirection.h>
 #include <readerwriterqueue.h>
 
 using QtNodes::NodeData;
 using QtNodes::NodeDataType;
 using QtNodes::PortIndex;
 using QtNodes::PortType;
-
-enum class Direction;
 
 class CanSignalSenderModel : public ComponentModel<CanSignalSender, CanSignalSenderModel> {
     Q_OBJECT

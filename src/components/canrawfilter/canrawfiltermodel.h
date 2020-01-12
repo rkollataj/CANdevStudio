@@ -5,6 +5,7 @@
 #include "componentmodel.h"
 #include "nodepainter.h"
 #include <QtCore/QObject>
+#include <datamodeltypes/datadirection.h>
 #include <readerwriterqueue.h>
 
 using QtNodes::NodeData;
@@ -13,7 +14,6 @@ using QtNodes::PortIndex;
 using QtNodes::PortType;
 
 class QCanBusFrame;
-enum class Direction;
 
 class CanRawFilterModel : public ComponentModel<CanRawFilter, CanRawFilterModel> {
     Q_OBJECT

@@ -13,10 +13,10 @@ class PsMessage {
 public:
     PsMessageType type();
     std::vector<uint8_t> toArray();
-    bool toFrame(uint32_t& id, std::vector<uint8_t>& payload);
+    bool toFrame(uint32_t& id, std::vector<uint8_t>& payload, std::string& dir);
 
 public:
-    static PsMessage fromFrame(const QCanBusFrame& frame, const QString& dir);
+    static PsMessage fromFrame(const QCanBusFrame& frame, int32_t dir);
     static PsMessage fromData(const std::vector<uint8_t>& data);
     static PsMessage createCloseMessage();
 

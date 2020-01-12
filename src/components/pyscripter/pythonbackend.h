@@ -17,7 +17,7 @@ public:
     bool start(const QString& scriptName);
     void stop();
 
-    void sendMsgFrame(const QCanBusFrame& frame, const QString& dir);
+    void sendMsgFrame(const QCanBusFrame& frame, int32_t dir);
     void sendMsgClose();
 
 public:

@@ -4,15 +4,14 @@
 #include "componentmodel.h"
 #include "nodepainter.h"
 #include <QtCore/QObject>
-#include <cansignaldata.h>
 #include <candbpainter.h>
+#include <cansignaldata.h>
+#include <datamodeltypes/datadirection.h>
 
 using QtNodes::NodeData;
 using QtNodes::NodeDataType;
 using QtNodes::PortIndex;
 using QtNodes::PortType;
-
-enum class Direction;
 
 class CanSignalDataModel : public ComponentModel<CanSignalData, CanSignalDataModel> {
     Q_OBJECT

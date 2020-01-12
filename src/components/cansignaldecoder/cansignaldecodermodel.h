@@ -4,8 +4,9 @@
 #include "componentmodel.h"
 #include "nodepainter.h"
 #include <QtCore/QObject>
-#include <cansignaldecoder.h>
 #include <candbpainter.h>
+#include <cansignaldecoder.h>
+#include <datamodeltypes/datadirection.h>
 #include <readerwriterqueue.h>
 
 using QtNodes::NodeData;
@@ -13,7 +14,6 @@ using QtNodes::NodeDataType;
 using QtNodes::PortIndex;
 using QtNodes::PortType;
 
-enum class Direction;
 class QCanBusFrame;
 
 class CanSignalDecoderModel : public ComponentModel<CanSignalDecoder, CanSignalDecoderModel> {

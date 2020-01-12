@@ -11,7 +11,7 @@ using QtNodes::NodeDataType;
 using QtNodes::PortIndex;
 using QtNodes::PortType;
 
-enum class Direction;
+enum Direction;
 class QCanBusFrame;
 
 class PyScripterModel : public ComponentModel<PyScripter, PyScripterModel> {

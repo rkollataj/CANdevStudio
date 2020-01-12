@@ -3,8 +3,9 @@
 
 #include <QWidget>
 #include <QtCore/QScopedPointer>
-#include <componentinterface.h>
 #include <common/context.h>
+#include <componentinterface.h>
+#include <datamodeltypes/datadirection.h>
 #include <memory>
 
 class PyScripterPrivate;
@@ -12,7 +13,6 @@ class QWidget;
 typedef Context<> PyScripterCtx;
 
 class QCanBusFrame;
-enum class Direction;
 
 class PyScripter : public QObject, public ComponentInterface {
     Q_OBJECT

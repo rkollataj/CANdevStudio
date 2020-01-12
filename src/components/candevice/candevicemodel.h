@@ -6,14 +6,13 @@
 #include "nodepainter.h"
 #include <QtCore/QObject>
 #include <QtSerialBus/QCanBusFrame>
+#include <datamodeltypes/datadirection.h>
 #include <readerwriterqueue.h>
 
 using QtNodes::NodeData;
 using QtNodes::NodeDataType;
 using QtNodes::PortIndex;
 using QtNodes::PortType;
-
-enum class Direction;
 
 /**
  *   @brief The class provides node graphical representation of CanDevice

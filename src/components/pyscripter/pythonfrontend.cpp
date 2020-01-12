@@ -26,8 +26,9 @@ void PythonFrontend::run()
         if (msg.type() == PsMessageType::FRAME) {
             uint32_t id;
             std::vector<uint8_t> payload;
+            std::string dir;
 
-            if (msg.toFrame(id, payload)) {
+            if (msg.toFrame(id, payload, dir)) {
                 std::string frameLine = fmt::format("cdsComm.rcvFrame.emit({}, [", id);
 
                 for (std::size_t i = 0; i < payload.size(); ++i) {
@@ -35,10 +36,10 @@ void PythonFrontend::run()
                         frameLine += ",";
                     }
 
-                    frameLine += fmt::format("{}",payload[i]);
+                    frameLine += fmt::format("{}", payload[i]);
                 }
 
-                frameLine += "])";
+                frameLine += fmt::format("],'{}')", dir);
 
                 auto state = PyGILState_Ensure();
 
@@ -100,7 +101,7 @@ from PySide2.QtWidgets import QApplication
 class CdsComm(QObject):
     # create two new signals on the fly: one will handle
     # int type, the other will handle strings
-    rcvFrame = Signal(int, list)
+    rcvFrame = Signal(int, list, str)
 
 app = QApplication(sys.argv)
 cdsComm = CdsComm()
@@ -112,7 +113,7 @@ cdsComm = CdsComm()
 
     auto state = PyGILState_Ensure();
     PyRun_SimpleString(R"(
-cdsComm.rcvFrame.connect(lambda id, payload: print("Frame: ", id, " ", payload)) 
+cdsComm.rcvFrame.connect(lambda id, payload, dir: print("Frame: ", id, " ", payload, " ", dir))
 app.exec_()
 )");
     PyGILState_Release(state);

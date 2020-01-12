@@ -5,13 +5,12 @@
 #include "nodepainter.h"
 #include <QtCore/QObject>
 #include <cansignalviewer.h>
+#include <datamodeltypes/datadirection.h>
 
 using QtNodes::NodeData;
 using QtNodes::NodeDataType;
 using QtNodes::PortIndex;
 using QtNodes::PortType;
-
-enum class Direction;
 
 class CanSignalViewerModel : public ComponentModel<CanSignalViewer, CanSignalViewerModel> {
     Q_OBJECT

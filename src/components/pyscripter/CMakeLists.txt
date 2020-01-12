@@ -40,6 +40,7 @@ target_include_directories(${COMPONENT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DI
 
 include_directories(${CMAKE_SOURCE_DIR}/3rdParty/cxxopts/include)
 include_directories(${CMAKE_SOURCE_DIR}/3rdParty/spdlog/include)
+include_directories(${CMAKE_SOURCE_DIR}/src/common)
 
 add_executable(CANdevStudio-python pythonfrontend.cpp shmemmgr.cpp psmessage.cpp)
 target_link_libraries(CANdevStudio-python ${LIBRT} ${CMAKE_THREAD_LIBS_INIT} ${CDS_BOOST_LIB} ${PYTHON_LIBRARIES} Qt5::Widgets Qt5::Core Qt5::SerialBus)

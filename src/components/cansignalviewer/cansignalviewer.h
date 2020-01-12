@@ -5,13 +5,13 @@
 #include <QtCore/QScopedPointer>
 #include <componentinterface.h>
 #include <context.h>
+#include <datamodeltypes/datadirection.h>
 #include <memory>
 
 class CanSignalViewerPrivate;
 class QWidget;
 struct CanSignalViewerGuiInt;
 typedef Context<CanSignalViewerGuiInt> CanSignalViewerCtx;
-enum class Direction;
 
 class CanSignalViewer : public QObject, public ComponentInterface {
     Q_OBJECT
@@ -35,16 +35,16 @@ public:
 
 signals:
     void mainWidgetDockToggled(QWidget* widget) override;
-    void simBcastSnd(const QJsonObject &msg, const QVariant &param = QVariant()) override;
+    void simBcastSnd(const QJsonObject& msg, const QVariant& param = QVariant()) override;
 
 public slots:
     void stopSimulation() override;
     void startSimulation() override;
-    void simBcastRcv(const QJsonObject &msg, const QVariant &param) override;
+    void simBcastRcv(const QJsonObject& msg, const QVariant& param) override;
     void rcvSignal(const QString& name, const QVariant& val, const Direction& dir);
 
 private:
     QScopedPointer<CanSignalViewerPrivate> d_ptr;
 };
 
-#endif //CANSIGNALVIEWER_H
+#endif // CANSIGNALVIEWER_H

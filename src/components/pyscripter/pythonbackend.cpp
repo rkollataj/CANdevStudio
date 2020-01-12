@@ -50,7 +50,7 @@ void PythonBackend::stop()
     _process.waitForFinished();
 }
 
-void PythonBackend::sendMsgFrame(const QCanBusFrame& frame, const QString& dir)
+void PythonBackend::sendMsgFrame(const QCanBusFrame& frame, int32_t dir)
 {
     _shm.writeQueue(_outQueue, PsMessage::fromFrame(frame, dir).toArray());
 }
