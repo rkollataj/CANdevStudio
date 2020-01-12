@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QThread>
 #include <cxxopts.hpp>
+#include <spdlog/fmt/fmt.h>
 
 static PyObject* SpamError;
 
@@ -57,18 +58,37 @@ PythonFrontend::PythonFrontend(
 
 void PythonFrontend::run()
 {
-    while (true) {
+    PsMessage msg;
+
+    while (msg.type() != PsMessageType::CLOSE) {
         std::vector<uint8_t> vec = _shm.readQueue(_inQueue);
 
-        std::cout << "Message!\n";
+        msg = PsMessage::fromData(vec);
 
-        PsMessage msg = PsMessage::fromData(vec);
+        if (msg.type() == PsMessageType::FRAME) {
+            uint32_t id;
+            std::vector<uint8_t> payload;
 
-        std::cout << msg.type() << "\n";
+            if (msg.toFrame(id, payload)) {
+                std::string frameLine = fmt::format("cdsComm.rcvFrame.emit({}, [", id);
 
-        if (msg.type() == PsMessageType::CLOSE_MESSAGE) {
-            std::cout << "Exit!\n";
-            break;
+                for (uint8_t p : payload) {
+                    frameLine += fmt::format("{},",p);
+                }
+
+                // replace last comma
+                frameLine[frameLine.length()-1] = ']';
+                frameLine += ")";
+
+                //std::cout << frameLine << "\n";
+
+
+                auto state = PyGILState_Ensure();
+
+                PyRun_SimpleString(frameLine.c_str());
+
+                PyGILState_Release(state);
+            }
         }
     }
 
@@ -101,16 +121,53 @@ int main(int argc, char** argv)
     auto outQueue = result["o"].as<std::string>();
     auto scriptName = result["s"].as<std::string>();
 
-    QApplication app(argc, argv);
+    wchar_t* program = Py_DecodeLocale(argv[0], NULL);
+    if (program == NULL) {
+        fprintf(stderr, "Fatal error: cannot decode argv[0]\n");
+        exit(1);
+    }
+
+    // Add a built-in module, before Py_Initialize
+    PyImport_AppendInittab("spam", PyInit_spam);
+
+    // Pass argv[0] to the Python interpreter
+    Py_SetProgramName(program);
+
+    // Initialize the Python interpreter.  Required.
+    Py_Initialize();
+
+    PyEval_InitThreads();
+
+    PyRun_SimpleString(R"(
+import sys
+from PySide2.QtCore import QObject, Signal, Slot
+from PySide2.QtWidgets import QApplication
+
+class CdsComm(QObject):
+    # create two new signals on the fly: one will handle
+    # int type, the other will handle strings
+    rcvFrame = Signal(int, list)
+
+app = QApplication(sys.argv)
+cdsComm = CdsComm()
+
+)");
 
     PythonFrontend pf(shmId, inQueue, outQueue);
     pf.start();
 
-    app.exec();
+    auto state = PyGILState_Ensure();
+    PyRun_SimpleString(R"(
+cdsComm.rcvFrame.connect(lambda id, payload: print("Raka: ", id, " ", payload)) 
+app.exec_()
+)");
+    PyGILState_Release(state);
 
     pf.wait();
 
     std::cout << "bye bye!\n";
+
+    PyMem_RawFree(program);
 
     return 0;
 }

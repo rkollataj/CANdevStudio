@@ -6,11 +6,9 @@
 
 class QCanBusFrame;
 
-enum PsMessageType { FRAME_MESSAGE = 0, SIGNAL_MESSAGE, CLOSE_MESSAGE };
+enum PsMessageType { FRAME = 0, SIGNAL, CLOSE, UNKNOWN };
 
 class PsMessage {
-    PsMessage() = default;
-
 public:
     PsMessageType type();
     std::vector<uint8_t> toArray();
@@ -36,7 +34,7 @@ private:
     }
 
 private:
-    PsMessageType _msgType;
+    PsMessageType _msgType{ PsMessageType::UNKNOWN };
     std::vector<uint8_t> _data;
 };
 

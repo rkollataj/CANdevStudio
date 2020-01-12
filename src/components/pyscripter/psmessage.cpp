@@ -14,7 +14,7 @@ std::vector<uint8_t> PsMessage::toArray()
 PsMessage PsMessage::fromFrame(const QCanBusFrame& frame)
 {
     PsMessage msg;
-    msg.insert(PsMessageType::FRAME_MESSAGE);
+    msg.insert(PsMessageType::FRAME);
     msg.insert(frame.frameId());
     msg.insert(frame.payload().data(), frame.payload().size());
 
@@ -27,9 +27,9 @@ bool PsMessage::toFrame(uint32_t& id, std::vector<uint8_t>& payload)
 
     PsMessageType msgType = static_cast<PsMessageType>(reinterpret_cast<int32_t*>(_data.data())[0]);
 
-    if (msgType == PsMessageType::FRAME_MESSAGE) {
+    if (msgType == PsMessageType::FRAME) {
         id = reinterpret_cast<uint32_t*>(_data.data())[1];
-        payload.insert(payload.end(), _data.data()[8], _data.size() - 8);
+        payload.insert(payload.end(), _data.data() + 8, _data.data() + _data.size());
         ret = true;
     }
 
@@ -49,7 +49,7 @@ PsMessage PsMessage::fromData(const std::vector<uint8_t>& data)
 PsMessage PsMessage::createCloseMessage()
 {
     PsMessage msg;
-    msg.insert(PsMessageType::CLOSE_MESSAGE);
+    msg.insert(PsMessageType::CLOSE);
 
     return msg;
 }
