@@ -3,6 +3,7 @@
 
 #include "shmemmgr.h"
 #include <QProcess>
+#include <QThread>
 
 namespace CdsShMem {
 extern const std::string id;
@@ -10,18 +11,26 @@ extern const std::string id;
 
 class QCanBusFrame;
 
-class PythonBackend {
+class PythonBackend : public QThread {
+    Q_OBJECT
+
 public:
     PythonBackend();
 
-    bool start(const QString& scriptName);
+    void startScript(const QString& scriptName);
     void stop();
 
     void sendMsgFrame(const QCanBusFrame& frame, int32_t dir);
     void sendMsgClose();
 
+signals:
+    void sndFrame(const QCanBusFrame& frame);
+
 public:
     static ShMemMgr _appShm;
+
+private:
+    void run() override;
 
 private:
     QProcess _process;

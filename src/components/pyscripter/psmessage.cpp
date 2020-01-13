@@ -23,6 +23,17 @@ PsMessage PsMessage::fromFrame(const QCanBusFrame& frame, int32_t dir)
     return msg;
 }
 
+PsMessage PsMessage::fromFrame(uint32_t id, std::vector<uint8_t>& payload, int32_t dir)
+{
+    PsMessage msg;
+    msg.insert(PsMessageType::FRAME);
+    msg.insert(id);
+    msg.insert(dir);
+    msg.insert(payload.data(), payload.size());
+
+    return msg;
+}
+
 bool PsMessage::toFrame(uint32_t& id, std::vector<uint8_t>& payload, std::string& dir)
 {
     bool ret = false;

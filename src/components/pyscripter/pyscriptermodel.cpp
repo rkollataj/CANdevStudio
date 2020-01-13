@@ -34,6 +34,7 @@ PyScripterModel::PyScripterModel()
     _label->setAttribute(Qt::WA_TranslucentBackground);
 
     connect(this, &PyScripterModel::sndFrame, &_component, &PyScripter::rcvFrame);
+    connect(&_component, &PyScripter::sndFrame, this, &PyScripterModel::rcvFrame);
 }
 
 QtNodes::NodePainterDelegate* PyScripterModel::painterDelegate() const
@@ -56,12 +57,31 @@ NodeDataType PyScripterModel::dataType(PortType portType, PortIndex ndx) const
     return {};
 }
 
-std::shared_ptr<NodeData> PyScripterModel::outData(PortIndex)
+std::shared_ptr<NodeData> PyScripterModel::outData(PortIndex port)
 {
-    // example
-    // return std::make_shared<CanRawData>(_frame, _direction, _status);
+    std::shared_ptr<NodeData> ret;
 
-    return {};
+    if (port == 0) {
+        bool status = _rxQueue.try_dequeue(ret);
+
+        if (!status) {
+            cds_error("No data available on rx queue");
+            return {};
+        }
+    }
+
+    return ret;
+}
+
+void PyScripterModel::rcvFrame(const QCanBusFrame& frame)
+{
+    bool ret = _rxQueue.try_enqueue(std::make_shared<CanRawData>(frame));
+
+    if (ret) {
+        emit dataUpdated(0); // Data ready on port 0
+    } else {
+        cds_warn("Queue full. Frame dropped");
+    }
 }
 
 void PyScripterModel::setInData(std::shared_ptr<NodeData> nodeData, PortIndex ndx)

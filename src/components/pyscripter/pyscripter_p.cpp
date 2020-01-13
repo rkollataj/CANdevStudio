@@ -7,6 +7,8 @@ PyScripterPrivate::PyScripterPrivate(PyScripter* q, PyScripterCtx&& ctx)
     , q_ptr(q)
 {
     initProps();
+
+    connect(&_pyHandler, &PythonBackend::sndFrame, q, &PyScripter::sndFrame);
 }
 
 void PyScripterPrivate::initProps()

@@ -5,6 +5,7 @@
 #include "nodepainter.h"
 #include <QtCore/QObject>
 #include <pyscripter.h>
+#include <readerwriterqueue.h>
 
 using QtNodes::NodeData;
 using QtNodes::NodeDataType;
@@ -27,6 +28,7 @@ public:
     QtNodes::NodePainterDelegate* painterDelegate() const override;
 
 public slots:
+    void rcvFrame(const QCanBusFrame& frame);
 
 signals:
     void requestRedraw();
@@ -36,6 +38,8 @@ private:
     std::unique_ptr<NodePainter> _painter;
     const QString _rawType{ "RAW" };
     const QString _signalType{ "SIG" };
+    // 127 to use 4 blocks, 512 bytes each
+    moodycamel::ReaderWriterQueue<std::shared_ptr<NodeData>> _rxQueue{ 127 };
 };
 
 #endif // PYSCRIPTERMODEL_H

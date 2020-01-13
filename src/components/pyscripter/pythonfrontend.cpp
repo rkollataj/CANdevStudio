@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QThread>
 #include <cxxopts.hpp>
+#include <datamodeltypes/datadirection.h>
 #include <spdlog/fmt/fmt.h>
 
 namespace {
@@ -18,6 +19,8 @@ PyObject* PyInit_cdsCommModule(void)
 }
 } // namespace
 
+PythonFrontend* PythonFrontend::_thisWrapper;
+
 PythonFrontend::PythonFrontend(
     const std::string& shmId, const std::string& inQueueName, const std::string& outQueueName)
 {
@@ -25,10 +28,10 @@ PythonFrontend::PythonFrontend(
     _inQueue = _shm.openQueue(inQueueName);
     _outQueue = _shm.openQueue(outQueueName);
 
-    PythonFrontend& _thisWrapper = *this;
+    _thisWrapper = this;
 }
 
-PyObject* PythonFrontend::sndFrame(PyObject* self, PyObject* args)
+PyObject* PythonFrontend::sndFrame(PyObject*, PyObject* args)
 {
     uint32_t id;
     std::vector<uint8_t> payload;
@@ -50,11 +53,9 @@ PyObject* PythonFrontend::sndFrame(PyObject* self, PyObject* args)
         payload.push_back(PyLong_AsUnsignedLong(pItem));
     }
 
-    std::cout << "Send Frame " << id << ":";
-    for (uint8_t p : payload) {
-        std::cout << " " << std::hex << (uint32_t) p;
-    }
-    std::cout << "\n";
+    PsMessage msg = PsMessage::fromFrame(id, payload, Direction::TX);
+
+    _thisWrapper->_shm.writeQueue(_thisWrapper->_outQueue, msg.toArray());
 
     Py_INCREF(Py_None);
     return Py_None;
@@ -96,7 +97,12 @@ void PythonFrontend::run()
         }
     }
 
-    QApplication::quit();
+    QMetaObject::invokeMethod(QCoreApplication::instance(), "quit", Qt::QueuedConnection);
+}
+
+void PythonFrontend::sendBackendCloseMsg()
+{
+    _shm.writeQueue(_outQueue, PsMessage::createCloseMessage().toArray());
 }
 
 int main(int argc, char** argv)
@@ -169,12 +175,10 @@ app.exec_()
 )");
     PyGILState_Release(state);
 
+    pf.sendBackendCloseMsg();
     pf.wait();
-
-    std::cout << "bye bye!\n";
 
     PyMem_RawFree(program);
 
     return 0;
 }
-

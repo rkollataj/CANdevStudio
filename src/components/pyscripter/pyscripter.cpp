@@ -80,7 +80,7 @@ void PyScripter::startSimulation()
     Q_D(PyScripter);
 
     d->_simStarted = true;
-    d->_pyHandler.start("");
+    d->_pyHandler.startScript("");
 }
 
 void PyScripter::simBcastRcv(const QJsonObject& msg, const QVariant& param)

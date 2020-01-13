@@ -1,10 +1,10 @@
 #include "pythonbackend.h"
 #include "psmessage.h"
+#include <QCanBusFrame>
 #include <QCoreApplication>
 #include <QFileInfo>
 #include <QUuid>
 #include <log.h>
-#include <QCanBusFrame>
 
 namespace CdsShMem {
 const std::string id = QUuid::createUuid().toString().toStdString();
@@ -23,7 +23,7 @@ PythonBackend::PythonBackend()
     _inQueue = _shm.createQueue(_inQueueName.toStdString());
 }
 
-bool PythonBackend::start(const QString& scriptName)
+void PythonBackend::startScript(const QString& scriptName)
 {
     QStringList args;
     args << "-m" << CdsShMem::id.c_str();
@@ -41,12 +41,41 @@ bool PythonBackend::start(const QString& scriptName)
     _process.setProcessChannelMode(QProcess::ForwardedChannels);
     _process.start(frontendPath, args);
 
-    return false;
+    // Starts Thread
+    start();
+}
+
+void PythonBackend::run()
+{
+    PsMessage msg;
+
+    while (msg.type() != PsMessageType::CLOSE) {
+        std::vector<uint8_t> vec = _shm.readQueue(_inQueue);
+
+        msg = PsMessage::fromData(vec);
+
+        if (msg.type() == PsMessageType::FRAME) {
+            uint32_t id;
+            std::vector<uint8_t> payload;
+            std::string dir;
+
+            if (msg.toFrame(id, payload, dir)) {
+                QCanBusFrame frame;
+                frame.setFrameId(id);
+                frame.setPayload(QByteArray(reinterpret_cast<const char *>(payload.data()), payload.size()));
+
+                emit sndFrame(frame);
+            }
+        }
+    }
 }
 
 void PythonBackend::stop()
 {
     sendMsgClose();
+    // wait for backend "read" thread
+    wait();
+    // wait for frontend process
     _process.waitForFinished();
 }
 
@@ -59,4 +88,3 @@ void PythonBackend::sendMsgClose()
 {
     _shm.writeQueue(_outQueue, PsMessage::createCloseMessage().toArray());
 }
-

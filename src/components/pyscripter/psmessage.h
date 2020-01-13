@@ -17,6 +17,7 @@ public:
 
 public:
     static PsMessage fromFrame(const QCanBusFrame& frame, int32_t dir);
+    static PsMessage fromFrame(uint32_t id, std::vector<uint8_t>& payload, int32_t dir);
     static PsMessage fromData(const std::vector<uint8_t>& data);
     static PsMessage createCloseMessage();
 
