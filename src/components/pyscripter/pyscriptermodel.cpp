@@ -10,14 +10,14 @@ namespace {
 const std::map<PortType, std::vector<NodeDataType>> portMappings = {
     { PortType::In,
         {
-            { CanRawData{}.type() },
-            { CanSignalModel{}.type() }
+           CanRawData{}.type(),
+           CanSignalModel{}.type()
         }
     },
     { PortType::Out,
         {
-            { CanRawData{}.type() },
-            { CanSignalModel{}.type() }
+            CanRawData{}.type(),
+            CanSignalModel{}.type()
         }
     }
 };
