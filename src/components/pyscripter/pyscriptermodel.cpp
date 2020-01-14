@@ -35,6 +35,7 @@ PyScripterModel::PyScripterModel()
 
     connect(this, &PyScripterModel::sndFrame, &_component, &PyScripter::rcvFrame);
     connect(&_component, &PyScripter::sndFrame, this, &PyScripterModel::rcvFrame);
+    connect(this, &PyScripterModel::sndSignal, &_component, &PyScripter::rcvSignal);
 }
 
 QtNodes::NodePainterDelegate* PyScripterModel::painterDelegate() const
@@ -62,7 +63,14 @@ std::shared_ptr<NodeData> PyScripterModel::outData(PortIndex port)
     std::shared_ptr<NodeData> ret;
 
     if (port == 0) {
-        bool status = _rxQueue.try_dequeue(ret);
+        bool status = _rawQueue.try_dequeue(ret);
+
+        if (!status) {
+            cds_error("No data available on rx queue");
+            return {};
+        }
+    } else if (port == 1) {
+        bool status = _sigQueue.try_dequeue(ret);
 
         if (!status) {
             cds_error("No data available on rx queue");
@@ -75,14 +83,26 @@ std::shared_ptr<NodeData> PyScripterModel::outData(PortIndex port)
 
 void PyScripterModel::rcvFrame(const QCanBusFrame& frame)
 {
-    bool ret = _rxQueue.try_enqueue(std::make_shared<CanRawData>(frame));
+    bool ret = _rawQueue.try_enqueue(std::make_shared<CanRawData>(frame));
 
     if (ret) {
         emit dataUpdated(0); // Data ready on port 0
     } else {
-        cds_warn("Queue full. Frame dropped");
+        cds_warn("Raw queue full. Frame dropped");
     }
 }
+
+void PyScripterModel::rcvSignal(const QString& name, const QVariant& val)
+{
+    bool ret = _sigQueue.try_enqueue(std::make_shared<CanSignalModel>(name, val));
+
+    if (ret) {
+        emit dataUpdated(1);
+    } else {
+        cds_warn("Sig queue full. Frame dropped");
+    }
+}
+
 
 void PyScripterModel::setInData(std::shared_ptr<NodeData> nodeData, PortIndex ndx)
 {
@@ -93,6 +113,9 @@ void PyScripterModel::setInData(std::shared_ptr<NodeData> nodeData, PortIndex nd
                 assert(nullptr != d);
                 emit sndFrame(d->frame(), d->direction(), d->status());
             } else if (_signalType == portMappings.at(PortType::In)[ndx].name) {
+                auto d = std::dynamic_pointer_cast<CanSignalModel>(nodeData);
+                assert(nullptr != d);
+                emit sndSignal(d->name(), d->value(), d->direction());
             } else {
             }
         } else {

@@ -38,12 +38,14 @@ signals:
     void mainWidgetDockToggled(QWidget* widget) override;
     void simBcastSnd(const QJsonObject& msg, const QVariant& param = QVariant()) override;
     void sndFrame(const QCanBusFrame& frame);
+    void sndSignal(const QString& name, const QVariant& val);
 
 public slots:
     void stopSimulation() override;
     void startSimulation() override;
     void simBcastRcv(const QJsonObject& msg, const QVariant& param) override;
     void rcvFrame(const QCanBusFrame& frame, Direction direction, bool status);
+    void rcvSignal(const QString& name, const QVariant& val, Direction direction);
 
 private:
     QScopedPointer<PyScripterPrivate> d_ptr;

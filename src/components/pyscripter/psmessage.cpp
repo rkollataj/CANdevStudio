@@ -34,35 +34,19 @@ PsMessage PsMessage::fromFrame(uint32_t id, std::vector<uint8_t>& payload, int32
     return msg;
 }
 
-bool PsMessage::toFrame(uint32_t& id, std::vector<uint8_t>& payload, std::string& dir)
+PsMessage PsMessage::fromSignal(uint32_t id, const std::string& name, double value, int32_t dir)
 {
-    bool ret = false;
+    int32_t padding_4B = 0;
 
-    PsMessageType msgType = static_cast<PsMessageType>(reinterpret_cast<int32_t*>(_data.data())[0]);
+    PsMessage msg;
+    msg.insert(PsMessageType::SIGNAL);
+    msg.insert(id);
+    msg.insert(dir);
+    msg.insert(padding_4B);
+    msg.insert(value);
+    msg.insert(name.data(), name.length());
 
-    if (msgType == PsMessageType::FRAME) {
-        id = reinterpret_cast<uint32_t*>(_data.data())[1];
-        int32_t dirInt = reinterpret_cast<int32_t*>(_data.data())[2];
-
-        switch (dirInt) {
-            case Direction::RX:
-                dir = "RX";
-                break;
-
-            case Direction::TX:
-                dir = "TX";
-                break;
-
-            default:
-                dir = "Unknown";
-                break;
-        }
-
-        payload.insert(payload.end(), _data.data() + 12, _data.data() + _data.size());
-        ret = true;
-    }
-
-    return ret;
+    return msg;
 }
 
 PsMessage PsMessage::fromData(const std::vector<uint8_t>& data)
@@ -83,3 +67,58 @@ PsMessage PsMessage::createCloseMessage()
     return msg;
 }
 
+bool PsMessage::toFrame(uint32_t& id, std::vector<uint8_t>& payload, std::string& dir)
+{
+    bool ret = false;
+
+    PsMessageType msgType = static_cast<PsMessageType>(reinterpret_cast<int32_t*>(_data.data())[0]);
+
+    if (msgType == PsMessageType::FRAME) {
+        id = reinterpret_cast<uint32_t*>(_data.data())[1];
+        dir = dirToStr(reinterpret_cast<int32_t*>(_data.data())[2]);
+
+        payload.insert(payload.end(), _data.data() + 12, _data.data() + _data.size());
+        ret = true;
+    }
+
+    return ret;
+}
+
+bool PsMessage::toSignal(uint32_t& id, std::string& name, double& value, std::string& dir)
+{
+    bool ret = false;
+
+    PsMessageType msgType = static_cast<PsMessageType>(reinterpret_cast<int32_t*>(_data.data())[0]);
+
+    if (msgType == PsMessageType::SIGNAL) {
+         id = reinterpret_cast<uint32_t*>(_data.data())[1];
+         dir = dirToStr(reinterpret_cast<int32_t*>(_data.data())[2]);
+         value = reinterpret_cast<double*>(_data.data())[2];
+
+         name.insert(name.end(), _data.data() + 24, _data.data() + _data.size());
+         ret = true;
+    }
+
+    return ret;
+}
+
+std::string PsMessage::dirToStr(int32_t dir)
+{
+    std::string ret;
+
+    switch (dir) {
+    case Direction::RX:
+        ret = "RX";
+        break;
+
+    case Direction::TX:
+        ret = "TX";
+        break;
+
+    default:
+        ret = "Unknown";
+        break;
+    }
+
+    return ret;
+}

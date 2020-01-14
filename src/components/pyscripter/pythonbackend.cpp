@@ -79,6 +79,11 @@ void PythonBackend::stop()
     _process.waitForFinished();
 }
 
+void PythonBackend::sendMsgSignal(uint32_t id, const QString& name, double value, int32_t dir)
+{
+    _shm.writeQueue(_outQueue, PsMessage::fromSignal(id, name.toStdString(), value, dir).toArray());
+}
+
 void PythonBackend::sendMsgFrame(const QCanBusFrame& frame, int32_t dir)
 {
     _shm.writeQueue(_outQueue, PsMessage::fromFrame(frame, dir).toArray());

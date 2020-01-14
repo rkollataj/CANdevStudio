@@ -29,17 +29,20 @@ public:
 
 public slots:
     void rcvFrame(const QCanBusFrame& frame);
+    void rcvSignal(const QString& name, const QVariant& val);
 
 signals:
     void requestRedraw();
     void sndFrame(const QCanBusFrame& frame, Direction const direction, bool status);
+    void sndSignal(const QString& name, const QVariant& val, Direction direction);
 
 private:
     std::unique_ptr<NodePainter> _painter;
     const QString _rawType{ "RAW" };
     const QString _signalType{ "SIG" };
     // 127 to use 4 blocks, 512 bytes each
-    moodycamel::ReaderWriterQueue<std::shared_ptr<NodeData>> _rxQueue{ 127 };
+    moodycamel::ReaderWriterQueue<std::shared_ptr<NodeData>> _rawQueue{ 127 };
+    moodycamel::ReaderWriterQueue<std::shared_ptr<NodeData>> _sigQueue{ 127 };
 };
 
 #endif // PYSCRIPTERMODEL_H

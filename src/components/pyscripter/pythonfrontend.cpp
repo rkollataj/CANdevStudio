@@ -8,7 +8,13 @@
 #include <spdlog/fmt/fmt.h>
 
 namespace {
-PyMethodDef cdsCommMethods[] = { { "sndFrame", PythonFrontend::sndFrame, METH_VARARGS, "" }, { NULL, NULL, 0, NULL } };
+
+// clang-format off
+PyMethodDef cdsCommMethods[] = {
+    { "sndFrame", PythonFrontend::sndFrame, METH_VARARGS, "" },
+    { NULL, NULL, 0, NULL }
+};
+// clang-format on
 
 PyModuleDef cdsCommModule
     = { PyModuleDef_HEAD_INIT, "cdsCommModule", NULL, -1, cdsCommMethods, NULL, NULL, NULL, NULL };
@@ -94,6 +100,21 @@ void PythonFrontend::run()
 
                 PyGILState_Release(state);
             }
+        } else if (msg.type() == PsMessageType::SIGNAL) {
+            uint32_t id;
+            std::string dir;
+            double value;
+            std::string name;
+
+            if (msg.toSignal(id, name, value, dir)) {
+                std::string frameLine = fmt::format("cdsComm.rcvSignal.emit({}, '{}', {}, '{}')", id, name, value, dir);
+
+                auto state = PyGILState_Ensure();
+
+                PyRun_SimpleString(frameLine.c_str());
+
+                PyGILState_Release(state);
+            }
         }
     }
 
@@ -155,6 +176,7 @@ from PySide2.QtWidgets import QApplication
 
 class CdsComm(QObject):
     rcvFrame = Signal(int, list, str)
+    rcvSignal = Signal(int, str, float, str)
 
     def sndFrame(self, id, payload):
         cdsCommModule.sndFrame(id, payload)
@@ -169,8 +191,8 @@ cdsComm = CdsComm()
 
     auto state = PyGILState_Ensure();
     PyRun_SimpleString(R"(
-#cdsComm.rcvFrame.connect(lambda id, payload, dir: print("Frame: ", id, " ", payload, " ", dir))
-cdsComm.rcvFrame.connect(cdsComm.sndFrame)
+cdsComm.rcvSignal.connect(lambda id, name, val, dir: print("Signal: ", id, " ", name, " ", val, " ", dir))
+#cdsComm.rcvFrame.connect(cdsComm.sndFrame)
 app.exec_()
 )");
     PyGILState_Release(state);

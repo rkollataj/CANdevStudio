@@ -21,10 +21,12 @@ public:
     void stop();
 
     void sendMsgFrame(const QCanBusFrame& frame, int32_t dir);
+    void sendMsgSignal(uint32_t id, const QString& name, double value, int32_t dir);
     void sendMsgClose();
 
 signals:
     void sndFrame(const QCanBusFrame& frame);
+    void sndSignal(const QString& name, const QVariant& val);
 
 public:
     static ShMemMgr _appShm;

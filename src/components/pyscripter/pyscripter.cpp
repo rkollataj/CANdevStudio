@@ -98,3 +98,22 @@ void PyScripter::rcvFrame(const QCanBusFrame& frame, Direction direction, bool s
     }
 }
 
+void PyScripter::rcvSignal(const QString& name, const QVariant& val, Direction direction)
+{
+    Q_D(PyScripter);
+
+    if (d->_simStarted) {
+        auto nameSplit = name.split('_');
+
+        if (nameSplit.size() < 2) {
+            cds_error("Wrong signal name: {}", name.toStdString());
+            return;
+        }
+
+        uint32_t id = nameSplit[0].toUInt(nullptr, 16);
+
+        QString sigName = name.mid(name.indexOf("_") + 1);
+
+        d->_pyHandler.sendMsgSignal(id, sigName, val.toDouble(), direction);
+    }
+}
