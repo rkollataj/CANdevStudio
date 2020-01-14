@@ -35,8 +35,8 @@ TEST_CASE("nPorts", "[pyscripterModel]")
 {
     PyScripterModel cm;
 
-    REQUIRE(cm.nPorts(QtNodes::PortType::Out) == 0);
-    REQUIRE(cm.nPorts(QtNodes::PortType::In) == 0);
+    REQUIRE(cm.nPorts(QtNodes::PortType::Out) == 2);
+    REQUIRE(cm.nPorts(QtNodes::PortType::In) == 2);
 }
 
 TEST_CASE("dataType", "[pyscripterModel]")
