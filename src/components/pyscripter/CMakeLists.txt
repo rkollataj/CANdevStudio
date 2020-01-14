@@ -16,7 +16,12 @@ if(WIN32)
     link_directories(${BOOST_LIBRARYDIR})
 endif()
 
-find_package(PythonLibs 3)
+if("${CDS_FORCE_PYTHON_VERSION}" STREQUAL "")
+    find_package(PythonLibs 3 REQUIRED)
+else()
+    # Workaroud for MinGW in Appveyor
+    find_package(PythonLibs EXACT ${CDS_FORCE_PYTHON_VERSION} REQUIRED)
+endif()
 
 include_directories(${PYTHON_INCLUDE_DIRS})
 
