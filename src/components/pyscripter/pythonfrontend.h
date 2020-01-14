@@ -14,6 +14,7 @@ class PythonFrontend : public QThread {
 public:
     PythonFrontend(const std::string& shmId, const std::string& inQueueName, const std::string& outQueueName);
     static PyObject* sndFrame(PyObject* self, PyObject* args);
+    static PyObject* sndSignal(PyObject* self, PyObject* args);
     void sendBackendCloseMsg();
 
 private:

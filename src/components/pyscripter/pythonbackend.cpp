@@ -4,6 +4,7 @@
 #include <QCoreApplication>
 #include <QFileInfo>
 #include <QUuid>
+#include <QVariant>
 #include <log.h>
 
 namespace CdsShMem {
@@ -62,9 +63,20 @@ void PythonBackend::run()
             if (msg.toFrame(id, payload, dir)) {
                 QCanBusFrame frame;
                 frame.setFrameId(id);
-                frame.setPayload(QByteArray(reinterpret_cast<const char *>(payload.data()), payload.size()));
+                frame.setPayload(QByteArray(reinterpret_cast<const char*>(payload.data()), payload.size()));
 
                 emit sndFrame(frame);
+            }
+        } else if (msg.type() == PsMessageType::SIGNAL) {
+            uint32_t id;
+            std::string name;
+            double val;
+            std::string dir;
+
+            if (msg.toSignal(id, name, val, dir)) {
+                QString signal = fmt::format("0x{:03x}_{}", id, name).c_str();
+
+                emit sndSignal(signal, val);
             }
         }
     }

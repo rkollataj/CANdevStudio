@@ -36,6 +36,7 @@ PyScripterModel::PyScripterModel()
     connect(this, &PyScripterModel::sndFrame, &_component, &PyScripter::rcvFrame);
     connect(&_component, &PyScripter::sndFrame, this, &PyScripterModel::rcvFrame);
     connect(this, &PyScripterModel::sndSignal, &_component, &PyScripter::rcvSignal);
+    connect(&_component, &PyScripter::sndSignal, this, &PyScripterModel::rcvSignal);
 }
 
 QtNodes::NodePainterDelegate* PyScripterModel::painterDelegate() const

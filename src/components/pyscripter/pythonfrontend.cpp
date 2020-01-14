@@ -12,6 +12,7 @@ namespace {
 // clang-format off
 PyMethodDef cdsCommMethods[] = {
     { "sndFrame", PythonFrontend::sndFrame, METH_VARARGS, "" },
+    { "sndSignal", PythonFrontend::sndSignal, METH_VARARGS, "" },
     { NULL, NULL, 0, NULL }
 };
 // clang-format on
@@ -60,6 +61,25 @@ PyObject* PythonFrontend::sndFrame(PyObject*, PyObject* args)
     }
 
     PsMessage msg = PsMessage::fromFrame(id, payload, Direction::TX);
+
+    _thisWrapper->_shm.writeQueue(_thisWrapper->_outQueue, msg.toArray());
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+PyObject* PythonFrontend::sndSignal(PyObject*, PyObject* args)
+{
+    uint32_t id;
+    const char* name;
+    double val;
+
+    if (!PyArg_ParseTuple(args, "Isd", &id, &name, &val)) {
+        PyErr_SetString(PyExc_TypeError, "expected parameters (uint, list).");
+        return nullptr;
+    }
+
+    PsMessage msg = PsMessage::fromSignal(id, name, val);
 
     _thisWrapper->_shm.writeQueue(_thisWrapper->_outQueue, msg.toArray());
 
@@ -181,6 +201,9 @@ class CdsComm(QObject):
     def sndFrame(self, id, payload):
         cdsCommModule.sndFrame(id, payload)
 
+    def sndSignal(self, id, name, val):
+        cdsCommModule.sndSignal(id, name, val)
+
 app = QApplication(sys.argv)
 cdsComm = CdsComm()
 
@@ -191,8 +214,9 @@ cdsComm = CdsComm()
 
     auto state = PyGILState_Ensure();
     PyRun_SimpleString(R"(
-cdsComm.rcvSignal.connect(lambda id, name, val, dir: print("Signal: ", id, " ", name, " ", val, " ", dir))
+#cdsComm.rcvSignal.connect(lambda id, name, val, dir: print("Signal: ", id, " ", name, " ", val, " ", dir))
 #cdsComm.rcvFrame.connect(cdsComm.sndFrame)
+cdsComm.rcvSignal.connect(cdsComm.sndSignal)
 app.exec_()
 )");
     PyGILState_Release(state);

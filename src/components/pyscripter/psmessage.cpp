@@ -1,6 +1,5 @@
 #include "psmessage.h"
 #include <QCanBusFrame>
-#include <datamodeltypes/datadirection.h>
 
 PsMessageType PsMessage::type()
 {
@@ -91,12 +90,12 @@ bool PsMessage::toSignal(uint32_t& id, std::string& name, double& value, std::st
     PsMessageType msgType = static_cast<PsMessageType>(reinterpret_cast<int32_t*>(_data.data())[0]);
 
     if (msgType == PsMessageType::SIGNAL) {
-         id = reinterpret_cast<uint32_t*>(_data.data())[1];
-         dir = dirToStr(reinterpret_cast<int32_t*>(_data.data())[2]);
-         value = reinterpret_cast<double*>(_data.data())[2];
+        id = reinterpret_cast<uint32_t*>(_data.data())[1];
+        dir = dirToStr(reinterpret_cast<int32_t*>(_data.data())[2]);
+        value = reinterpret_cast<double*>(_data.data())[2];
 
-         name.insert(name.end(), _data.data() + 24, _data.data() + _data.size());
-         ret = true;
+        name.insert(name.end(), _data.data() + 24, _data.data() + _data.size());
+        ret = true;
     }
 
     return ret;

@@ -2,6 +2,7 @@
 #define __PSMESSAGE_H
 
 #include <cstdint>
+#include <datamodeltypes/datadirection.h>
 #include <string>
 #include <vector>
 
@@ -19,7 +20,7 @@ public:
 public:
     static PsMessage fromFrame(const QCanBusFrame& frame, int32_t dir);
     static PsMessage fromFrame(uint32_t id, std::vector<uint8_t>& payload, int32_t dir);
-    static PsMessage fromSignal(uint32_t id, const std::string& name, double value, int32_t dir);
+    static PsMessage fromSignal(uint32_t id, const std::string& name, double value, int32_t dir = Direction::TX);
     static PsMessage fromData(const std::vector<uint8_t>& data);
     static PsMessage createCloseMessage();
 
