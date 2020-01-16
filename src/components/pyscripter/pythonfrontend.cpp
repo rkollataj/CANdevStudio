@@ -11,31 +11,44 @@ namespace {
 
 // clang-format off
 PyMethodDef cdsCommMethods[] = {
+    { "init", PythonFrontend::init, METH_VARARGS, "" },
     { "sndFrame", PythonFrontend::sndFrame, METH_VARARGS, "" },
     { "sndSignal", PythonFrontend::sndSignal, METH_VARARGS, "" },
-    { NULL, NULL, 0, NULL }
+    { nullptr, nullptr, 0, nullptr }
 };
 // clang-format on
 
 PyModuleDef cdsCommModule
-    = { PyModuleDef_HEAD_INIT, "cdsCommModule", NULL, -1, cdsCommMethods, NULL, NULL, NULL, NULL };
+    = { PyModuleDef_HEAD_INIT, "cdsCommModule", nullptr, -1, cdsCommMethods, nullptr, nullptr, nullptr, nullptr };
 
 PyObject* PyInit_cdsCommModule(void)
 {
     return PyModule_Create(&cdsCommModule);
 }
+
+std::unique_ptr<PythonFrontend> pf;
+
 } // namespace
 
-PythonFrontend* PythonFrontend::_thisWrapper;
+std::string PythonFrontend::shmId;
+std::string PythonFrontend::inQueue;
+std::string PythonFrontend::outQueue;
+std::string PythonFrontend::scriptName;
 
-PythonFrontend::PythonFrontend(
-    const std::string& shmId, const std::string& inQueueName, const std::string& outQueueName)
+PythonFrontend::PythonFrontend()
 {
-    _shm.openShm(shmId);
-    _inQueue = _shm.openQueue(inQueueName);
-    _outQueue = _shm.openQueue(outQueueName);
+    _shm.openShm(PythonFrontend::shmId);
+    _inQueue = _shm.openQueue(PythonFrontend::inQueue);
+    _outQueue = _shm.openQueue(PythonFrontend::outQueue);
+}
 
-    _thisWrapper = this;
+PyObject* PythonFrontend::init(PyObject*, PyObject*)
+{
+    pf = std::make_unique<PythonFrontend>();
+    pf->start();
+
+    Py_INCREF(Py_None);
+    return Py_None;
 }
 
 PyObject* PythonFrontend::sndFrame(PyObject*, PyObject* args)
@@ -45,7 +58,7 @@ PyObject* PythonFrontend::sndFrame(PyObject*, PyObject* args)
     PyObject* pList;
 
     if (!PyArg_ParseTuple(args, "IO!", &id, &PyList_Type, &pList)) {
-        PyErr_SetString(PyExc_TypeError, "expected parameters (uint, list).");
+        PyErr_SetString(PyExc_TypeError, "expected parameters (uint, list[uint]).");
         return nullptr;
     }
 
@@ -62,7 +75,7 @@ PyObject* PythonFrontend::sndFrame(PyObject*, PyObject* args)
 
     PsMessage msg = PsMessage::fromFrame(id, payload, Direction::TX);
 
-    _thisWrapper->_shm.writeQueue(_thisWrapper->_outQueue, msg.toArray());
+    pf->_shm.writeQueue(pf->_outQueue, msg.toArray());
 
     Py_INCREF(Py_None);
     return Py_None;
@@ -75,13 +88,13 @@ PyObject* PythonFrontend::sndSignal(PyObject*, PyObject* args)
     double val;
 
     if (!PyArg_ParseTuple(args, "Isd", &id, &name, &val)) {
-        PyErr_SetString(PyExc_TypeError, "expected parameters (uint, list).");
+        PyErr_SetString(PyExc_TypeError, "expected parameters (uint, str, float).");
         return nullptr;
     }
 
     PsMessage msg = PsMessage::fromSignal(id, name, val);
 
-    _thisWrapper->_shm.writeQueue(_thisWrapper->_outQueue, msg.toArray());
+    pf->_shm.writeQueue(pf->_outQueue, msg.toArray());
 
     Py_INCREF(Py_None);
     return Py_None;
@@ -167,13 +180,13 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    auto shmId = result["m"].as<std::string>();
-    auto inQueue = result["i"].as<std::string>();
-    auto outQueue = result["o"].as<std::string>();
-    auto scriptName = result["s"].as<std::string>();
+    PythonFrontend::shmId = result["m"].as<std::string>();
+    PythonFrontend::inQueue = result["i"].as<std::string>();
+    PythonFrontend::outQueue = result["o"].as<std::string>();
+    PythonFrontend::scriptName = result["s"].as<std::string>();
 
-    wchar_t* program = Py_DecodeLocale(argv[0], NULL);
-    if (program == NULL) {
+    wchar_t* program = Py_DecodeLocale(argv[0], nullptr);
+    if (program == nullptr) {
         fprintf(stderr, "Fatal error: cannot decode argv[0]\n");
         exit(1);
     }
@@ -191,8 +204,7 @@ int main(int argc, char** argv)
     PyRun_SimpleString(R"(
 import sys
 import cdsCommModule
-from PySide2.QtCore import QObject, Signal, Slot
-from PySide2.QtWidgets import QApplication
+from PySide2.QtCore import QObject, Signal
 
 class CdsComm(QObject):
     rcvFrame = Signal(int, list, str)
@@ -204,25 +216,28 @@ class CdsComm(QObject):
     def sndSignal(self, id, name, val):
         cdsCommModule.sndSignal(id, name, val)
 
-app = QApplication(sys.argv)
-cdsComm = CdsComm()
-
+    def init(self):
+        cdsCommModule.init()
 )");
-
-    PythonFrontend pf(shmId, inQueue, outQueue);
-    pf.start();
 
     auto state = PyGILState_Ensure();
     PyRun_SimpleString(R"(
-#cdsComm.rcvSignal.connect(lambda id, name, val, dir: print("Signal: ", id, " ", name, " ", val, " ", dir))
-#cdsComm.rcvFrame.connect(cdsComm.sndFrame)
+from PySide2.QtWidgets import QApplication
+
+app = QApplication(sys.argv)
+
+cdsComm = CdsComm()
+cdsComm.init();
+
+# Loopback setup
+cdsComm.rcvFrame.connect(cdsComm.sndFrame)
 cdsComm.rcvSignal.connect(cdsComm.sndSignal)
 app.exec_()
 )");
     PyGILState_Release(state);
 
-    pf.sendBackendCloseMsg();
-    pf.wait();
+    pf->sendBackendCloseMsg();
+    pf->wait();
 
     PyMem_RawFree(program);
 
