@@ -4,6 +4,7 @@
 
 PyScripterPrivate::PyScripterPrivate(PyScripter* q, PyScripterCtx&& ctx)
     : _ctx(std::move(ctx))
+    , _settings("CANdevStudio-PyScripter")
     , q_ptr(q)
 {
     initProps();
@@ -17,6 +18,9 @@ void PyScripterPrivate::initProps()
     for (const auto& p : _supportedProps) {
         _props[ComponentInterface::propertyName(p)];
     }
+
+    _props[_editorProperty] = _settings.value(_editorProperty).toString();
+    _props[_editorArgsProperty] = _settings.value(_editorArgsProperty).toString();
 }
 
 ComponentInterface::ComponentProperties PyScripterPrivate::getSupportedProperties() const

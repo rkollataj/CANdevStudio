@@ -8,11 +8,11 @@
 #include "ui_projectconfig.h"
 #include <QMenu>
 #include <QtWidgets/QPushButton>
+#include <bcastmsgs.h>
 #include <log.h>
 #include <modelvisitor.h> // apply_model_visitor
 #include <nodes/Node>
 #include <propertyeditordialog.h>
-#include <bcastmsgs.h>
 
 #include "componentinterface.h"
 #include "plugins.hpp"
@@ -153,7 +153,18 @@ public:
         if (component.mainWidget() != nullptr) {
             openWidget(node);
         } else {
-            if (!_simStarted) {
+            bool triggered = false;
+
+            for (auto& a : component.getCustomMenu()) {
+                if (a->isEnabled()) {
+                    a->trigger();
+                    triggered = true;
+                }
+
+                delete a;
+            }
+
+            if (!_simStarted && !triggered) {
                 _pcInt.openProperties(node);
             }
         }
@@ -184,8 +195,18 @@ public:
             contextMenu.addAction(&actionProperties);
             contextMenu.setDefaultAction(&actionOpen);
         } else {
+            for (auto& a : component.getCustomMenu()) {
+                contextMenu.addAction(a);
+            }
+
             contextMenu.addAction(&actionProperties);
-            contextMenu.setDefaultAction(&actionProperties);
+
+            for (auto& a : contextMenu.actions()) {
+                if (contextMenu.defaultAction() == nullptr && a->isEnabled()) {
+                    contextMenu.setDefaultAction(a);
+                    break;
+                }
+            }
         }
 
         contextMenu.addAction(&actionDelete);

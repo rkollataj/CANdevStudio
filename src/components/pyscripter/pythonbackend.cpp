@@ -3,6 +3,7 @@
 #include <QCanBusFrame>
 #include <QCoreApplication>
 #include <QFileInfo>
+#include <QStandardPaths>
 #include <QUuid>
 #include <QVariant>
 #include <log.h>
@@ -31,16 +32,13 @@ void PythonBackend::startScript(const QString& scriptName)
     // backednd out is frontend in
     args << "-i" << _outQueueName;
     args << "-o" << _inQueueName;
-    args << "-s"
-         << "fake_script";
+    args << "-s" << scriptName;
 
     // CANdevStudio-python shall be located in the same folder as main executable
-    QFileInfo fi(QCoreApplication::applicationFilePath());
-    auto frontendPath = QCoreApplication::applicationDirPath()
-        + fi.completeBaseName().replace("CANdevStudio", "/CANdevStudio-python");
+    QString cdsp = QStandardPaths::findExecutable("CANdevStudio-python", { QCoreApplication::applicationDirPath() });
 
     _process.setProcessChannelMode(QProcess::ForwardedChannels);
-    _process.start(frontendPath, args);
+    _process.start(cdsp, args);
 
     // Starts Thread
     start();

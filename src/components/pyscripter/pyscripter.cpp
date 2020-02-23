@@ -1,6 +1,9 @@
 #include "pyscripter.h"
 #include "pyscripter_p.h"
 #include "pythonbackend.h"
+#include <QDesktopServices>
+#include <QFileInfo>
+#include <QProcess>
 #include <confighelpers.h>
 #include <datamodeltypes/datadirection.h>
 #include <log.h>
@@ -40,6 +43,9 @@ void PyScripter::setConfig(const QWidget& qobject)
     Q_D(PyScripter);
 
     configHelpers::setQConfig(qobject, getSupportedProperties(), d->_props);
+
+    d->_settings.setValue(d->_editorProperty, d->_props[d->_editorProperty]);
+    d->_settings.setValue(d->_editorArgsProperty, d->_props[d->_editorArgsProperty]);
 }
 
 QJsonObject PyScripter::getConfig() const
@@ -116,4 +122,44 @@ void PyScripter::rcvSignal(const QString& name, const QVariant& val, Direction d
 
         d->_pyHandler.sendMsgSignal(id, sigName, val.toDouble(), direction);
     }
+}
+
+std::vector<QAction*> PyScripter::getCustomMenu()
+{
+    Q_D(PyScripter);
+
+    // Ownership to be handled by caller
+    QAction* editAction = new QAction("Edit script");
+
+    QFileInfo scriptFi(d->_props[d->_scriptProperty].toString());
+    QFileInfo editorFi(d->_props[d->_editorProperty].toString());
+    QString editorArgs = d->_props[d->_editorArgsProperty].toString();
+
+    if (scriptFi.exists()) {
+        if (editorFi.exists()) {
+            connect(editAction, &QAction::triggered, [scriptFi, editorFi, editorArgs] {
+                QStringList args;
+                if (editorArgs.length() > 0) {
+                    for (auto& a : editorArgs.split(" ")) {
+                        args << a;
+                    }
+                }
+                args << scriptFi.absoluteFilePath();
+
+                cds_error("{}", args.join("_").toStdString());
+
+                QProcess p;
+                p.startDetached(editorFi.absoluteFilePath(), args);
+            });
+        } else {
+            connect(editAction, &QAction::triggered,
+                [scriptFi] { QDesktopServices::openUrl(QUrl::fromLocalFile(scriptFi.absoluteFilePath())); });
+        }
+    } else {
+        editAction->setEnabled(false);
+    }
+
+    std::vector<QAction*> ret = { editAction };
+
+    return ret;
 }

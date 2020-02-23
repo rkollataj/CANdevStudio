@@ -61,10 +61,6 @@ struct PropertyFieldPath : public PropertyFieldText {
             QString path;
             QString currPath = QFileInfo(_le->text()).path();
 
-            if (currPath.length() == 0) {
-                currPath = QDir::homePath();
-            }
-
             if (_folderOnly) {
                 path = QFileDialog::getExistingDirectory(
                     this, "Select directory", currPath, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
@@ -73,6 +69,10 @@ struct PropertyFieldPath : public PropertyFieldText {
             }
 
             if (path.length() > 0) {
+                if (_folderOnly) {
+                    path += QDir::separator();
+                }
+
                 _le->setText(path);
             }
         });

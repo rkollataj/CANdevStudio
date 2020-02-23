@@ -3,7 +3,9 @@
 
 #include "pyscripter.h"
 #include "pythonbackend.h"
+#include <QSettings>
 #include <memory>
+#include <propertyfields.h>
 
 class PyScripter;
 
@@ -25,17 +27,24 @@ public:
     PyScripterCtx _ctx;
     std::map<QString, QVariant> _props;
     PythonBackend _pyHandler;
+    const QString _nameProperty = "name";
+    const QString _scriptProperty = "script";
+    const QString _editorProperty = "editor";
+    const QString _editorArgsProperty = "editor args";
+    QSettings _settings;
 
 private:
     PyScripter* q_ptr;
-    const QString _nameProperty = "name";
 
     // workaround for clang 3.5
     using cf = ComponentInterface::CustomEditFieldCbk;
 
     // clang-format off
     ComponentInterface::ComponentProperties _supportedProps = {
-            std::make_tuple(_nameProperty, QVariant::String, true, cf(nullptr))
+            std::make_tuple(_nameProperty, QVariant::String, true, cf(nullptr)),
+            std::make_tuple(_scriptProperty, QVariant::String, true, cf([] { return new PropertyFieldPath; } )),
+            std::make_tuple(_editorProperty, QVariant::String, true, cf([] { return new PropertyFieldPath; } )),
+            std::make_tuple(_editorArgsProperty, QVariant::String, true, cf(nullptr))
     };
     // clang-format on
 };

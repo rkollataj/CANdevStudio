@@ -1,6 +1,7 @@
 #ifndef __COMPONENTINTERFACE_H
 #define __COMPONENTINTERFACE_H
 
+#include <QAction>
 #include <QVariant>
 #include <QtCore/QJsonObject>
 #include <functional>
@@ -106,6 +107,11 @@ struct ComponentInterface {
 
     virtual void simBcastSnd(const QJsonObject& msg, const QVariant& param = QVariant()) = 0;
     virtual void simBcastRcv(const QJsonObject& msg, const QVariant& param) = 0;
+
+    virtual std::vector<QAction*> getCustomMenu()
+    {
+        return {};
+    }
 };
 
 #endif /* !__COMPONENTINTERFACE_H */

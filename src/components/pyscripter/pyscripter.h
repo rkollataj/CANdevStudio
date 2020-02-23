@@ -1,6 +1,7 @@
 #ifndef PYSCRIPTER_H
 #define PYSCRIPTER_H
 
+#include <QAction>
 #include <QWidget>
 #include <QtCore/QScopedPointer>
 #include <common/context.h>
@@ -33,6 +34,7 @@ public:
     void configChanged() override;
     bool mainWidgetDocked() const override;
     ComponentInterface::ComponentProperties getSupportedProperties() const override;
+    std::vector<QAction*> getCustomMenu() override;
 
 signals:
     void mainWidgetDockToggled(QWidget* widget) override;
