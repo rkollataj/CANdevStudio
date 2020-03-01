@@ -82,7 +82,12 @@ void PythonBackend::run()
 
 void PythonBackend::stop()
 {
-    sendMsgClose();
+    if (_process.state() == QProcess::NotRunning) {
+        sendIntMsgClose();
+    } else {
+        sendMsgClose();
+    }
+
     // wait for backend "read" thread
     wait();
     // wait for frontend process
@@ -97,6 +102,11 @@ void PythonBackend::sendMsgSignal(uint32_t id, const QString& name, double value
 void PythonBackend::sendMsgFrame(const QCanBusFrame& frame, int32_t dir)
 {
     _shm.writeQueue(_outQueue, PsMessage::fromFrame(frame, dir).toArray());
+}
+
+void PythonBackend::sendIntMsgClose()
+{
+    _shm.writeQueue(_inQueue, PsMessage::createCloseMessage().toArray());
 }
 
 void PythonBackend::sendMsgClose()

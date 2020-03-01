@@ -2,6 +2,7 @@
 #include "psmessage.h"
 #include <Python.h>
 #include <QApplication>
+#include <QFileInfo>
 #include <QThread>
 #include <cxxopts.hpp>
 #include <datamodeltypes/datadirection.h>
@@ -188,7 +189,13 @@ int main(int argc, char** argv)
     wchar_t* program = Py_DecodeLocale(argv[0], nullptr);
     if (program == nullptr) {
         fprintf(stderr, "Fatal error: cannot decode argv[0]\n");
-        exit(1);
+        return -1;
+    }
+
+    QFileInfo qfi(PythonFrontend::scriptName.c_str());
+    if (!qfi.exists()) {
+        fprintf(stderr, "Fatal error: Script '%s' does not exist\n", PythonFrontend::scriptName.c_str());
+        return -1;
     }
 
     // Pass argv[0] to the Python interpreter
@@ -220,20 +227,13 @@ class CdsComm(QObject):
         cdsCommModule.init()
 )");
 
+    QFile scriptFile(qfi.filePath());
+    scriptFile.open(QIODevice::ReadOnly);
+    std::string script = scriptFile.readAll().toStdString();
+    scriptFile.close();
+
     auto state = PyGILState_Ensure();
-    PyRun_SimpleString(R"(
-from PySide2.QtWidgets import QApplication
-
-app = QApplication(sys.argv)
-
-cdsComm = CdsComm()
-cdsComm.init();
-
-# Loopback setup
-cdsComm.rcvFrame.connect(cdsComm.sndFrame)
-cdsComm.rcvSignal.connect(cdsComm.sndSignal)
-app.exec_()
-)");
+    PyRun_SimpleString(script.c_str());
     PyGILState_Release(state);
 
     pf->sendBackendCloseMsg();

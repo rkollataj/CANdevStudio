@@ -22,6 +22,7 @@ public:
 
     void sendMsgFrame(const QCanBusFrame& frame, int32_t dir);
     void sendMsgSignal(uint32_t id, const QString& name, double value, int32_t dir);
+    void sendIntMsgClose();
     void sendMsgClose();
 
 signals:
