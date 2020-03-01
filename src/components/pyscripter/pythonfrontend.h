@@ -5,6 +5,7 @@
 #include <QObject>
 #include <iostream>
 #include <QThread>
+#include <atomic>
 
 typedef struct _object PyObject;
 
@@ -26,6 +27,7 @@ public:
     static std::string inQueue;
     static std::string outQueue;
     static std::string scriptName;
+    std::atomic_bool _pyRunning;
 
 private:
     ShMemMgr _shm;

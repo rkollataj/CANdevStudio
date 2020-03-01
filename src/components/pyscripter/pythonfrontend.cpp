@@ -41,12 +41,11 @@ PythonFrontend::PythonFrontend()
     _shm.openShm(PythonFrontend::shmId);
     _inQueue = _shm.openQueue(PythonFrontend::inQueue);
     _outQueue = _shm.openQueue(PythonFrontend::outQueue);
+    _pyRunning = false;
 }
 
 PyObject* PythonFrontend::init(PyObject*, PyObject*)
 {
-    pf = std::make_unique<PythonFrontend>();
-    pf->start();
 
     Py_INCREF(Py_None);
     return Py_None;
@@ -152,7 +151,9 @@ void PythonFrontend::run()
         }
     }
 
-    QMetaObject::invokeMethod(QCoreApplication::instance(), "quit", Qt::QueuedConnection);
+    if (_pyRunning) {
+        QMetaObject::invokeMethod(QCoreApplication::instance(), "quit", Qt::QueuedConnection);
+    }
 }
 
 void PythonFrontend::sendBackendCloseMsg()
@@ -198,6 +199,9 @@ int main(int argc, char** argv)
         return -1;
     }
 
+    pf = std::make_unique<PythonFrontend>();
+    pf->start();
+
     // Pass argv[0] to the Python interpreter
     Py_SetProgramName(program);
 
@@ -233,7 +237,14 @@ class CdsComm(QObject):
     scriptFile.close();
 
     auto state = PyGILState_Ensure();
-    PyRun_SimpleString(script.c_str());
+
+    PyCompilerFlags flags = _PyCompilerFlags_INIT;
+    // To make sure that execution of script will not terminate process on error
+    flags.cf_flags = Py_InspectFlag;
+    pf->_pyRunning = true;
+    PyRun_SimpleStringFlags(script.c_str(), &flags);
+    pf->_pyRunning = false;
+
     PyGILState_Release(state);
 
     pf->sendBackendCloseMsg();
