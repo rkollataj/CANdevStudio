@@ -12,7 +12,6 @@ namespace {
 
 // clang-format off
 PyMethodDef cdsCommMethods[] = {
-    { "init", PythonFrontend::init, METH_VARARGS, "" },
     { "sndFrame", PythonFrontend::sndFrame, METH_VARARGS, "" },
     { "sndSignal", PythonFrontend::sndSignal, METH_VARARGS, "" },
     { nullptr, nullptr, 0, nullptr }
@@ -31,24 +30,12 @@ std::unique_ptr<PythonFrontend> pf;
 
 } // namespace
 
-std::string PythonFrontend::shmId;
-std::string PythonFrontend::inQueue;
-std::string PythonFrontend::outQueue;
-std::string PythonFrontend::scriptName;
-
-PythonFrontend::PythonFrontend()
+PythonFrontend::PythonFrontend(const std::string& shmId, const std::string& inQueue, const std::string& outQueue)
 {
-    _shm.openShm(PythonFrontend::shmId);
-    _inQueue = _shm.openQueue(PythonFrontend::inQueue);
-    _outQueue = _shm.openQueue(PythonFrontend::outQueue);
+    _shm.openShm(shmId);
+    _inQueue = _shm.openQueue(inQueue);
+    _outQueue = _shm.openQueue(outQueue);
     _pyRunning = false;
-}
-
-PyObject* PythonFrontend::init(PyObject*, PyObject*)
-{
-
-    Py_INCREF(Py_None);
-    return Py_None;
 }
 
 PyObject* PythonFrontend::sndFrame(PyObject*, PyObject* args)
@@ -182,10 +169,10 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    PythonFrontend::shmId = result["m"].as<std::string>();
-    PythonFrontend::inQueue = result["i"].as<std::string>();
-    PythonFrontend::outQueue = result["o"].as<std::string>();
-    PythonFrontend::scriptName = result["s"].as<std::string>();
+    auto shmId = result["m"].as<std::string>();
+    auto inQueue = result["i"].as<std::string>();
+    auto outQueue = result["o"].as<std::string>();
+    auto scriptName = result["s"].as<std::string>();
 
     wchar_t* program = Py_DecodeLocale(argv[0], nullptr);
     if (program == nullptr) {
@@ -193,13 +180,13 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    QFileInfo qfi(PythonFrontend::scriptName.c_str());
+    QFileInfo qfi(scriptName.c_str());
     if (!qfi.exists()) {
-        fprintf(stderr, "Fatal error: Script '%s' does not exist\n", PythonFrontend::scriptName.c_str());
+        fprintf(stderr, "Fatal error: Script '%s' does not exist\n", scriptName.c_str());
         return -1;
     }
 
-    pf = std::make_unique<PythonFrontend>();
+    pf = std::make_unique<PythonFrontend>(shmId, inQueue, outQueue);
     pf->start();
 
     // Pass argv[0] to the Python interpreter

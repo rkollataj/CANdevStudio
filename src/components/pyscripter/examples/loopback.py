@@ -7,7 +7,6 @@ app = QApplication(sys.argv)
 # Create and initialize CANdevStudio internal communication module
 # Note that this component does not exist outside of CANdevStudio
 cdsComm = CdsComm()
-cdsComm.init();
 
 # Loopback setup
 cdsComm.rcvFrame.connect(cdsComm.sndFrame)
